@@ -42,9 +42,9 @@ body {
   display: flex;
   flex-direction: column;
   background-color: $color-white;
-  max-width: $breakpoint-md; // Mobile-first constraint
+  max-width: $breakpoint-md; // 모바일 최우선 제약 (데스크톱에서 모바일 뷰 유지)
   margin: 0 auto;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05); // Slight shadow for mobile container feel on desktop
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05); // 데스크톱 뷰에서 모바일 컨테이너 느낌을 위한 그림자
 }
 
 a {
@@ -81,7 +81,7 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.2;
 }
 
-// BEM utilities
+// BEM 방식의 유틸리티 클래스
 .container {
   @include container;
 }

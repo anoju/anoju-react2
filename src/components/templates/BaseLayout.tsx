@@ -20,7 +20,7 @@ const BaseLayout: React.FC<LayoutProps> = ({ title, children }) => {
         <div className="container header__inner">
           <h1 className="header__logo">anoju</h1>
           <nav className="header__nav">
-            {/* Navigation items will be added later */}
+            {/* 네비게이션 아이템은 추후 추가 예정 */}
           </nav>
         </div>
       </header>

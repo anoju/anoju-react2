@@ -1,1 +1,106 @@
-node_modules
+# 로그 (Logs)
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# 진단 리포트 (Diagnostic reports)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# 런타임 데이터 (Runtime data)
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# jscoverage/JSCover에 의해 생성된 라이브러리 (Instrumented libs)
+lib-cov
+
+# istanbul 등을 위한 커버리지 디렉토리 (Coverage directory)
+coverage
+*.lcov
+
+# nyc 데이터
+.nyc_output
+
+# Grunt 임시 저장소
+.grunt
+
+# Bower 의존성 폴더
+bower_components
+
+# node-waf 설정
+.lock-wscript
+
+# 빌드 결과물 (Compiled binary addons)
+build/Release
+
+# 의존성 폴더 (Dependency directories)
+node_modules/
+jspm_packages/
+
+# Snowpack 의존성 폴더
+web_modules/
+
+# TypeScript 선언 캐시
+typings/
+
+# TypeScript 캐시
+*.tsbuildinfo
+
+# 선택적 npm 캐시
+.npm
+
+# 선택적 eslint 캐시
+.eslintcache
+
+# 선택적 stylelint 캐시
+.stylelintcache
+
+# Microbundle 캐시
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# 선택적 REPL 히스토리
+.node_repl_history
+
+# npm pack 결과물
+*.tgz
+
+# Yarn v2 관련
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# IDE 관련 - VSCode
+.vscode/
+
+# IDE 관련 - IntelliJ
+.idea
+
+# 운영체제 관련 (OS)
+.DS_Store
+Thumbs.db
+
+# 빌드 결과물 (Build)
+dist
+dist-ssr
+*.local
+
+# 환경 변수 파일 (Environment variables)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Vite 설정 관련
+*.pcss
+*.map

@@ -1,7 +1,7 @@
-// Pretendard Font Import (CDN or Local)
+// Pretendard 폰트 임포트 (CDN 사용)
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
 
-// Colors
+// 색상 정의 (Color Palette)
 $color-primary: #3b82f6;
 $color-secondary: #6366f1;
 $color-accent: #f59e0b;
@@ -12,7 +12,7 @@ $color-warning: #f59e0b;
 $color-white: #ffffff;
 $color-black: #000000;
 
-// Grays (Slate/Zinc blend)
+// 무채색 정의 (Grays)
 $color-gray-50: #f8fafc;
 $color-gray-100: #f1f5f9;
 $color-gray-200: #e2e8f0;
@@ -24,10 +24,10 @@ $color-gray-700: #334155;
 $color-gray-800: #1e293b;
 $color-gray-900: #0f172a;
 
-// Typography
+// 타이포그래피 (Typography)
 $font-family-base: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
 
-// Spacing
+// 간격 정의 (Spacing)
 $spacing-xs: 0.25rem;
 $spacing-sm: 0.5rem;
 $spacing-md: 1rem;
@@ -35,12 +35,12 @@ $spacing-lg: 1.5rem;
 $spacing-xl: 2rem;
 $spacing-xxl: 3rem;
 
-// Breakpoints
+// 미디어 쿼리 중단점 (Breakpoints)
 $breakpoint-sm: 640px;
 $breakpoint-md: 768px;
 $breakpoint-lg: 1024px;
 $breakpoint-xl: 1280px;
 
-// Layout
+// 레이아웃 구성 요소 (Layout)
 $header-height: 60px;
 $safe-area-bottom: env(safe-area-inset-bottom);

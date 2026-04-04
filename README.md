@@ -39,3 +39,27 @@ npm run dev
 # 프로덕션 빌드
 npm run build
 ```
+
+## 🛠 VS Code 권장 설정
+일관된 코드 스타일과 린트 자동 수정을 위해 아래 설정을 `.vscode/settings.json`에 적용하여 사용하시길 권장합니다.
+
+```json
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "always"
+  },
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "files.associations": {
+    "*.scss": "scss"
+  },
+  "scss.lint.unknownAtRules": "ignore"
+}
+```
