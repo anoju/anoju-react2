@@ -1,0 +1,47 @@
+@use "../../styles/base/variables" as *;
+@use "../../styles/base/mixins" as *;
+
+.layout {
+  @include flex(column);
+  min-height: 100vh;
+}
+
+.header {
+  @include shadow-sm;
+  background-color: $color-white;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: $header-height;
+
+  &__inner {
+    @include flex(row, space-between, center);
+    height: 100%;
+  }
+
+  &__logo {
+    font-size: $spacing-lg;
+    color: $color-primary;
+    letter-spacing: -0.02em;
+  }
+}
+
+.main {
+  flex: 1;
+  width: 100%;
+}
+
+.footer {
+  background-color: $color-gray-100;
+  padding: $spacing-xl 0;
+  margin-top: auto;
+
+  &__inner {
+    @include flex(row, center, center);
+  }
+
+  &__copy {
+    color: $color-gray-500;
+    font-size: $spacing-sm;
+  }
+}

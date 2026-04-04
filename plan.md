@@ -7,21 +7,35 @@
 * **패키지 매니저:** `npm` (또는 프로젝트에 맞는 패키지 매니저 사용)
 * **모바일 최우선 (Mobile First):** 모바일 기기 사용자 경험을 최우선으로 설계하며, 반응형 디자인 반영.
 
-## 2. 스타일링 및 UI 아키텍처 (Styling & UI Architecture)
-프로젝트 규정 및 SCSS 활용을 통한 고도화된 스타일 환경을 만듭니다.
-* **방식:** **SCSS** 기반. 전처리기를 활용한 믹스인, 변수 활용 및 **Source Map** 적용(개발 시 디버깅 용이).
-* **클래스 네이밍 규칙:** **BEM (Block Element Modifier)** 방식을 엄격하게 적용 (예: `.header-container__nav-item--active`).
-* **디자인 시스템:**
-  * `styles/_variables.scss`, `styles/_mixins.scss` 등을 통해 디자인 토큰화.
-  * **웹 폰트:** **Pretendard**를 기본 폰트로 설정하여 선명하고 현대적인 가독성 제공.
-* **컴포넌트 설계:** **Atomic Design** 패턴 지향 (Atoms, Molecules, Organisms 등)으로 재사용성 극대화.
+## 2. 언어 및 주석 규칙 (Language & Commenting)
+* **기본 언어:** 프로젝트 내의 모든 설명, README, 코드 내 주석은 반드시 **한글(Korean)**로 작성합니다.
+* **문태:** 명확하고 일관된 한글 가이드를 제공합니다.
 
-## 3. 코드 품질 및 컨벤션 (Code Quality & Convention)
-안정적이고 최적화된 코드 작성을 위한 기반입니다.
-* **ESLint & Prettier:**
-  * **수정/추가된 파일에 대해서만** 린트 및 포맷팅 적용 (불필요한 전체 변경 방지).
-* **변수 및 상호작용 식별자 네이밍:** **카멜 케이스(camelCase)** 적용.
-* **웹 접근성(A11y):** 시맨틱 HTML, `alt` 속성, `aria-` 속성을 준수하여 보편적 설계 적용.
+## 3. 파일 및 폴더 구조화 (File & Folder Organization)
+모든 시스템은 파일 증가에 대비하여 체계적으로 폴더화하여 관리합니다.
+
+### 3.1 스타일링 (SCSS)
+* **구조화:** `src/styles` 아래 기능별 서브 폴더를 생성하여 관리합니다.
+  * `/base`: 리셋, 전역 변수, 믹스인
+  * `/layout`: 헤더, 푸터, 레이아웃 관련 스타일
+  * `/components`: 개별 컴포넌트용 SCSS
+* **방식:** **SCSS** 기반 및 **Source Map** 적용.
+* **네이밍:** **BEM (Block Element Modifier)** 방식 엄격 준수.
+* **최신 문법 준수 (Sass Modules & Modernization):**
+  * `@import` 대신 **`@use`** 및 **`@forward`** 사용을 필수화합니다.
+  * 나눗셈 연산 시 `/` 연산자 대신 **`math.div()`** 사용을 권장합니다. (이를 위해 `@use "sass:math"` 필요)
+  * 내장 함수 사용 시 관련 모듈(`sass:color`, `sass:map` 등)을 명시적으로 불러와 사용하며, 레거시 함수(`lighten()`, `darken()` 등) 대신 최신 함수(`color.adjust()`, `color.scale()` 등)를 지향합니다.
+  * 변수 및 믹스인 참조 시 네임스페이스를 명시하여 전역 오염을 방지합니다.
+
+### 3.2 에셋 (Assets)
+* **이미지 관리:** `src/assets/images` 폴더를 생성하고 용도별로 하위 폴더를 두어 관리합니다.
+  * `/icons`: 아이콘 이미지
+  * `/logos`: 로고 및 브랜드 이미지
+  * `/contents`: 게시글 및 페이지 콘텐츠용 이미지
+* **기타 에셋:** 폰트(`assets/fonts`), 데이터 파일 등도 각각 폴더별로 구분합니다.
+
+### 3.3 컴포넌트 아키텍처
+* **Atomic Design:** `Atoms`, `Molecules`, `Organisms`, `Templates` 폴더 구조를 유지하며, 각 컴포넌트는 전용 폴더 내에 `index.tsx`와 `*.scss`를 함께 두어 캡슐화합니다.
 
 ## 4. 주요 기능 정의 (Key Features)
 ### 4.1 회원 기능 (Membership)
@@ -37,30 +51,29 @@
   * 게시글/댓글 작성: 회원 전용.
   * 수정 및 삭제(숨김): 작성 본인만 가능.
 
-### 4.3 콘텐츠 관리 (Content Management)
-* 소개 페이지 등 단순 콘텐츠 화면 제공.
-* 관리 용이성을 위해 콘텐츠 페이지들을 규칙적으로 분리 및 구조화(예: `/pages/content/` 폴더 내 관리).
-
-## 5. 폴더 구조 설계 (Directory Structure - Atomic Design)
+## 5. 상세 폴더 구조 기초 (Detailed Directory Structure)
 ```text
 /src
- ├── /assets       # 이미지, 폰트(Pretendard) 등 정적 리소스
- ├── /components   # Atomic Design 기반 컴포넌트
- │   ├── /atoms    # 최소 단위 요소 (Button, Input 등)
- │   ├── /molecules # 결합 단위 (FormField, SearchBar 등)
- │   ├── /organisms # 독립적 기능 단위 (Header, PostCard 등)
- │   └── /templates # 레이아웃 구성 템플릿
- ├── /pages        # 라운트별 페이지 컴포넌트
- │   └── /static   # 정적 콘텐츠 페이지 (소개 등)
- ├── /hooks        # 커스텀 훅 (메모리 해제 로직 필수)
- ├── /styles       # 전역 SCSS, variables, mixins (BEM 구조)
+ ├── /assets       # 이미지 및 에셋 관리
+ │   ├── /images   # 이미지 전용 (icons, logos, contents 하부 폴더)
+ │   └── /fonts    # Pretendard 등 폰트
+ ├── /components   # Atomic Design 기반 컴포넌트 폴더화
+ │   ├── /atoms    # /Button/index.tsx, /Button/Button.scss 등
+ │   ├── /molecules
+ │   ├── /organisms
+ │   └── /templates
+ ├── /pages        # 페이지 컴포넌트
+ │   └── /static   # 정적 콘텐츠 (소개 등)
+ ├── /hooks        # 커스텀 훅 (추후 폴더별 분리 가능)
+ ├── /styles       # SCSS 체계화 폴더 (/base, /layout, /components)
  ├── /utils        # 공통 함수 및 헬퍼
  ├── /types        # TypeScript 전역 및 공통 타입 정의
- ├── App.tsx       # 라우터 및 글로벌 레이아웃 설정
- └── main.tsx      # 리액트 렌더링 엔트리 포인트
+ ├── App.tsx       # 라우터 설정
+ └── main.tsx      # 엔트리 포인트
 ```
 
 ## 6. 개발 원칙 및 최적화 전략 (Development Principles)
-* **레이아웃 커스터마이징:** 페이지별로 타이틀, 메타 정보 등을 개별 설정할 수 있도록 Layout Wrapper 레이어 강화.
-* **방어적 프로그래밍:** Optional Chaining(`?.`), Nullish Coalescing(`??`), `try-catch` 예외 처리 철저.
-* **메모리 최적화:** 컴포넌트 언마운트 시 이벤트 리스너 및 타이머 클린업 필수.
+* **방어적 프로그래밍:** Optional Chaining, Nullish Coalescing, `try-catch` 필수 적용.
+* **메모리 최적화:** `useEffect` 클린업(이벤트/타이머 해제) 필수.
+* **웹 접근성:** 시맨틱 HTML5 및 `aria-` 속성 준수.
+* **린트(Lint):** 작성/수정한 파일에 대해서만 선별적으로 적용.
