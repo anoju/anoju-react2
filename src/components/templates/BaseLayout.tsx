@@ -1,6 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import ThemeToggle from '../atoms/ThemeToggle';
+import { ThemeToggle } from '../atoms';
 import './BaseLayout.scss';
 
 interface LayoutProps {

@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { motion, type Variants } from 'framer-motion';
-import BaseLayout from './components/templates/BaseLayout';
-import Button from './components/atoms/Button';
+import { BaseLayout, Button } from '@/components';
 
 // Animation variants
 const containerVariants: Variants = {
