@@ -1,4 +1,4 @@
-# React 프로젝트 구성 계획 (Project Setup Plan)
+# Anoju 프로젝트 구성 계획 (Project Setup Plan)
 
 ## 1. 프로젝트 초기화 (Project Initialization)
 가장 빠르고 모던한 개발 경험을 제공하는 빌드 툴을 사용합니다.
@@ -7,11 +7,25 @@
 * **패키지 매니저:** `npm` (또는 프로젝트에 맞는 패키지 매니저 사용)
 * **모바일 최우선 (Mobile First):** 모바일 기기 사용자 경험을 최우선으로 설계하며, 반응형 디자인 반영.
 
-## 2. 언어 및 주석 규칙 (Language & Commenting)
-* **기본 언어:** 프로젝트 내의 모든 설명, README, 코드 내 주석은 반드시 **한글(Korean)**로 작성합니다.
-* **문태:** 명확하고 일관된 한글 가이드를 제공합니다.
+## 2. 디자인 컨셉 (Design Concept)
+'Anoju'라는 브랜드명에 맞춰 사용자를 포근하게 감싸안는 느낌과 현대적인 사용성을 결합합니다.
+*   **방향**: **Warm Minimalism** (감성적 여백) + **Modern Essential** (직관적 기능성).
+*   **포인트 컬러**: **퍼플(Purple/Violet)** 계열을 시그니처 컬러로 사용합니다.
+*   **시각적 특징**: 부드러운 곡선(Rounded Corners), 적절한 여백, 글래스모피즘(Glassmorphism) 효과 활용.
 
-## 3. 파일 및 폴더 구조화 (File & Folder Organization)
+## 3. 테마 지원 (Theme Management)
+사용자 환경에 최적화된 다크/라이트 모드를 완벽하게 지원합니다.
+*   **모드 구성**:
+    *   **라이트(Light)**: 따뜻한 화이트/베이지 톤의 배경.
+    *   **다크(Dark)**: 깊이 있는 차콜/네이비 톤의 배경.
+    *   **시스템 설정(Auto)**: OS 설정에 따라 자동으로 전환 (기본값).
+*   **기술 구현**: `data-theme` 속성 또는 CSS 변수(Custom Properties)를 활용하여 실시간 테마 전환 대응.
+
+## 4. 언어 및 주석 규칙 (Language & Commenting)
+* **기본 언어:** 프로젝트 내의 모든 설명, README, 코드 내 주석은 반드시 **한글(Korean)**로 작성합니다.
+* **표현 방식:** 명확하고 일관된 한글 가이드를 제공합니다.
+
+## 5. 파일 및 폴더 구조화 (File & Folder Organization)
 모든 시스템은 파일 증가에 대비하여 체계적으로 폴더화하여 관리합니다.
 
 ### 3.1 스타일링 (SCSS)
@@ -37,7 +51,7 @@
 ### 3.3 컴포넌트 아키텍처
 * **Atomic Design:** `Atoms`, `Molecules`, `Organisms`, `Templates` 폴더 구조를 유지하며, 각 컴포넌트는 전용 폴더 내에 `index.tsx`와 `*.scss`를 함께 두어 캡슐화합니다.
 
-## 4. 주요 기능 정의 (Key Features)
+## 6. 주요 기능 정의 (Key Features)
 ### 4.1 회원 기능 (Membership)
 * **회원가입:** 이메일 회원가입(이메일 인증 필수) 및 SNS 간편 회원가입 연동.
 * **인증 관리:** 아이디 찾기, 비밀번호 찾기(재설정) 기능 제공.
@@ -51,7 +65,7 @@
   * 게시글/댓글 작성: 회원 전용.
   * 수정 및 삭제(숨김): 작성 본인만 가능.
 
-## 5. 상세 폴더 구조 기초 (Detailed Directory Structure)
+## 7. 상세 폴더 구조 기초 (Detailed Directory Structure)
 ```text
 /src
  ├── /assets       # 이미지 및 에셋 관리
@@ -72,7 +86,7 @@
  └── main.tsx      # 엔트리 포인트
 ```
 
-## 6. 개발 원칙 및 최적화 전략 (Development Principles)
+## 8. 개발 원칙 및 최적화 전략 (Development Principles)
 * **방어적 프로그래밍:** Optional Chaining, Nullish Coalescing, `try-catch` 필수 적용.
 * **메모리 최적화:** `useEffect` 클린업(이벤트/타이머 해제) 필수.
 * **웹 접근성:** 시맨틱 HTML5 및 `aria-` 속성 준수.
