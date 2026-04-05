@@ -1,0 +1,81 @@
+@use "@/assets/styles/base" as *;
+
+.about-page {
+  padding: $spacing-4xl $spacing-lg;
+  max-width: 800px;
+  margin: 0 auto;
+
+  &__title {
+    @include text-style($typo-h2);
+    margin-bottom: $spacing-xl;
+    font-weight: 800;
+    
+    span {
+      color: var(--color-primary);
+    }
+  }
+
+  &__main-desc {
+    @include text-style($typo-body-lg);
+    color: var(--color-text-dimmed);
+    margin-bottom: $spacing-3xl;
+  }
+
+  &__value-box {
+    padding: $spacing-3xl;
+    background-color: var(--color-primary-soft);
+    border-radius: var(--radius-lg);
+    margin-bottom: $spacing-3xl;
+
+    h3 {
+      @include text-style($typo-h3);
+      margin-bottom: $spacing-lg;
+      color: var(--color-primary);
+      font-weight: 700;
+    }
+  }
+
+  &__value-list {
+    @include flex($direction: column, $gap: $spacing-lg);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  &__value-item {
+    display: flex;
+    gap: $spacing-md;
+
+    .icon {
+      @include text-style($typo-h3);
+    }
+
+    .content {
+      strong {
+        display: block;
+        margin-bottom: $spacing-2xs;
+        color: var(--color-text);
+        @include text-style($typo-body-lg);
+        font-weight: 700;
+      }
+      p {
+        @include text-style($typo-body-md);
+        color: var(--color-text-dimmed);
+      }
+    }
+  }
+}
+
+@include mobile {
+  .about-page {
+    padding: $spacing-3xl $spacing-lg;
+    
+    &__title {
+        @include text-style($typo-h3);
+    }
+    
+    &__value-box {
+        padding: $spacing-lg;
+    }
+  }
+}

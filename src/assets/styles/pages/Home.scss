@@ -1,0 +1,79 @@
+@use "@/assets/styles/base" as *;
+
+.home-hero {
+  padding: $spacing-4xl $spacing-lg;
+  text-align: center;
+  background: linear-gradient(180deg, var(--color-surface) 0%, var(--color-bg) 100%);
+  
+  &__subtitle {
+    color: var(--color-primary);
+    font-weight: 700;
+    @include text-style($typo-body-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    display: block;
+    margin-bottom: $spacing-md;
+  }
+
+  &__title {
+    @include text-style($typo-h1);
+    margin-bottom: $spacing-lg;
+    font-weight: 800;
+    color: var(--color-text);
+
+    span {
+      color: var(--color-primary);
+    }
+  }
+
+  &__desc {
+    @include text-style($typo-body-lg);
+    color: var(--color-text-dimmed);
+    max-width: 520px;
+    margin: 0 auto $spacing-2xl;
+  }
+
+  &__actions {
+    @include flex($justify: center, $gap: $spacing-md);
+  }
+}
+
+.home-content {
+  padding: $spacing-3xl $spacing-lg;
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: $spacing-xl;
+  }
+
+  &__card {
+    padding: $spacing-xl;
+    background-color: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--color-border);
+
+    h3 {
+      @include text-style($typo-h4);
+      margin-bottom: $spacing-md;
+      color: var(--color-text);
+      font-weight: 700;
+    }
+
+    p {
+      @include text-style($typo-body-md);
+      color: var(--color-text-dimmed);
+    }
+  }
+}
+
+@include mobile {
+  .home-hero {
+    padding: $spacing-3xl $spacing-lg;
+    
+    &__title {
+        @include text-style($typo-h2);
+    }
+  }
+}

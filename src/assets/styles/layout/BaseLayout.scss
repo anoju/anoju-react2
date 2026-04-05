@@ -1,5 +1,4 @@
-@use "../../styles/base/variables" as *;
-@use "../../styles/base/mixins" as *;
+@use "@/assets/styles/base" as *;
 
 .layout {
   display: flex;
@@ -18,7 +17,6 @@
   box-shadow: var(--shadow-sm);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  padding: 0 $spacing-md;
 
   &__inner {
     display: flex;
@@ -26,17 +24,25 @@
     justify-content: space-between;
     align-items: center;
     height: 100%;
-    max-width: $breakpoint-md; // 컨테이너 제약
+    max-width: $breakpoint-md; // 컨테이네 제약
     margin: 0 auto;
     width: 100%;
+    padding: 0 $spacing-md;
   }
 
   &__logo {
+    text-decoration: none;
     font-size: 1.5rem;
     font-weight: 800;
     color: var(--color-primary);
     letter-spacing: -0.04em;
     font-family: inherit;
+    transition: var(--transition-base);
+
+    &:hover {
+      opacity: 0.8;
+      filter: brightness(1.1);
+    }
     
     &::first-letter {
       font-size: 1.8rem;
@@ -46,7 +52,35 @@
   &__nav {
     display: flex;
     align-items: center;
+    gap: $spacing-lg;
+  }
+
+  &__menu {
+    display: flex;
+    align-items: center;
     gap: $spacing-md;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__link {
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-text-dimmed);
+    padding: $spacing-xs $spacing-sm;
+    transition: var(--transition-base);
+    border-radius: var(--radius-sm);
+
+    &:hover {
+      color: var(--color-primary);
+      background-color: var(--color-primary-soft);
+    }
+
+    &--active {
+      color: var(--color-primary);
+    }
   }
 }
 
@@ -74,4 +108,14 @@
     font-size: 0.8rem;
     letter-spacing: 0.02em;
   }
+}
+
+@media (max-width: $breakpoint-sm) {
+    .header__link {
+        font-size: 0.85rem;
+        padding: $spacing-xs 0.4rem;
+    }
+    .header__nav {
+        gap: $spacing-sm;
+    }
 }

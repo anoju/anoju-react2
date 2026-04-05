@@ -1,7 +1,8 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
+import { Link, NavLink } from 'react-router-dom';
 import { ThemeToggle } from '../atoms';
-import './BaseLayout.scss';
+import '@/assets/styles/layout/BaseLayout.scss';
 
 interface LayoutProps {
   title?: string;
@@ -19,8 +20,13 @@ const BaseLayout: React.FC<LayoutProps> = ({ title, children }) => {
       
       <header className="header">
         <div className="header__inner">
-          <h1 className="header__logo">Anoju</h1>
+          <Link to="/" className="header__logo">Anoju</Link>
           <nav className="header__nav">
+            <ul className="header__menu">
+              <li><NavLink to="/" className={({ isActive }) => `header__link ${isActive ? 'header__link--active' : ''}`}>홈</NavLink></li>
+              <li><NavLink to="/gallery" className={({ isActive }) => `header__link ${isActive ? 'header__link--active' : ''}`}>갤러리</NavLink></li>
+              <li><NavLink to="/about" className={({ isActive }) => `header__link ${isActive ? 'header__link--active' : ''}`}>소개</NavLink></li>
+            </ul>
             <ThemeToggle />
           </nav>
         </div>

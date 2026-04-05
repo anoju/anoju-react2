@@ -1,0 +1,56 @@
+@use "@/assets/styles/base" as *;
+
+.gallery-page {
+  padding: $spacing-3xl $spacing-lg;
+
+  &__header {
+    margin-bottom: $spacing-3xl;
+    text-align: center;
+    
+    h2 {
+      @include text-style($typo-h1);
+      font-weight: 800;
+      margin-bottom: $spacing-md;
+    }
+
+    p {
+      @include text-style($typo-body-md);
+      color: var(--color-text-dimmed);
+    }
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: $spacing-lg;
+  }
+
+  &__item {
+    aspect-ratio: 1 / 1;
+    background-color: var(--color-surface-soft);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--color-border);
+    @include flex($justify: center, $align: center);
+    color: var(--color-primary);
+    @include text-style($typo-h2);
+    transition: var(--transition-base);
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--color-primary);
+    }
+  }
+}
+
+@include mobile {
+  .gallery-page {
+    padding: $spacing-xl $spacing-lg;
+    
+    &__header h2 {
+        @include text-style($typo-h3);
+    }
+  }
+}

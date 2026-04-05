@@ -21,12 +21,12 @@
 ## 4. 파일 및 폴더 체계화 (File & Folder Organization)
 모든 개발 작업 시 파일의 증가에 대비하여 체계적으로 폴더를 구성하고 분류합니다.
 
-* **이미지 에셋:** `src/assets/images` 폴더를 기본으로 하며, 하위에 `icons`, `logos`, `contents` 등 용도별 폴더를 생성하여 관리합니다.
-* **SCSS 스타일:** `src/styles` 아래 전역/기본 스타일(`base`), 레이아웃 스타일(`layout`), 개별 컴포넌트 스타일(`components`) 폴더를 두어 계층 구조를 유지합니다.
+* **이미지 및 스타일 에셋:** `src/assets/images`, `src/assets/styles` 폴더를 기본으로 하며, 스타일 하위에 `base`(기본), `layout`(레이아웃), `pages`(페이지별) 폴더를 생성하여 관리합니다.
 * **컴포넌트:** 아토믹 디자인 패턴에 따라 `atoms`, `molecules`, `organisms`, `templates` 폴더 내에 각 컴포넌트별 전용 폴더(index.tsx, *.scss)를 생성하여 캡슐화합니다.
 
 ## 5. 스타일링 컨벤션 (Styling Convention)
-* **SCSS & BEM:** 모든 스타일은 SCSS로 작성하며, BEM(Block Element Modifier) 네이밍 방식을 엄격히 준수합니다.
+* **SCSS & BEM:** 모든 스타일은 SCSS로 작성하며, BEM(Block Element Modifier) 네이밍 방식을 엄격히 준수합니다. **컴포넌트 내 인라인 스타일(`style={{...}}`)은 절대 금지합니다.**
+* **디자인 시스템 활용:** 모든 수치(`margin`, `padding`, `gap`)는 `$spacing-*` 변수를 사용하며, 모든 타이포그래피는 `@include text-style($typo-*)` 믹스인 사용을 원칙으로 합니다.
 * **소스맵:** 개발 시 디버깅을 위해 소스맵 생성을 옵션으로 포함합니다.
 * **중복 제거:** 공통 변수 및 믹스인은 `styles/base/_variables.scss`, `styles/base/_mixins.scss`에 정의하여 재사용합니다.
 * **Sass 현대화 (Dart Sass 표준):**
