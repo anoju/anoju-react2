@@ -2,46 +2,76 @@
 @use "../../styles/base/mixins" as *;
 
 .layout {
-  @include flex(column);
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
+  background-color: var(--color-bg);
 }
 
 .header {
-  @include shadow-sm;
-  background-color: $color-white;
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
   position: sticky;
   top: 0;
   z-index: 100;
   height: $header-height;
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 0 $spacing-md;
 
   &__inner {
-    @include flex(row, space-between, center);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
     height: 100%;
+    max-width: $breakpoint-md; // 컨테이너 제약
+    margin: 0 auto;
+    width: 100%;
   }
 
   &__logo {
-    font-size: $spacing-lg;
-    color: $color-primary;
-    letter-spacing: -0.02em;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--color-primary);
+    letter-spacing: -0.04em;
+    font-family: inherit;
+    
+    &::first-letter {
+      font-size: 1.8rem;
+    }
+  }
+
+  &__nav {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
   }
 }
 
 .main {
   flex: 1;
   width: 100%;
+  padding-bottom: $spacing-xl;
 }
 
 .footer {
-  background-color: $color-gray-100;
+  background-color: var(--color-surface-soft);
+  border-top: 1px solid var(--color-border);
   padding: $spacing-xl 0;
   margin-top: auto;
 
   &__inner {
-    @include flex(row, center, center);
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
   }
 
   &__copy {
-    color: $color-gray-500;
-    font-size: $spacing-sm;
+    color: var(--color-text-dimmed);
+    font-size: 0.8rem;
+    letter-spacing: 0.02em;
   }
 }
