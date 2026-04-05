@@ -4,13 +4,15 @@
 
 ## 1. 프로젝트 개요 (Project Summary)
 * **목적:** 모바일 최우선(Mobile-First) 반응형 웹 애플리케이션 개발.
-* **기술 스택:** React, Vite, TypeScript, SCSS (Vanilla SCSS 사용).
+* **기술 스택:** React, Vite, TypeScript, SCSS (Vanilla SCSS 사용), **ahooks**, **Framer Motion**.
 * **주요 기능:** SNS/이메일 회원가입(인증 포함), 자유게시판/갤러리(에디터 적용), 정적 콘텐츠 페이지 관리.
 
 ## 2. 디자인 및 테마 컨셉 (Design & Theme)
 *   **디자인 방향**: **Warm Minimalism**의 감성과 **Modern Essential**의 편의성을 결합하며, **퍼플(Purple)**을 시그니처 포인트 컬러로 사용합니다.
+*   **UI 레퍼런스**: **Shadcn UI**(구조), **Nord Design System**(감성), **Ant Design Mobile**(모바일 UX)을 주요 레퍼런스로 활용합니다.
 *   **테마 지원**: 라이트(Light), 다크(Dark), 시스템 설정(Auto) 모드를 완벽 지원하며, CSS 변수(`var(--color-...)`)를 필수적으로 활용합니다.
 *   **시각적 언어**: 부드러운 곡선과 적절한 여백, 현대적인 글래스모피즘 효과를 권장합니다.
+*   **마이크로 인터랙션**: **Framer Motion**을 사용하여 부드럽고 예측 가능한 인터랙션(탭 피드백, 페이지 트랜지션 등)을 구현합니다.
 
 ## 3. 언어 정책 (Language Policy)
 * **기본 언어:** 사용자 환경 및 코드 내 모든 설명, 주석, README는 반드시 **한글(Korean)**을 사용합니다.

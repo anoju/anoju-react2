@@ -1,37 +1,36 @@
 import React from 'react';
-import './ThemeToggle.scss';
+import { motion } from 'framer-motion';
 import { useTheme, type ThemeMode } from '../../../hooks/useTheme';
+import './ThemeToggle.scss';
 
 const ThemeToggle: React.FC = () => {
   const { theme, setTheme } = useTheme();
 
-  const handleToggle = (mode: ThemeMode) => {
-    setTheme(mode);
-  };
+  const options: { mode: ThemeMode; icon: string; label: string }[] = [
+    { mode: 'light', icon: '☀', label: '라이트' },
+    { mode: 'dark', icon: '🌙', label: '다크' },
+    { mode: 'auto', icon: 'A', label: '자동' },
+  ];
 
   return (
     <div className="theme-toggle">
-      <button 
-        className={`theme-toggle__btn ${theme === 'light' ? 'theme-toggle__btn--active' : ''}`}
-        onClick={() => handleToggle('light')}
-        aria-label="라이트 모드"
-      >
-        ☀
-      </button>
-      <button 
-        className={`theme-toggle__btn ${theme === 'dark' ? 'theme-toggle__btn--active' : ''}`}
-        onClick={() => handleToggle('dark')}
-        aria-label="다크 모드"
-      >
-        🌙
-      </button>
-      <button 
-        className={`theme-toggle__btn ${theme === 'auto' ? 'theme-toggle__btn--active' : ''}`}
-        onClick={() => handleToggle('auto')}
-        aria-label="시스템 설정"
-      >
-        A
-      </button>
+      {options.map((opt) => (
+        <button
+          key={opt.mode}
+          className={`theme-toggle__btn ${theme === opt.mode ? 'theme-toggle__btn--active' : ''}`}
+          onClick={() => setTheme(opt.mode)}
+          aria-label={opt.label}
+        >
+          <span className="theme-toggle__icon">{opt.icon}</span>
+          {theme === opt.mode && (
+            <motion.div
+              layoutId="active-theme-bg"
+              className="theme-toggle__active-bg"
+              transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+            />
+          )}
+        </button>
+      ))}
     </div>
   );
 };

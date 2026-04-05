@@ -2,7 +2,7 @@
 
 ## 1. 프로젝트 초기화 (Project Initialization)
 가장 빠르고 모던한 개발 경험을 제공하는 빌드 툴을 사용합니다.
-* **스택:** **Vite + React + TypeScript + SCSS**
+* **스택:** **Vite + React + TypeScript + SCSS + ahooks + Framer Motion**
 * **장점:** 기존 Create React App(CRA) 대비 압도적으로 빠른 로컬 서버 구동 및 빌드 속도
 * **패키지 매니저:** `npm` (또는 프로젝트에 맞는 패키지 매니저 사용)
 * **모바일 최우선 (Mobile First):** 모바일 기기 사용자 경험을 최우선으로 설계하며, 반응형 디자인 반영.
@@ -92,3 +92,11 @@
 * **웹 접근성:** 시맨틱 HTML5 및 `aria-` 속성 준수.
 * **린트(Lint):** 작성/수정한 파일에 대해서만 선별적으로 적용.
 * **타입 안전성:** TypeScript 사용 시 **`any` 타입 사용을 금지**하거나 최소화합니다. 불가피한 경우에만 사용하며, 가급적 구체적인 모델링이나 제네릭을 활용합니다.
+
+## 9. UI 레퍼런스 및 인터랙션 (UI Reference & Interactions)
+모든 컴포넌트는 다음 UI 라이브러리의 설계 철학을 참고하여 'Anoju'만의 스타일로 재구성합니다.
+*   **Shadcn UI / Radix UI**: 깔끔한 디자인 구조와 접근성(A11y) 설계 기준.
+*   **Nord / Polaris**: 따뜻한(Warm Minimalism) 무드와 친절한 상태 안내 문법.
+*   **Ant Design Mobile**: 모바일 최적화 레이아웃 및 터치 인터랙션.
+*   **유틸리티 훅 (ahooks)**: **VueUse**와 같은 필수 기능을 위해 적극 활용합니다. (`useClickAway`, `useLocalStorageState`, `useDebounce` 등)
+*   **마이크로 인터랙션 (Framer Motion)**: 모든 컴포넌트의 상태 변화 시 부드러운 인터랙션 적용.

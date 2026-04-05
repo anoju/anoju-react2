@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion, type HTMLMotionProps } from 'framer-motion';
 import './Button.scss';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -13,6 +14,7 @@ const Button: React.FC<ButtonProps> = ({
   size = 'md', 
   fullWidth = false,
   className = '',
+  disabled,
   ...props 
 }) => {
   const classNames = [
@@ -24,9 +26,15 @@ const Button: React.FC<ButtonProps> = ({
   ].join(' ').trim();
 
   return (
-    <button className={classNames} {...props}>
+    <motion.button 
+      className={classNames} 
+      disabled={disabled}
+      whileHover={!disabled ? { scale: 1.02, transition: { duration: 0.2 } } : {}}
+      whileTap={!disabled ? { scale: 0.98 } : {}}
+      {...(props as HTMLMotionProps<'button'>)}
+    >
       {children}
-    </button>
+    </motion.button>
   );
 };
 

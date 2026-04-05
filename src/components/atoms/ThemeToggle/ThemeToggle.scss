@@ -9,10 +9,12 @@
   border-radius: var(--radius-full);
   border: 1px solid var(--color-border);
   width: fit-content;
+  position: relative;
 
   &__btn {
-    width: 32px;
-    height: 32px;
+    position: relative;
+    width: 36px;
+    height: 36px;
     border-radius: var(--radius-full);
     display: flex;
     align-items: center;
@@ -20,21 +22,34 @@
     font-size: 14px;
     color: var(--color-text-dimmed);
     cursor: pointer;
-    transition: var(--transition-base);
+    background: transparent;
+    border: none;
+    transition: color 0.3s ease;
+    z-index: 1;
 
     &:hover {
-      background-color: var(--color-border);
+      color: var(--color-text);
     }
 
     &--active {
-      background-color: var(--color-primary);
-      color: var(--color-text-white);
-      box-shadow: var(--shadow-sm);
-
-      &:hover {
-        background-color: var(--color-primary);
-        opacity: 0.9;
-      }
+      color: var(--color-text-white) !important;
     }
+  }
+
+  &__icon {
+    position: relative;
+    z-index: 2;
+  }
+
+  &__active-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--color-primary);
+    border-radius: var(--radius-full);
+    box-shadow: var(--shadow-sm);
+    z-index: 1;
   }
 }

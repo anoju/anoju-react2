@@ -1,26 +1,27 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
+import { useLocalStorageState } from 'ahooks';
 
 export type ThemeMode = 'light' | 'dark' | 'auto';
 
 export const useTheme = () => {
-  const [theme, setTheme] = useState<ThemeMode>(() => {
-    const savedTheme = localStorage.getItem('theme') as ThemeMode;
-    return savedTheme || 'auto';
+  const [theme, setTheme] = useLocalStorageState<ThemeMode>('anoju-theme', {
+    defaultValue: 'auto',
   });
 
   useEffect(() => {
+    // 이전 'theme' 키(JSON이 아닌 원시 문자열)가 남아있어 발생하는 구문 에러 방지용 정리
+    if (localStorage.getItem('theme') && !localStorage.getItem('theme')?.includes('"')) {
+      localStorage.removeItem('theme');
+    }
+
     const root = document.documentElement;
     
     if (theme === 'auto') {
       root.removeAttribute('data-theme');
     } else {
-      root.setAttribute('data-theme', theme);
+      root.setAttribute('data-theme', theme as string);
     }
-    
-    localStorage.setItem('theme', theme);
   }, [theme]);
 
-  // 시스템 설정 변경 감지 (auto 모드일 때 실시간 반영은 CSS 미디어 쿼리가 처리함)
-  
   return { theme, setTheme };
 };
