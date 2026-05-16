@@ -7,12 +7,50 @@
 * **기술 스택:** React, Vite, TypeScript, SCSS (Vanilla SCSS 사용), **ahooks**, **Framer Motion**.
 * **주요 기능:** SNS/이메일 회원가입(인증 포함), 자유게시판/갤러리(에디터 적용), 정적 콘텐츠 페이지 관리.
 
+## 1.1 작업 요청 구분 원칙 (Design vs Implementation)
+* **설계 요청:** 사용자가 `설계`의 수정 또는 추가를 요청하는 경우, 구현 코드는 작성하지 않고 `plan.md`와 `AGENTS.md`만 업데이트합니다.
+* **구현 금지 조건:** 사용자가 명시적으로 `구현`을 요청하기 전까지는 컴포넌트, 훅, 스타일, 라우팅, 데이터 연동 등 실제 구현 작업을 진행하지 않습니다.
+* **구현 요청:** 사용자가 `구현`을 명시적으로 요청하면, 해당 요청의 to-do 리스트를 먼저 작성하고 순서대로 진행합니다.
+* **의사결정 확인:** 구현 방식, 화면 동작, 공통 구조처럼 선택지가 있는 결정은 사용자의 확인을 받은 뒤 확정합니다.
+
 ## 2. 디자인 및 테마 컨셉 (Design & Theme)
 *   **디자인 방향**: **Warm Minimalism**의 감성과 **Modern Essential**의 편의성을 결합하며, **퍼플(Purple)**을 시그니처 포인트 컬러로 사용합니다.
-*   **UI 레퍼런스**: **Shadcn UI**(구조), **Nord Design System**(감성), **Ant Design Mobile**(모바일 UX)을 주요 레퍼런스로 활용합니다.
-*   **테마 지원**: 라이트(Light), 다크(Dark), 시스템 설정(Auto) 모드를 완벽 지원하며, CSS 변수(`var(--color-...)`)를 필수적으로 활용합니다.
+*   **UI 컴포넌트 구현 원칙**: UI 컴포넌트 라이브러리는 직접 도입하지 않고 프로젝트 내부에서 직접 구현합니다.
+*   **UI 참조 기준**: 컴포넌트 API, 이벤트 명명, 상태 속성, 접근성 동작은 **Radix UI**를 1차 기준으로 참고합니다. 접근성이 복잡한 컴포넌트는 **React Aria**를 보조 기준으로 검증하고, 모바일 UX 흐름은 **Ant Design Mobile**을 참고합니다. **Shadcn UI**는 Radix 기반 조합 방식만 참고하며 디자인과 코드는 복제하지 않습니다.
+*   **공통 UI 1차 범위**: 우선 구현 대상 공통 UI는 `Button`, `IconButton`, `Img`, `Input`, `TextArea`, `Checkbox`, `Radio`, `Switch`, `Tabs`, `Select`(단순형), `Toast`, `Dialog`, `Alert`, `Confirm`, `BottomSheet`, `Spinner`, `PageLoading`, `EmptyState`, `ErrorState`, `DataList`, `AppHeader`, `FloatingMenu`, `Page`, `VisuallyHidden`입니다.
+*   **공통 UI API**: 공통 컴포넌트는 `size="xs|sm|md|lg|xl"`, `variant="solid|soft|outline|ghost|plain"`, `tone="primary|neutral|danger|success|warning|info"`를 기본 축으로 삼고, 상태는 `data-state`, `data-disabled`, `data-loading`, `data-selected`, `data-active`, `data-invalid`로 표현합니다.
+*   **공통 피드백 정책**: 저장/복사 등 짧은 결과는 `Toast`, 단순 안내는 `Alert`, 삭제/로그아웃/작성 취소처럼 결정이 필요한 경우는 `Confirm`, 모바일 액션 선택은 `BottomSheet`, 페이지/섹션 실패는 `ErrorState`, 데이터 없음은 `EmptyState`, 짧은 진행 상태는 `Spinner`를 사용합니다.
+*   **Dialog 사용 원칙**: `Dialog`는 콘텐츠나 복합 UI를 담는 범용 모달 컨테이너로 사용합니다. 안내 메시지와 확인/취소 메시지는 원시 `Dialog`를 직접 쓰지 않고, 사용성이 편한 `Alert`와 `Confirm` 래퍼를 사용합니다.
+*   **로딩 정책**: 전체 페이지를 막는 `PageLoading`은 인증 초기화, 보호 라우트 판정, 필수 초기 데이터 확인처럼 어쩔 수 없는 경우에만 사용합니다. 버튼 액션은 `Button loading`, 리스트 추가 로딩은 리스트 하단 로딩을 사용합니다.
+*   **Skeleton 정책**: 짧은 Skeleton 노출은 오류처럼 보일 수 있으므로 기본 1차 컴포넌트에서는 제외하고, `500ms` 이상 예상되는 리스트/상세 구조에서만 2차로 제한 검토합니다.
+*   **DataList 정책**: 리스트형 화면은 공통 `DataList`를 사용하며, 1차로 `mode="infinite"`와 `mode="loadMore"`를 지원합니다. 첫 조회 실패는 `ErrorState`, 데이터 없음은 `EmptyState`, 추가 조회 실패는 기존 목록 유지 후 하단 재시도 액션으로 처리합니다.
+*   **폼 검증 정책**: 입력 중 과한 에러 노출을 피하고, `blur` 시 필드 검증, `submit` 시 전체 검증을 수행합니다. 제출 실패 시 첫 번째 에러 필드로 포커스를 이동하고, 필드 에러와 폼 에러를 분리합니다.
+*   **아이콘 정책**: 아이콘은 `lucide-react`를 기본 라이브러리로 사용하며, 아이콘 단독 버튼은 `IconButton`과 접근성 이름을 반드시 사용합니다. 특수 브랜드/서비스 아이콘을 제외하고 직접 SVG 작성을 지양합니다.
+*   **테마 지원**: 라이트(Light), 다크(Dark), 시스템 설정(Auto) 모드를 완벽 지원하며, `html`의 `data-theme="light|dark|auto"` 속성과 CSS 변수(`var(--color-...)`)를 필수적으로 활용합니다.
+*   **글자모드 지원**: 글자모드는 `작게`, `기본`, `크게` 3단계를 지원하며, `html`의 `data-font-mode="small|base|large"` 속성과 CSS 변수(`var(--font-size-*)`, `var(--line-height-*)`)로 제어합니다.
+*   **CSS 변수 단일 관리**: 디자인 토큰 CSS 변수는 `src/assets/styles/base/_tokens.scss`에서만 정의/수정하고, 다른 SCSS 파일에서는 토큰을 참조만 합니다.
+*   **토큰 네이밍 기준**: 색상 토큰은 `--color-text-*`, `--color-bg-*`, `--color-border-*`, `--color-icon-*`, `--color-action-*`처럼 역할별로 세분화하고, 글자 크기는 `--font-size-caption`, `--font-size-body-md`, `--font-size-title-lg`, `--font-size-heading-md`, `--font-size-display-sm`처럼 사용처 기반으로 관리합니다.
+*   **글자모드 레이아웃 대응**: 글자모드 변경 시 텍스트 높이, 줄 수, sticky 위치, 고정 영역 오프셋, 플로팅 버튼 위치가 달라질 수 있으므로 관련 컴포넌트는 크기와 위치를 다시 계산할 수 있게 설계합니다.
+*   **이미지 컴포넌트 필수 사용**: 모든 이미지는 공통 `Img` 컴포넌트를 통해 렌더링하며, 라이트/다크 모드별 이미지 소스가 필요한 경우 `Img` 컴포넌트에서 테마별 소스와 `alt`를 일관되게 처리합니다.
 *   **시각적 언어**: 부드러운 곡선과 적절한 여백, 현대적인 글래스모피즘 효과를 권장합니다.
 *   **마이크로 인터랙션**: **Framer Motion**을 사용하여 부드럽고 예측 가능한 인터랙션(탭 피드백, 페이지 트랜지션 등)을 구현합니다.
+*   **숨김/노출 인터랙션:** 사용자가 `숨김`, `노출`, `숨겼다 보여졌다`, `나타났다 사라졌다`처럼 표현한 UI 동작은 단순 표시 전환이 아니라 Framer Motion 또는 CSS Transition 기반의 자연스러운 인터랙션이 적용된 형태로 구현합니다.
+
+## 2.1 전역 화면 레이아웃 및 고정 영역 정책 (Global Layout & Fixed Areas)
+* **설계 우선 원칙:** 전역 레이아웃, 헤더, 하단 플로팅 버튼, 고정 영역 관리 로직은 구현 전 반드시 `plan.md`에 먼저 설계 내용을 업데이트하고, 주요 의사결정이 필요한 경우 사용자 확인을 받은 뒤 진행합니다.
+* **상단 헤더:** 헤더는 기본적으로 상단 고정 영역으로 동작하되, 아래로 스크롤할 때 숨기고 위로 스크롤할 때 다시 나타나는 동작을 지원해야 합니다.
+* **헤더 고정 옵션:** 특정 화면에서는 스크롤 방향과 무관하게 헤더를 항상 고정 노출할 수 있는 옵션을 제공해야 합니다.
+* **Sticky 콘텐츠 연동:** 본문 내부의 `sticky` 성격 콘텐츠와 헤더의 숨김/노출 상태가 충돌하지 않도록 상단 고정 영역의 높이, 오프셋, z-index를 중앙에서 관리합니다.
+* **헤더 구성:** 좌측 영역은 `뒤로가기 버튼`, `페이지 타이틀`, `좌측 확장 영역` 순서로 배치하고, 우측 영역은 `우측 확장 영역`, `홈 버튼` 순서로 배치합니다.
+* **헤더 요소 제어:** 뒤로가기 버튼, 페이지 타이틀, 홈 버튼, 좌우 확장 영역은 화면별 요구에 따라 숨김 처리하거나 커스텀 콘텐츠를 주입할 수 있어야 합니다.
+* **뒤로가기 동작:** 뒤로가기는 기본적으로 `history.back()`을 사용하되, 화면별 설정에 따라 특정 경로 이동 또는 커스텀 핸들러로 대체할 수 있어야 합니다.
+* **전체메뉴 버튼 제외:** 전체메뉴는 별도 페이지로 관리하므로 전역 헤더에는 전체메뉴 버튼을 두지 않습니다.
+* **모바일 푸터 정책:** 모바일 UI에는 기본 푸터를 제공하지 않습니다.
+* **하단 플로팅 버튼:** 홈 화면 등 주요 화면에서만 하단 플로팅 버튼을 제공하며, 기본 메뉴는 `홈`, `전체메뉴`, `마이페이지`로 구성합니다.
+* **로그인 전 메뉴:** 하단 플로팅 버튼의 `마이페이지` 항목은 로그인 전에는 `로그인` 메뉴로 노출하고, 로그인 후에는 `마이페이지` 메뉴로 노출합니다.
+* **보호 메뉴 인증 체크:** `마이페이지`처럼 로그인이 필요한 메뉴와 화면은 진입 전에 반드시 인증 상태를 확인하고, 미로그인 상태라면 로그인 화면으로 이동시켜야 합니다.
+* **플로팅 버튼 스크롤 동작:** 하단 플로팅 버튼도 헤더와 동일하게 아래로 스크롤할 때 숨기고 위로 스크롤할 때 나타나는 동작을 지원해야 합니다.
+* **하단 고정 영역 관리:** 플로팅 버튼 외에도 콘텐츠 내부 하단 고정 영역이 존재할 수 있으므로, 상단 고정 영역 관리와 함께 하단 고정 영역의 높이, 안전 영역, 간격, z-index를 중앙에서 관리하여 겹침을 방지합니다.
 
 ## 3. 언어 정책 (Language Policy)
 * **기본 언어:** 사용자 환경 및 코드 내 모든 설명, 주석, README는 반드시 **한글(Korean)**을 사용합니다.
@@ -21,14 +59,23 @@
 ## 4. 파일 및 폴더 체계화 (File & Folder Organization)
 모든 개발 작업 시 파일의 증가에 대비하여 체계적으로 폴더를 구성하고 분류합니다.
 
-* **이미지 및 스타일 에셋:** `src/assets/images`, `src/assets/styles` 폴더를 기본으로 하며, 스타일 하위에 `base`(기본), `layout`(레이아웃), `pages`(페이지별) 폴더를 생성하여 관리합니다.
-* **컴포넌트:** 아토믹 디자인 패턴에 따라 `atoms`, `molecules`, `organisms`, `templates` 폴더 내에 각 컴포넌트별 전용 폴더(index.tsx, *.scss)를 생성하여 캡슐화합니다.
+* **이미지 및 스타일 에셋:** `src/assets/images`, `src/assets/styles` 폴더를 기본으로 하며, 스타일 하위에 `base`(기본), `layout`(레이아웃), `components`(컴포넌트), `pages`(페이지별) 폴더를 생성하여 관리합니다.
+* **SCSS 단일 관리:** 모든 SCSS 파일은 반드시 `src/assets/styles` 아래에서만 작성하고 관리합니다. 컴포넌트 폴더, 페이지 폴더, 기타 기능 폴더 내부에는 SCSS 파일을 생성하지 않습니다.
+* **공통 요소 폴더:** 여러 화면과 기능에서 공유되는 요소는 `src/apis`, `src/data`, `src/types`, `src/constants`, `src/utils`, `src/hooks`, `src/lib` 아래에서 역할별로 관리합니다.
+* **라우팅 설정:** 라우트 경로, 로그인 필요 여부, 헤더/플로팅 메뉴 기본 설정은 `src/routes/routeConfig.ts`에서 TypeScript 설정으로 중앙 관리합니다.
+* **페이지 메타:** `document.title`, description, robots 정책은 `routeConfig.ts`의 `meta` 객체에서 관리합니다. 모든 페이지는 `meta.title`을 가지며 최종 타이틀은 `페이지명 | Anoju` 형식을 사용합니다.
+* **인증 가드:** `requiresAuth: true`인 라우트는 진입 전에 인증 상태를 확인하고, 미로그인 상태라면 로그인 화면으로 이동시키며 로그인 후 복귀할 경로를 보존합니다.
+* **화면 폴더:** 화면 컴포넌트는 `src/pages/화면명/Index.tsx` 구조를 사용하며, 화면명 폴더는 PascalCase를 사용합니다. 예: `src/pages/Home/Index.tsx`
+* **라우트 경로:** 실제 화면 경로는 폴더명과 분리하여 소문자 kebab-case를 사용합니다. 예: `src/pages/Home/Index.tsx` 화면의 경로는 `/home`
+* **화면 전용 요소:** 특정 화면에서만 사용하는 `data.ts`, `types.ts`, `api.ts`, `hooks.ts` 등은 해당 화면 폴더 내부에 둘 수 있습니다. 여러 화면에서 재사용되면 공통 폴더로 이동합니다.
+* **컴포넌트:** 아토믹 디자인 패턴에 따라 `atoms`, `molecules`, `organisms`, `templates` 폴더 내에 각 컴포넌트별 전용 폴더를 생성하여 캡슐화합니다. 단, 스타일 파일은 컴포넌트 폴더가 아니라 `src/assets/styles/components`에서 관리합니다.
 
 ## 5. 스타일링 컨벤션 (Styling Convention)
 * **SCSS & BEM:** 모든 스타일은 SCSS로 작성하며, BEM(Block Element Modifier) 네이밍 방식을 엄격히 준수합니다. **컴포넌트 내 인라인 스타일(`style={{...}}`)은 절대 금지합니다.**
 * **디자인 시스템 활용:** 모든 수치(`margin`, `padding`, `gap`)는 `$spacing-*` 변수를 사용하며, 모든 타이포그래피는 `@include text-style($typo-*)` 믹스인 사용을 원칙으로 합니다.
 * **소스맵:** 개발 시 디버깅을 위해 소스맵 생성을 옵션으로 포함합니다.
-* **중복 제거:** 공통 변수 및 믹스인은 `styles/base/_variables.scss`, `styles/base/_mixins.scss`에 정의하여 재사용합니다.
+* **디자인 토큰:** 색상, 배경, 테두리, 그림자, 타이포그래피, 간격, 레이아웃 오프셋 관련 CSS 변수는 `src/assets/styles/base/_tokens.scss`에서만 관리합니다.
+* **중복 제거:** 공통 변수 및 믹스인은 `src/assets/styles/base/_variables.scss`, `src/assets/styles/base/_mixins.scss`에 정의하여 재사용합니다.
 * **Sass 현대화 (Dart Sass 표준):**
   * `@import` 대신 **`@use`** 및 **`@forward`** 사용을 필수화합니다.
   * `/` 나눗셈 연산 대신 **`math.div()`**를 사용하고, 컬러 함수 등 내장 함수는 **`sass:math`, `sass:color`** 모듈을 명시적으로 호출하여 사용합니다.
@@ -37,6 +84,13 @@
 ## 6. 개발 원칙 및 방어적 코딩 (Development Principles)
 * **방어적 프로그래밍:** Optional Chaining(`?.`), Nullish Coalescing(`??`), API 호출 시 `try-catch` 등을 필수 적용합니다.
 * **타입 엄격성:** TypeScript 사용 시 **`any` 타입 사용을 원칙적으로 금지**합니다. 모호한 데이터는 `unknown`을 사용하거나 인터페이스를 정의하며, `any`는 기술적으로 회피 불가능한 경우에만 최소한으로 사용합니다.
+* **전역 상태 관리:** 전역 상태는 Zustand를 사용하며, `src/stores/authStore.ts`, `src/stores/themeStore.ts`, `src/stores/layoutStore.ts`, `src/stores/appStore.ts`처럼 역할별로 분리합니다.
+* **뒤로가기 설정:** 헤더 뒤로가기 버튼은 단순 boolean이 아니라 `history`, `route`, `custom` 타입을 가진 설정 객체로 관리합니다. 커스텀 동작은 설정 파일에 함수를 직접 넣지 않고 `actionKey`로 연결합니다.
+* **API 에러 처리:** PocketBase 원본 에러는 화면에서 직접 다루지 않고 `UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `VALIDATION`, `NETWORK`, `SERVER`, `UNKNOWN` 코드 기반의 공통 `AppError` 형태로 변환하여 처리합니다.
+* **검색/필터/정렬:** 검색어, 태그, 정렬, 필터는 URL query와 동기화하고, 변경 시 `DataList`의 페이지/커서 상태를 초기화합니다.
+* **작성/수정/삭제 UX:** 작성 중 내용이 있으면 이탈 전 `Confirm`을 사용하고, 삭제 전에도 반드시 `Confirm`을 사용합니다. 삭제는 기본적으로 soft delete이며 hard delete는 관리자만 수행합니다.
+* **파일 업로드:** 이미지는 `jpg`, `jpeg`, `png`, `webp`만 허용하고, 프로필 이미지는 2MB 이하, 게시글/갤러리 이미지는 장당 5MB 이하를 권장합니다. 업로드 이미지는 공통 `Img` 컴포넌트로 렌더링합니다.
+* **캐시/실시간:** 생성/수정/삭제 후 관련 목록과 상세 데이터를 무효화하거나 재조회합니다. 좋아요/스크랩은 낙관적 업데이트를 허용하되 실패 시 rollback하며, 모든 PocketBase 구독은 언마운트 시 해제합니다.
 * **메모리 최적화:** 컴포넌트 언마운트 시 이벤트 리스너 및 타이머를 반드시 해제(Clean-up)합니다.
 * **웹 접근성(A11y):** 시맨틱 HTML5 태그를 최우선으로 사용하며, 적절한 `aria-` 속성과 `alt` 텍스트를 제공합니다.
 
@@ -47,8 +101,10 @@
 ## 8. 데이터베이스 및 백엔드 운영 수칙 (PocketBase)
 * **연동 원칙:** 모든 데이터 통신은 PocketBase SDK를 사용하는 것을 원칙으로 합니다.
 * **환경 변수:** 서버 URL은 `.env` 파일의 `VITE_PB_URL` 변수에 관리하며, 코드 내 하드코딩을 금지합니다.
-* **인증 관리:** 사용자 인증 상태는 SDK에서 제공하는 `authStore`를 활용하며, 전역 상태(Context/Zustand 등)와 동기화하여 관리합니다.
+* **인증 관리:** 사용자 인증 상태는 SDK에서 제공하는 `authStore`를 활용하며, Zustand 기반 `src/stores/authStore.ts`와 동기화하여 관리합니다.
+* **권한 관리:** 기본 역할은 `guest`, `user`, `admin`이며, 프론트 노출 제어와 PocketBase API Rules를 함께 사용합니다. 이메일 미인증, 정지, 탈퇴 상태는 역할과 별개로 쓰기 액션을 제한할 수 있습니다.
 * **에러 핸들링:** API 호출 시 반드시 `try-catch` 및 방어적 코딩 규칙을 적용하여 네트워크 장애에 대비합니다.
+* **사용자 메시지:** PocketBase 원본 에러 메시지를 사용자에게 그대로 노출하지 않고, 한글 사용자 메시지로 변환하여 `Toast`, `ErrorState`, 폼 필드 에러에 맞게 표시합니다.
 * **실시간 데이터:** 실시간 업데이트가 필요한 기능(채팅, 알림 등)은 PocketBase의 `Subscribe` 기능을 우선적으로 활용합니다.
 
 ---
