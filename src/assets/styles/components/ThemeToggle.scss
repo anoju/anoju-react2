@@ -1,0 +1,52 @@
+@use "@/assets/styles/base" as *;
+
+.theme-toggle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  padding: var(--spacing-xs);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-full);
+  background-color: var(--color-bg-surface-soft);
+  gap: var(--spacing-xs);
+
+  &__btn {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 0;
+    border-radius: var(--radius-full);
+    color: var(--color-icon-default);
+    background: transparent;
+    cursor: pointer;
+    transition: var(--transition-base);
+
+    &:hover {
+      color: var(--color-icon-primary);
+    }
+
+    &--active {
+      color: var(--color-icon-inverse);
+    }
+  }
+
+  &__icon {
+    position: relative;
+    z-index: 2;
+    display: inline-flex;
+  }
+
+  &__active-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: var(--radius-full);
+    background-color: var(--color-action-primary);
+    box-shadow: var(--shadow-sm);
+  }
+}

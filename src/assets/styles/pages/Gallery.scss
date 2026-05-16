@@ -1,56 +1,35 @@
-@use "@/assets/styles/base" as *;
-
 .gallery-page {
-  padding: $spacing-3xl $spacing-lg;
+  padding-top: var(--spacing-xl);
+  padding-bottom: var(--spacing-2xl);
 
   &__header {
-    margin-bottom: $spacing-3xl;
-    text-align: center;
-    
+    margin-bottom: var(--spacing-xl);
+
     h2 {
-      @include text-style($typo-h1);
-      font-weight: 800;
-      margin-bottom: $spacing-md;
+      margin: 0;
+      font-size: var(--font-size-2xl);
     }
 
     p {
-      @include text-style($typo-body-md);
-      color: var(--color-text-dimmed);
+      margin: var(--spacing-xs) 0 0;
+      color: var(--color-text-secondary);
     }
   }
 
   &__grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: $spacing-lg;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--spacing-md);
   }
 
   &__item {
-    aspect-ratio: 1 / 1;
-    background-color: var(--color-surface-soft);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    box-shadow: var(--shadow-md);
-    border: 1px solid var(--color-border);
-    @include flex($justify: center, $align: center);
-    color: var(--color-primary);
-    @include text-style($typo-h2);
-    transition: var(--transition-base);
-
-    &:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-lg);
-      border-color: var(--color-primary);
-    }
-  }
-}
-
-@include mobile {
-  .gallery-page {
-    padding: $spacing-xl $spacing-lg;
-    
-    &__header h2 {
-        @include text-style($typo-h3);
-    }
+    display: grid;
+    min-height: 9rem;
+    place-items: center;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-surface-soft);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
   }
 }

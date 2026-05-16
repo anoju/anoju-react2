@@ -1,79 +1,95 @@
-@use "@/assets/styles/base" as *;
+.home-page {
+  &__hero {
+    position: relative;
+    display: flex;
+    min-height: min(76vh, 42rem);
+    align-items: end;
+    overflow: hidden;
+    color: var(--color-text-inverse);
+    background: #211b17;
+  }
 
-.home-hero {
-  padding: $spacing-4xl $spacing-lg;
-  text-align: center;
-  background: linear-gradient(180deg, var(--color-surface) 0%, var(--color-bg) 100%);
-  
+  &__media {
+    position: absolute;
+    inset: 0;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.7;
+    }
+
+    &::after {
+      position: absolute;
+      inset: 0;
+      content: "";
+      background: linear-gradient(to top, rgba(23, 19, 16, 0.78), rgba(23, 19, 16, 0.1));
+    }
+  }
+
+  &__hero-inner {
+    position: relative;
+    z-index: 1;
+    padding-top: var(--spacing-3xl);
+    padding-bottom: var(--spacing-2xl);
+  }
+
   &__subtitle {
-    color: var(--color-primary);
-    font-weight: 700;
-    @include text-style($typo-body-sm);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    display: block;
-    margin-bottom: $spacing-md;
+    display: inline-block;
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    font-weight: 720;
   }
 
   &__title {
-    @include text-style($typo-h1);
-    margin-bottom: $spacing-lg;
-    font-weight: 800;
-    color: var(--color-text);
-
-    span {
-      color: var(--color-primary);
-    }
+    max-width: 38rem;
+    margin: 0;
+    font-size: var(--font-size-4xl);
+    line-height: var(--line-height-tight);
+    letter-spacing: 0;
   }
 
   &__desc {
-    @include text-style($typo-body-lg);
-    color: var(--color-text-dimmed);
-    max-width: 520px;
-    margin: 0 auto $spacing-2xl;
+    max-width: 30rem;
+    margin: var(--spacing-md) 0 0;
+    font-size: var(--font-size-lg);
+    line-height: var(--line-height-base);
   }
 
   &__actions {
-    @include flex($justify: center, $gap: $spacing-md);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-xl);
   }
-}
 
-.home-content {
-  padding: $spacing-3xl $spacing-lg;
+  &__content {
+    padding-top: var(--spacing-2xl);
+    padding-bottom: var(--spacing-2xl);
+  }
 
   &__grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: $spacing-xl;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    gap: var(--spacing-md);
   }
 
   &__card {
-    padding: $spacing-xl;
-    background-color: var(--color-surface);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-lg);
-    border: 1px solid var(--color-border);
+    padding: var(--spacing-lg);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-surface);
 
     h3 {
-      @include text-style($typo-h4);
-      margin-bottom: $spacing-md;
-      color: var(--color-text);
-      font-weight: 700;
+      margin: 0;
+      font-size: var(--font-size-lg);
     }
 
     p {
-      @include text-style($typo-body-md);
-      color: var(--color-text-dimmed);
-    }
-  }
-}
-
-@include mobile {
-  .home-hero {
-    padding: $spacing-3xl $spacing-lg;
-    
-    &__title {
-        @include text-style($typo-h2);
+      margin: var(--spacing-sm) 0 0;
+      color: var(--color-text-secondary);
+      line-height: var(--line-height-base);
     }
   }
 }

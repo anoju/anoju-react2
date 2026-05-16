@@ -1,15 +1,15 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { useTheme, type ThemeMode } from '../../../hooks/useTheme';
-import './ThemeToggle.scss';
+import { Monitor, Moon, Sun } from 'lucide-react';
+import { useTheme, type ThemeMode } from '@/hooks/useTheme';
 
 const ThemeToggle: React.FC = () => {
   const { theme, setTheme } = useTheme();
 
-  const options: { mode: ThemeMode; icon: string; label: string }[] = [
-    { mode: 'light', icon: '☀', label: '라이트' },
-    { mode: 'dark', icon: '🌙', label: '다크' },
-    { mode: 'auto', icon: 'A', label: '자동' },
+  const options: { mode: ThemeMode; icon: React.ReactNode; label: string }[] = [
+    { mode: 'light', icon: <Sun size={16} />, label: '라이트' },
+    { mode: 'dark', icon: <Moon size={16} />, label: '다크' },
+    { mode: 'auto', icon: <Monitor size={16} />, label: '자동' },
   ];
 
   return (

@@ -1,19 +1,21 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from '@/pages/Home';
-import About from '@/pages/static/About';
-import Gallery from '@/pages/Gallery';
-import NotFound from '@/pages/NotFound';
+import { useEffect } from 'react';
+import { BrowserRouter } from 'react-router-dom';
+import { AppRoutes } from '@/routes/AppRoutes';
+import { useAuthStore } from '@/stores/authStore';
+import { initializeThemeAttributes } from '@/stores/themeStore';
 
 function App() {
+  const initializeAuth = useAuthStore((state) => state.initialize);
+
+  useEffect(() => {
+    initializeThemeAttributes();
+    initializeAuth();
+  }, [initializeAuth]);
+
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/gallery" element={<Gallery />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </Router>
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
   );
 }
 

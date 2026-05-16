@@ -1,0 +1,48 @@
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
+  color: var(--color-icon-default);
+  background: transparent;
+  cursor: pointer;
+  transition: var(--transition-base);
+
+  &--xs {
+    width: 1.875rem;
+    height: 1.875rem;
+  }
+
+  &--sm {
+    width: 2.125rem;
+    height: 2.125rem;
+  }
+
+  &--lg {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  &--xl {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+
+  &--ghost:hover:not(:disabled),
+  &--soft {
+    color: var(--color-icon-primary);
+    background: var(--color-bg-primary-soft);
+  }
+
+  &--outline {
+    border-color: var(--color-border-default);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.56;
+  }
+}

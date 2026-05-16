@@ -1,36 +1,19 @@
-@use "@/assets/styles/base" as *;
-
 .not-found {
-  padding: $spacing-4xl $spacing-lg;
+  display: flex;
+  min-height: 24rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: var(--spacing-2xl);
   text-align: center;
 
-  &__icon {
-    @include text-style($typo-h1);
-    font-size: 4rem; // 아이콘용 특수 크기 유지
-    margin-bottom: $spacing-lg;
-    display: block;
-  }
-
   &__title {
-    @include text-style($typo-h2);
-    margin-bottom: $spacing-lg;
-    font-weight: 800;
-    color: var(--color-text);
+    margin: 0;
+    font-size: var(--font-size-2xl);
   }
 
   &__desc {
-    @include text-style($typo-body-lg);
-    color: var(--color-text-dimmed);
-    margin-bottom: $spacing-3xl;
-  }
-}
-
-@include mobile {
-  .not-found {
-    padding: $spacing-3xl $spacing-lg;
-    
-    &__title {
-        @include text-style($typo-h3);
-    }
+    margin: var(--spacing-sm) 0 var(--spacing-lg);
+    color: var(--color-text-secondary);
   }
 }
