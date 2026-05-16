@@ -4,6 +4,8 @@ export const DEFAULT_HOME_PATH = '/home';
 
 export const LOGIN_PATH = '/login';
 
+export const REGISTER_PATH = '/register';
+
 export const MENU_PATH = '/menu';
 
 export const MY_PAGE_PATH = '/my-page';

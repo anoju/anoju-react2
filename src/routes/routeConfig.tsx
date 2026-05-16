@@ -1,12 +1,13 @@
 import Home from '@/pages/Home/Index';
 import Login from '@/pages/Login/Index';
+import Register from '@/pages/Register/Index';
 import Menu from '@/pages/Menu/Index';
 import MyPage from '@/pages/MyPage/Index';
 import Settings from '@/pages/Settings/Index';
 import Gallery from '@/pages/Gallery/Index';
 import About from '@/pages/static/About/Index';
 import NotFound from '@/pages/NotFound/Index';
-import { DEFAULT_HOME_PATH, LOGIN_PATH, MENU_PATH, MY_PAGE_PATH, SETTINGS_PATH } from '@/constants/app';
+import { DEFAULT_HOME_PATH, LOGIN_PATH, MENU_PATH, MY_PAGE_PATH, REGISTER_PATH, SETTINGS_PATH } from '@/constants/app';
 import type { AppRouteConfig, HeaderConfig, FloatingMenuConfig } from './types';
 
 const defaultHeader = (title: string): HeaderConfig => ({
@@ -74,6 +75,20 @@ export const routeConfig = [
     },
     layout: {
       header: defaultHeader('로그인'),
+      floatingMenu: defaultFloatingMenu,
+    },
+  },
+  {
+    id: 'register',
+    path: REGISTER_PATH,
+    element: <Register />,
+    meta: {
+      title: '회원가입',
+      description: 'Anoju 회원가입 화면입니다.',
+      robots: 'noindex',
+    },
+    layout: {
+      header: defaultHeader('회원가입'),
       floatingMenu: defaultFloatingMenu,
     },
   },

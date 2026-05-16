@@ -17,6 +17,10 @@ interface RegisterParams {
   name?: string;
 }
 
+interface UpdateProfileParams {
+  name?: string;
+}
+
 export const authApi = {
   login: ({ identity, password }: LoginParams) =>
     runApi(async () => {
@@ -43,6 +47,19 @@ export const authApi = {
   requestPasswordReset: (email: string) => runApi(() => pb.collection(USERS_COLLECTION).requestPasswordReset(email)),
 
   getOAuthProviders: () => runApi(() => pb.collection(USERS_COLLECTION).listAuthMethods()),
+
+  updateProfile: (params: UpdateProfileParams) =>
+    runApi(async () => {
+      const userId = pb.authStore.model?.id;
+
+      if (!userId) {
+        throw new Error('로그인이 필요합니다.');
+      }
+
+      const result = await pb.collection(USERS_COLLECTION).update(userId, params);
+      useAuthStore.getState().initialize();
+      return result;
+    }),
 
   getRedirectPath: (search: string) => {
     const params = new URLSearchParams(search);
