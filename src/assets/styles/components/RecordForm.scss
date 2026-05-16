@@ -1,0 +1,32 @@
+.record-form {
+  display: grid;
+  gap: var(--spacing-lg);
+
+  &__header {
+    display: grid;
+    gap: var(--spacing-xs);
+
+    h2 {
+      margin: 0;
+      font-size: var(--font-size-2xl);
+      line-height: var(--line-height-tight);
+    }
+
+    p {
+      margin: 0;
+      color: var(--color-text-secondary);
+      line-height: var(--line-height-base);
+    }
+  }
+
+  &__body {
+    display: grid;
+    gap: var(--spacing-md);
+  }
+
+  &__actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+    gap: var(--spacing-sm);
+  }
+}

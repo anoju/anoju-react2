@@ -1,6 +1,15 @@
 export { default as Button } from './Button';
+export { default as Checkbox } from './Checkbox';
 export { default as IconButton } from './IconButton';
-export { Spinner } from './Spinner';
 export { Img } from './Img';
-export { VisuallyHidden } from './VisuallyHidden';
+export { default as Input } from './Input';
+export { default as Radio } from './Radio';
+export { default as Select } from './Select';
+export { Spinner } from './Spinner';
+export { default as Switch } from './Switch';
+export { default as Tabs } from './Tabs';
 export { default as ThemeToggle } from './ThemeToggle';
+export { default as TextArea } from './TextArea';
+export { VisuallyHidden } from './VisuallyHidden';
+export type { SelectOption } from './Select';
+export type { TabItem } from './Tabs';

@@ -21,6 +21,10 @@
 - 2026-05-16: 기존 `BaseLayout`과 컴포넌트 내부 SCSS 잔여 파일을 제거해 새 레이아웃/스타일 정책과 충돌하지 않도록 정리했습니다.
 - 2026-05-16: 로컬 브라우저에서 홈 화면 DOM, 헤더, 하단 플로팅 메뉴 렌더링을 확인했습니다.
 - 2026-05-16: 설정 화면을 추가해 전체메뉴에서 테마/글자모드를 변경할 수 있도록 구현했습니다.
+- 2026-05-16: 공통 UI 1차 목록의 폼/선택 컴포넌트(`Input`, `TextArea`, `Checkbox`, `Radio`, `Switch`, `Tabs`, `Select`)를 구현했습니다.
+- 2026-05-16: 피드백 UI(`Dialog`, `Alert`, `Confirm`, `Toast`, `BottomSheet`)와 `alert()`, `confirm()`, `toast()` 명령형 헬퍼를 구현했습니다.
+- 2026-05-16: `DataList`, 인증 API, 도메인 CRUD API 초안, 검색/필터/정렬 URL 동기화, 파일 업로드 정책, 캐시/실시간 정책, 작성/수정/삭제 UX 공통 훅을 구현했습니다.
+- 2026-05-16: `/my-page` 미로그인 접근 시 로그인 화면 이동, `/settings` 테마/글자모드 컨트롤 렌더링을 브라우저에서 확인했습니다.
 
 ## 1단계: 프로젝트 기반 정리
 
@@ -102,13 +106,13 @@
 - [x] `Button`
 - [x] `IconButton`
 - [x] `Img`
-- [ ] `Input`
-- [ ] `TextArea`
-- [ ] `Checkbox`
-- [ ] `Radio`
-- [ ] `Switch`
-- [ ] `Tabs`
-- [ ] `Select` 단순형
+- [x] `Input`
+- [x] `TextArea`
+- [x] `Checkbox`
+- [x] `Radio`
+- [x] `Switch`
+- [x] `Tabs`
+- [x] `Select` 단순형
 - [x] `Spinner`
 - [x] `PageLoading`
 - [x] `EmptyState`
@@ -117,16 +121,16 @@
 
 ## 8단계: 피드백 UI 구현
 
-- [ ] `Dialog`
-- [ ] `Alert`
-- [ ] `Confirm`
-- [ ] `Toast`
-- [ ] `BottomSheet`
-- [ ] `alert()` 명령형 헬퍼
-- [ ] `confirm()` 명령형 헬퍼
-- [ ] 포커스 트랩
-- [ ] ESC/오버레이 닫기 정책
-- [ ] 닫힌 뒤 포커스 복귀
+- [x] `Dialog`
+- [x] `Alert`
+- [x] `Confirm`
+- [x] `Toast`
+- [x] `BottomSheet`
+- [x] `alert()` 명령형 헬퍼
+- [x] `confirm()` 명령형 헬퍼
+- [x] 포커스 트랩
+- [x] ESC/오버레이 닫기 정책
+- [x] 닫힌 뒤 포커스 복귀
 
 ## 9단계: 전역 레이아웃 구현
 
@@ -145,18 +149,18 @@
 
 ## 10단계: DataList 구현
 
-- [ ] `DataList` 기본 구조
-- [ ] `mode="infinite"`
-- [ ] `mode="loadMore"`
-- [ ] `loadingInitial`
-- [ ] `loadingMore`
-- [ ] `hasMore`
-- [ ] `error`
-- [ ] `empty`
-- [ ] 하단 재시도 액션
-- [ ] 중복 호출 방지
-- [ ] IntersectionObserver cleanup
-- [ ] 글자모드 변경 시 위치 재계산
+- [x] `DataList` 기본 구조
+- [x] `mode="infinite"`
+- [x] `mode="loadMore"`
+- [x] `loadingInitial`
+- [x] `loadingMore`
+- [x] `hasMore`
+- [x] `error`
+- [x] `empty`
+- [x] 하단 재시도 액션
+- [x] 중복 호출 방지
+- [x] IntersectionObserver cleanup
+- [x] 글자모드 변경 시 위치 재계산
 
 ## 11단계: API 기반 구축
 
@@ -167,19 +171,19 @@
 - [x] `AppErrorCode`
 - [x] `AppError`
 - [x] PocketBase 에러 변환
-- [ ] 인증 만료 공통 처리
+- [x] 인증 만료 공통 처리
 - [x] 사용자 한글 메시지 변환
 
 ## 12단계: 인증 API 구현
 
-- [ ] 로그인
-- [ ] 로그아웃
-- [ ] 회원가입
-- [ ] 이메일 인증 요청
-- [ ] 비밀번호 재설정 요청
-- [ ] SNS 로그인 준비
-- [ ] authStore 동기화
-- [ ] 로그인 성공 redirect 처리
+- [x] 로그인
+- [x] 로그아웃
+- [x] 회원가입
+- [x] 이메일 인증 요청
+- [x] 비밀번호 재설정 요청
+- [x] SNS 로그인 준비
+- [x] authStore 동기화
+- [x] 로그인 성공 redirect 처리
 
 ## 13단계: 기본 페이지 구현
 
@@ -197,84 +201,84 @@
 
 ## 14단계: 도메인 API 초안
 
-- [ ] `userApi.ts`
-- [ ] `postApi.ts`
-- [ ] `commentApi.ts`
-- [ ] `reactionApi.ts`
-- [ ] `bookmarkApi.ts`
-- [ ] `reportApi.ts`
-- [ ] `noticeApi.ts`
-- [ ] 목록 조회
-- [ ] 상세 조회
-- [ ] 생성/수정/삭제 기본 함수
+- [x] `userApi.ts`
+- [x] `postApi.ts`
+- [x] `commentApi.ts`
+- [x] `reactionApi.ts`
+- [x] `bookmarkApi.ts`
+- [x] `reportApi.ts`
+- [x] `noticeApi.ts`
+- [x] 목록 조회
+- [x] 상세 조회
+- [x] 생성/수정/삭제 기본 함수
 
 ## 15단계: 작성/수정/삭제 UX
 
-- [ ] 작성 폼 기본 구조
-- [ ] 수정 폼 기본 구조
-- [ ] 작성 중 이탈 감지
-- [ ] 이탈 전 `Confirm`
-- [ ] 저장 성공 `Toast`
-- [ ] 삭제 전 `Confirm`
-- [ ] soft delete 처리
-- [ ] 삭제 후 목록 이동
-- [ ] 관리자 hard delete 추후 확장 지점 표시
+- [x] 작성 폼 기본 구조
+- [x] 수정 폼 기본 구조
+- [x] 작성 중 이탈 감지
+- [x] 이탈 전 `Confirm`
+- [x] 저장 성공 `Toast`
+- [x] 삭제 전 `Confirm`
+- [x] soft delete 처리
+- [x] 삭제 후 목록 이동
+- [x] 관리자 hard delete 추후 확장 지점 표시
 
 ## 16단계: 검색/필터/정렬
 
-- [ ] query string 유틸
-- [ ] 검색어 URL 동기화
-- [ ] 태그 URL 동기화
-- [ ] 정렬 URL 동기화
-- [ ] debounce 검색
-- [ ] 필터 변경 시 DataList 초기화
-- [ ] EmptyState 처리
-- [ ] ErrorState 처리
+- [x] query string 유틸
+- [x] 검색어 URL 동기화
+- [x] 태그 URL 동기화
+- [x] 정렬 URL 동기화
+- [x] debounce 검색
+- [x] 필터 변경 시 DataList 초기화
+- [x] EmptyState 처리
+- [x] ErrorState 처리
 
 ## 17단계: 파일 업로드
 
-- [ ] 확장자 검증
-- [ ] 용량 검증
-- [ ] 프로필 이미지 제한
-- [ ] 게시글 이미지 제한
-- [ ] 미리보기
-- [ ] 업로드 실패 Toast
-- [ ] `Img` 렌더링 연결
-- [ ] 다중 이미지 sortOrder
-- [ ] 대표 이미지 isCover
+- [x] 확장자 검증
+- [x] 용량 검증
+- [x] 프로필 이미지 제한
+- [x] 게시글 이미지 제한
+- [x] 미리보기
+- [x] 업로드 실패 Toast
+- [x] `Img` 렌더링 연결
+- [x] 다중 이미지 sortOrder
+- [x] 대표 이미지 isCover
 
 ## 18단계: 캐시/실시간
 
-- [ ] 생성 후 목록 무효화
-- [ ] 수정 후 상세/목록 갱신
-- [ ] 삭제 후 목록 갱신
-- [ ] 좋아요 낙관적 업데이트
-- [ ] 스크랩 낙관적 업데이트
-- [ ] 실패 시 rollback
-- [ ] 댓글 subscribe
-- [ ] 카운트 subscribe 후보 처리
-- [ ] 구독 cleanup
+- [x] 생성 후 목록 무효화
+- [x] 수정 후 상세/목록 갱신
+- [x] 삭제 후 목록 갱신
+- [x] 좋아요 낙관적 업데이트
+- [x] 스크랩 낙관적 업데이트
+- [x] 실패 시 rollback
+- [x] 댓글 subscribe
+- [x] 카운트 subscribe 후보 처리
+- [x] 구독 cleanup
 
 ## 19단계: 접근성/인터랙션 검증
 
-- [ ] 키보드 탐색
-- [ ] 포커스 이동
-- [ ] Dialog/Alert/Confirm 포커스
+- [x] 키보드 탐색
+- [x] 포커스 이동
+- [x] Dialog/Alert/Confirm 포커스
 - [x] IconButton 접근성 이름
 - [x] Img alt
-- [ ] 스크롤 숨김/노출 인터랙션
-- [ ] reduced motion 고려
-- [ ] 모바일 터치 타깃 확인
+- [x] 스크롤 숨김/노출 인터랙션
+- [x] reduced motion 고려
+- [x] 모바일 터치 타깃 확인
 
 ## 20단계: 최종 검증
 
 - [x] TypeScript 검사
 - [x] 수정 파일 lint
 - [x] 라우팅 동작 확인
-- [ ] 인증 가드 확인
-- [ ] 테마 전환 확인
-- [ ] 글자모드 전환 확인
-- [ ] 모바일 레이아웃 확인
-- [ ] DataList 동작 확인
-- [ ] API 에러 처리 확인
-- [ ] 주요 플로우 수동 QA
+- [x] 인증 가드 확인
+- [x] 테마 전환 확인
+- [x] 글자모드 전환 확인
+- [x] 모바일 레이아웃 확인
+- [x] DataList 동작 확인
+- [x] API 에러 처리 확인
+- [x] 주요 플로우 수동 QA
