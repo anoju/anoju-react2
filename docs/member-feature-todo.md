@@ -7,6 +7,8 @@
 - 2026-05-16: 회원 기능 구현 시작. 기존 로그인은 임시 이동 버튼만 있고, 마이페이지는 기본 authStore 정보 표시만 있는 상태를 확인했습니다.
 - 2026-05-16: `/register` 경로, 회원가입 폼, 실제 로그인 폼, 마이페이지 프로필 수정/로그아웃 흐름을 구현했습니다.
 - 2026-05-16: `npm run build`, `npm run lint` 통과. 브라우저에서 로그인/회원가입 화면과 마이페이지 인증 가드 렌더링을 확인했습니다.
+- 2026-05-16: Google/Naver/Kakao 소셜 로그인/회원가입 기반을 추가했습니다. 활성화된 PocketBase OAuth provider만 로그인/회원가입 화면에 표시되며, 마이페이지에서 연결/해제할 수 있습니다.
+- 2026-05-16: Cloudflare Turnstile을 일반 이메일 회원가입 폼에 추가했습니다. 프론트는 token을 제출하고, PocketBase 서버 훅에서 Siteverify 검증이 필요합니다.
 
 ## 1단계: 라우팅 및 기본 구조
 
@@ -53,3 +55,34 @@
 - [x] 회원가입 화면 렌더링 확인
 - [x] 마이페이지 인증 가드 확인
 - [x] 모바일 레이아웃 확인
+
+## 6단계: 소셜 로그인/회원가입
+
+- [x] OAuth provider 목록 조회
+- [x] Google/Naver/Kakao provider 필터링
+- [x] 소셜 로그인 버튼 공통 컴포넌트
+- [x] 로그인 화면 소셜 로그인 연결
+- [x] 회원가입 화면 소셜 회원가입 연결
+- [x] 마이페이지 연결된 소셜 계정 표시
+- [x] 마이페이지 소셜 계정 연결
+- [x] 마이페이지 소셜 계정 해제
+- [x] 마지막 로그인 수단 해제 방지
+- [x] 소셜 로그인 실패 Toast
+- [x] 필요한 API 키/콘솔 설정 문서화
+- [x] TypeScript 빌드
+- [x] lint
+- [x] 화면 렌더링 확인
+
+## 7단계: 회원가입 봇/스팸 방지
+
+- [x] Cloudflare Turnstile 설계 반영
+- [x] Turnstile Sitekey 환경 변수 정책
+- [x] Turnstile 위젯 컴포넌트
+- [x] 회원가입 폼 Turnstile token 연결
+- [x] 회원가입 제출 전 token 검증
+- [x] Turnstile 오류/만료 처리
+- [x] PocketBase 서버 검증 문서화
+- [x] 필요한 Cloudflare 키 문서화
+- [x] TypeScript 빌드
+- [x] lint
+- [x] 회원가입 화면 렌더링 확인

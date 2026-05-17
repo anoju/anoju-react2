@@ -1,9 +1,11 @@
 import type React from 'react';
-import { useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Input, confirm, toast } from '@/components';
+import { Button, Input, SocialLoginButtons, confirm, toast } from '@/components';
 import { authApi, getUserMessage } from '@/apis';
+import type { LinkedOAuthProvider, SupportedOAuthProvider } from '@/apis/authApi';
 import { DEFAULT_HOME_PATH } from '@/constants/app';
+import { useOAuthProviders } from '@/hooks/useOAuthProviders';
 import { useAuthStore } from '@/stores/authStore';
 
 const MyPage = () => {
@@ -11,6 +13,35 @@ const MyPage = () => {
   const user = useAuthStore((state) => state.user);
   const [name, setName] = useState(user?.name ?? '');
   const [submitting, setSubmitting] = useState(false);
+  const [linkedProviders, setLinkedProviders] = useState<LinkedOAuthProvider[]>([]);
+  const [linkedLoading, setLinkedLoading] = useState(true);
+  const { providers, loading: providersLoading } = useOAuthProviders();
+
+  const linkedProviderNames = useMemo(
+    () => linkedProviders.map((provider) => provider.provider),
+    [linkedProviders],
+  );
+
+  const loginMethodCount = useMemo(() => {
+    const hasEmailLogin = Boolean(user?.email);
+    return (hasEmailLogin ? 1 : 0) + linkedProviders.length;
+  }, [linkedProviders.length, user?.email]);
+
+  const loadLinkedProviders = useCallback(async () => {
+    setLinkedLoading(true);
+
+    try {
+      setLinkedProviders(await authApi.listLinkedOAuthProviders());
+    } catch {
+      setLinkedProviders([]);
+    } finally {
+      setLinkedLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadLinkedProviders();
+  }, [loadLinkedProviders]);
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
@@ -55,6 +86,31 @@ const MyPage = () => {
     navigate(DEFAULT_HOME_PATH, { replace: true });
   };
 
+  const handleUnlinkProvider = async (provider: SupportedOAuthProvider) => {
+    if (loginMethodCount <= 1) {
+      toast('마지막 로그인 수단은 해제할 수 없습니다.', { tone: 'warning' });
+      return;
+    }
+
+    const confirmed = await confirm(`${provider} 계정 연결을 해제하시겠습니까?`, {
+      title: '소셜 계정 연결 해제',
+      confirmLabel: '해제',
+      tone: 'danger',
+    });
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await authApi.unlinkOAuthProvider(provider);
+      toast('소셜 계정 연결을 해제했습니다.', { tone: 'success' });
+      await loadLinkedProviders();
+    } catch (error) {
+      toast(getUserMessage(error), { tone: 'danger' });
+    }
+  };
+
   return (
     <section className="container my-page">
       <header className="my-page__header">
@@ -94,6 +150,50 @@ const MyPage = () => {
           로그아웃
         </Button>
       </div>
+
+      <section className="my-page__social" aria-labelledby="social-login-title">
+        <header className="my-page__section-header">
+          <h3 id="social-login-title">연결된 로그인 수단</h3>
+          <p>Google, Naver, Kakao 계정을 연결하면 같은 계정으로 로그인할 수 있습니다.</p>
+        </header>
+
+        {linkedLoading ? (
+          <p className="my-page__muted">연결 상태를 확인하고 있습니다.</p>
+        ) : (
+          <div className="my-page__provider-list">
+            {providers.map((provider) => {
+              const linked = linkedProviderNames.includes(provider.name);
+
+              return (
+                <div className="my-page__provider" key={provider.name}>
+                  <span>{provider.displayName}</span>
+                  {linked ? (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      tone="danger"
+                      onClick={() => handleUnlinkProvider(provider.name)}
+                    >
+                      연결 해제
+                    </Button>
+                  ) : (
+                    <span className="my-page__muted">미연결</span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        <SocialLoginButtons
+          providers={providers}
+          loading={providersLoading}
+          context="link"
+          disabledProviders={linkedProviderNames}
+          onSuccess={loadLinkedProviders}
+        />
+      </section>
     </section>
   );
 };

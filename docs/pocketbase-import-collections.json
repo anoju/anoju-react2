@@ -1,0 +1,656 @@
+[
+  {
+    "id": "anoju_posts",
+    "name": "posts",
+    "type": "base",
+    "system": false,
+    "listRule": "status = \"published\" && deleted = false || @request.auth.role = \"admin\"",
+    "viewRule": "status = \"published\" && deleted = false || author = @request.auth.id || @request.auth.role = \"admin\"",
+    "createRule": "@request.auth.id != \"\" && @request.auth.verified = true && @request.auth.status = \"active\"",
+    "updateRule": "(author = @request.auth.id && status != \"hidden\") || @request.auth.role = \"admin\"",
+    "deleteRule": "@request.auth.role = \"admin\"",
+    "fields": [
+      {
+        "id": "txt_post_title",
+        "name": "title",
+        "type": "text",
+        "system": false,
+        "required": true,
+        "presentable": true,
+        "hidden": false,
+        "min": 1,
+        "max": 160,
+        "pattern": "",
+        "autogeneratePattern": ""
+      },
+      {
+        "id": "txt_post_body",
+        "name": "content",
+        "type": "text",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "min": 1,
+        "max": 0,
+        "pattern": "",
+        "autogeneratePattern": ""
+      },
+      {
+        "id": "sel_post_type",
+        "name": "type",
+        "type": "select",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "maxSelect": 1,
+        "values": [
+          "board",
+          "gallery"
+        ]
+      },
+      {
+        "id": "rel_post_author",
+        "name": "author",
+        "type": "relation",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "collectionId": "_pb_users_auth_",
+        "cascadeDelete": false,
+        "minSelect": 1,
+        "maxSelect": 1
+      },
+      {
+        "id": "sel_post_stat",
+        "name": "status",
+        "type": "select",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "maxSelect": 1,
+        "values": [
+          "draft",
+          "published",
+          "hidden",
+          "deleted"
+        ]
+      },
+      {
+        "id": "json_post_tags",
+        "name": "tags",
+        "type": "json",
+        "system": false,
+        "required": false,
+        "presentable": false,
+        "hidden": false,
+        "maxSize": 2000000
+      },
+      {
+        "id": "num_post_view",
+        "name": "viewCount",
+        "type": "number",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "min": 0,
+        "max": null,
+        "onlyInt": true
+      },
+      {
+        "id": "num_post_comm",
+        "name": "commentCount",
+        "type": "number",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "min": 0,
+        "max": null,
+        "onlyInt": true
+      },
+      {
+        "id": "num_post_like",
+        "name": "likeCount",
+        "type": "number",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "min": 0,
+        "max": null,
+        "onlyInt": true
+      },
+      {
+        "id": "num_post_book",
+        "name": "bookmarkCount",
+        "type": "number",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "min": 0,
+        "max": null,
+        "onlyInt": true
+      },
+      {
+        "id": "bool_post_del",
+        "name": "deleted",
+        "type": "bool",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false
+      },
+      {
+        "id": "date_post_del",
+        "name": "deletedAt",
+        "type": "date",
+        "system": false,
+        "required": false,
+        "presentable": false,
+        "hidden": false,
+        "min": "",
+        "max": ""
+      }
+    ],
+    "indexes": [
+      "CREATE INDEX `idx_posts_status_deleted` ON `posts` (`status`, `deleted`)"
+    ]
+  },
+  {
+    "id": "anoju_comments",
+    "name": "comments",
+    "type": "base",
+    "system": false,
+    "listRule": "status = \"published\" && deleted = false || @request.auth.role = \"admin\"",
+    "viewRule": "status = \"published\" && deleted = false || author = @request.auth.id || @request.auth.role = \"admin\"",
+    "createRule": "@request.auth.id != \"\" && @request.auth.verified = true && @request.auth.status = \"active\"",
+    "updateRule": "author = @request.auth.id || @request.auth.role = \"admin\"",
+    "deleteRule": "@request.auth.role = \"admin\"",
+    "fields": [
+      {
+        "id": "rel_comm_post",
+        "name": "post",
+        "type": "relation",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "collectionId": "anoju_posts",
+        "cascadeDelete": true,
+        "minSelect": 1,
+        "maxSelect": 1
+      },
+      {
+        "id": "rel_comm_author",
+        "name": "author",
+        "type": "relation",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "collectionId": "_pb_users_auth_",
+        "cascadeDelete": false,
+        "minSelect": 1,
+        "maxSelect": 1
+      },
+      {
+        "id": "txt_comm_body",
+        "name": "content",
+        "type": "text",
+        "system": false,
+        "required": true,
+        "presentable": true,
+        "hidden": false,
+        "min": 1,
+        "max": 2000,
+        "pattern": "",
+        "autogeneratePattern": ""
+      },
+      {
+        "id": "rel_comm_parent",
+        "name": "parentComment",
+        "type": "relation",
+        "system": false,
+        "required": false,
+        "presentable": false,
+        "hidden": false,
+        "collectionId": "anoju_comments",
+        "cascadeDelete": false,
+        "minSelect": 0,
+        "maxSelect": 1
+      },
+      {
+        "id": "sel_comm_stat",
+        "name": "status",
+        "type": "select",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "maxSelect": 1,
+        "values": [
+          "published",
+          "hidden",
+          "deleted"
+        ]
+      },
+      {
+        "id": "num_comm_like",
+        "name": "likeCount",
+        "type": "number",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "min": 0,
+        "max": null,
+        "onlyInt": true
+      },
+      {
+        "id": "bool_comm_del",
+        "name": "deleted",
+        "type": "bool",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false
+      },
+      {
+        "id": "date_comm_del",
+        "name": "deletedAt",
+        "type": "date",
+        "system": false,
+        "required": false,
+        "presentable": false,
+        "hidden": false,
+        "min": "",
+        "max": ""
+      }
+    ],
+    "indexes": []
+  },
+  {
+    "id": "anoju_images",
+    "name": "post_images",
+    "type": "base",
+    "system": false,
+    "listRule": "post.status = \"published\" && post.deleted = false || @request.auth.role = \"admin\"",
+    "viewRule": "post.status = \"published\" && post.deleted = false || post.author = @request.auth.id || @request.auth.role = \"admin\"",
+    "createRule": "@request.auth.id != \"\" && post.author = @request.auth.id",
+    "updateRule": "post.author = @request.auth.id || @request.auth.role = \"admin\"",
+    "deleteRule": "post.author = @request.auth.id || @request.auth.role = \"admin\"",
+    "fields": [
+      {
+        "id": "rel_img_post",
+        "name": "post",
+        "type": "relation",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "collectionId": "anoju_posts",
+        "cascadeDelete": true,
+        "minSelect": 1,
+        "maxSelect": 1
+      },
+      {
+        "id": "file_img_image",
+        "name": "image",
+        "type": "file",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "maxSelect": 1,
+        "maxSize": 5242880,
+        "mimeTypes": [
+          "image/jpeg",
+          "image/png",
+          "image/webp"
+        ],
+        "thumbs": [],
+        "protected": false
+      },
+      {
+        "id": "txt_img_alt",
+        "name": "alt",
+        "type": "text",
+        "system": false,
+        "required": false,
+        "presentable": false,
+        "hidden": false,
+        "min": 0,
+        "max": 200,
+        "pattern": "",
+        "autogeneratePattern": ""
+      },
+      {
+        "id": "num_img_sort",
+        "name": "sortOrder",
+        "type": "number",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "min": 0,
+        "max": null,
+        "onlyInt": true
+      },
+      {
+        "id": "bool_img_cover",
+        "name": "isCover",
+        "type": "bool",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false
+      }
+    ],
+    "indexes": []
+  },
+  {
+    "id": "anoju_reactions",
+    "name": "reactions",
+    "type": "base",
+    "system": false,
+    "listRule": "@request.auth.id != \"\"",
+    "viewRule": "user = @request.auth.id || @request.auth.role = \"admin\"",
+    "createRule": "@request.auth.id != \"\" && @request.auth.verified = true && user = @request.auth.id",
+    "updateRule": null,
+    "deleteRule": "user = @request.auth.id || @request.auth.role = \"admin\"",
+    "fields": [
+      {
+        "id": "sel_react_tgt",
+        "name": "targetType",
+        "type": "select",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "maxSelect": 1,
+        "values": [
+          "post",
+          "comment"
+        ]
+      },
+      {
+        "id": "txt_react_tid",
+        "name": "targetId",
+        "type": "text",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "min": 15,
+        "max": 15,
+        "pattern": "",
+        "autogeneratePattern": ""
+      },
+      {
+        "id": "rel_react_user",
+        "name": "user",
+        "type": "relation",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "collectionId": "_pb_users_auth_",
+        "cascadeDelete": true,
+        "minSelect": 1,
+        "maxSelect": 1
+      },
+      {
+        "id": "sel_react_type",
+        "name": "type",
+        "type": "select",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "maxSelect": 1,
+        "values": [
+          "like"
+        ]
+      }
+    ],
+    "indexes": [
+      "CREATE UNIQUE INDEX `idx_reactions_unique` ON `reactions` (`targetType`, `targetId`, `user`, `type`)",
+      "CREATE INDEX `idx_reactions_target` ON `reactions` (`targetType`, `targetId`)"
+    ]
+  },
+  {
+    "id": "anoju_bookmarks",
+    "name": "bookmarks",
+    "type": "base",
+    "system": false,
+    "listRule": "user = @request.auth.id || @request.auth.role = \"admin\"",
+    "viewRule": "user = @request.auth.id || @request.auth.role = \"admin\"",
+    "createRule": "@request.auth.id != \"\" && @request.auth.verified = true && user = @request.auth.id",
+    "updateRule": null,
+    "deleteRule": "user = @request.auth.id || @request.auth.role = \"admin\"",
+    "fields": [
+      {
+        "id": "rel_book_post",
+        "name": "post",
+        "type": "relation",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "collectionId": "anoju_posts",
+        "cascadeDelete": true,
+        "minSelect": 1,
+        "maxSelect": 1
+      },
+      {
+        "id": "rel_book_user",
+        "name": "user",
+        "type": "relation",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "collectionId": "_pb_users_auth_",
+        "cascadeDelete": true,
+        "minSelect": 1,
+        "maxSelect": 1
+      }
+    ],
+    "indexes": [
+      "CREATE UNIQUE INDEX `idx_bookmarks_unique` ON `bookmarks` (`post`, `user`)"
+    ]
+  },
+  {
+    "id": "anoju_reports",
+    "name": "reports",
+    "type": "base",
+    "system": false,
+    "listRule": "@request.auth.role = \"admin\"",
+    "viewRule": "reporter = @request.auth.id || @request.auth.role = \"admin\"",
+    "createRule": "@request.auth.id != \"\" && @request.auth.verified = true && reporter = @request.auth.id",
+    "updateRule": "@request.auth.role = \"admin\"",
+    "deleteRule": "@request.auth.role = \"admin\"",
+    "fields": [
+      {
+        "id": "sel_report_tgt",
+        "name": "targetType",
+        "type": "select",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "maxSelect": 1,
+        "values": [
+          "post",
+          "comment",
+          "user"
+        ]
+      },
+      {
+        "id": "txt_report_tid",
+        "name": "targetId",
+        "type": "text",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "min": 15,
+        "max": 15,
+        "pattern": "",
+        "autogeneratePattern": ""
+      },
+      {
+        "id": "rel_report_user",
+        "name": "reporter",
+        "type": "relation",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "collectionId": "_pb_users_auth_",
+        "cascadeDelete": false,
+        "minSelect": 1,
+        "maxSelect": 1
+      },
+      {
+        "id": "sel_report_rea",
+        "name": "reason",
+        "type": "select",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "maxSelect": 1,
+        "values": [
+          "spam",
+          "abuse",
+          "privacy",
+          "illegal",
+          "other"
+        ]
+      },
+      {
+        "id": "txt_report_det",
+        "name": "detail",
+        "type": "text",
+        "system": false,
+        "required": false,
+        "presentable": false,
+        "hidden": false,
+        "min": 0,
+        "max": 1000,
+        "pattern": "",
+        "autogeneratePattern": ""
+      },
+      {
+        "id": "sel_report_sta",
+        "name": "status",
+        "type": "select",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "maxSelect": 1,
+        "values": [
+          "pending",
+          "reviewed",
+          "rejected",
+          "resolved"
+        ]
+      }
+    ],
+    "indexes": []
+  },
+  {
+    "id": "anoju_notices",
+    "name": "notices",
+    "type": "base",
+    "system": false,
+    "listRule": "active = true || @request.auth.role = \"admin\"",
+    "viewRule": "active = true || @request.auth.role = \"admin\"",
+    "createRule": "@request.auth.role = \"admin\"",
+    "updateRule": "@request.auth.role = \"admin\"",
+    "deleteRule": "@request.auth.role = \"admin\"",
+    "fields": [
+      {
+        "id": "txt_notice_tit",
+        "name": "title",
+        "type": "text",
+        "system": false,
+        "required": true,
+        "presentable": true,
+        "hidden": false,
+        "min": 1,
+        "max": 160,
+        "pattern": "",
+        "autogeneratePattern": ""
+      },
+      {
+        "id": "txt_notice_con",
+        "name": "content",
+        "type": "text",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "min": 1,
+        "max": 0,
+        "pattern": "",
+        "autogeneratePattern": ""
+      },
+      {
+        "id": "sel_notice_plc",
+        "name": "placement",
+        "type": "select",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "maxSelect": 1,
+        "values": [
+          "global",
+          "board",
+          "gallery"
+        ]
+      },
+      {
+        "id": "bool_notice_on",
+        "name": "active",
+        "type": "bool",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false
+      },
+      {
+        "id": "date_notice_st",
+        "name": "startsAt",
+        "type": "date",
+        "system": false,
+        "required": false,
+        "presentable": false,
+        "hidden": false,
+        "min": "",
+        "max": ""
+      },
+      {
+        "id": "date_notice_ed",
+        "name": "endsAt",
+        "type": "date",
+        "system": false,
+        "required": false,
+        "presentable": false,
+        "hidden": false,
+        "min": "",
+        "max": ""
+      }
+    ],
+    "indexes": []
+  }
+]

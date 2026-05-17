@@ -1,9 +1,10 @@
 import type React from 'react';
 import { useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Button, Input, confirm, toast } from '@/components';
+import { Button, Input, SocialLoginButtons, confirm, toast } from '@/components';
 import { authApi, getUserMessage } from '@/apis';
 import { DEFAULT_HOME_PATH, REGISTER_PATH } from '@/constants/app';
+import { useOAuthProviders } from '@/hooks/useOAuthProviders';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -11,6 +12,7 @@ const Login = () => {
   const [identity, setIdentity] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const { providers, loading: providersLoading } = useOAuthProviders();
 
   const redirectPath = useMemo(() => {
     const params = new URLSearchParams(location.search);
@@ -89,6 +91,20 @@ const Login = () => {
           로그인
         </Button>
       </form>
+
+      {providers.length > 0 || providersLoading ? (
+        <>
+          <div className="auth-page__divider" role="separator">
+            <span>또는</span>
+          </div>
+          <SocialLoginButtons
+            providers={providers}
+            loading={providersLoading}
+            context="login"
+            onSuccess={() => navigate(redirectPath, { replace: true })}
+          />
+        </>
+      ) : null}
 
       <div className="auth-page__actions">
         <Button type="button" variant="plain" tone="neutral" onClick={handlePasswordReset}>

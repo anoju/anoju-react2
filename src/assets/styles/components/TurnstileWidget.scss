@@ -1,0 +1,15 @@
+.turnstile-widget {
+  display: grid;
+  gap: var(--spacing-xs);
+
+  &__container {
+    min-height: 4.0625rem;
+  }
+
+  &__error {
+    margin: 0;
+    color: var(--color-text-danger);
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-base);
+  }
+}
