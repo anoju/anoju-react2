@@ -1,5 +1,15 @@
 import { NavLink } from 'react-router-dom';
-import { DEFAULT_HOME_PATH, LOGIN_PATH, MY_PAGE_PATH, REGISTER_PATH, SETTINGS_PATH } from '@/constants/app';
+import {
+  DEFAULT_HOME_PATH,
+  FREE_BOARD_PATH,
+  LOGIN_PATH,
+  MY_PAGE_PATH,
+  PICS_PATH,
+  PLAYGROUND_PATH,
+  REGISTER_PATH,
+  SETTINGS_PATH,
+  SNAPS_PATH,
+} from '@/constants/app';
 import { useAuthStore } from '@/stores/authStore';
 
 const Menu = () => {
@@ -12,8 +22,17 @@ const Menu = () => {
         <NavLink to={DEFAULT_HOME_PATH} className="menu-list__item">
           홈
         </NavLink>
-        <NavLink to="/gallery" className="menu-list__item">
-          갤러리
+        <NavLink to={PLAYGROUND_PATH} className="menu-list__item">
+          playground
+        </NavLink>
+        <NavLink to={FREE_BOARD_PATH} className="menu-list__item">
+          자유게시판
+        </NavLink>
+        <NavLink to={SNAPS_PATH} className="menu-list__item">
+          Snaps
+        </NavLink>
+        <NavLink to={PICS_PATH} className="menu-list__item">
+          Pics
         </NavLink>
         <NavLink to="/about" className="menu-list__item">
           소개

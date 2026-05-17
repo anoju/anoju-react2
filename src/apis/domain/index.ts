@@ -1,5 +1,6 @@
 export { bookmarkApi } from './bookmarkApi';
 export { commentApi } from './commentApi';
+export { communityApi } from './communityApi';
 export { createCrudApi } from './createCrudApi';
 export { noticeApi } from './noticeApi';
 export { postApi } from './postApi';

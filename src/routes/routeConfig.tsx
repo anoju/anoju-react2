@@ -3,11 +3,37 @@ import Login from '@/pages/Login/Index';
 import Register from '@/pages/Register/Index';
 import Menu from '@/pages/Menu/Index';
 import MyPage from '@/pages/MyPage/Index';
+import MyPageProfile from '@/pages/MyPageProfile/Index';
+import MyPosts from '@/pages/MyPosts/Index';
+import MyComments from '@/pages/MyComments/Index';
 import Settings from '@/pages/Settings/Index';
-import Gallery from '@/pages/Gallery/Index';
+import Playground from '@/pages/Playground/Index';
+import FreeBoard from '@/pages/FreeBoard/Index';
+import FreeBoardDetail from '@/pages/FreeBoardDetail/Index';
+import FreeBoardWrite from '@/pages/FreeBoardWrite/Index';
+import Snaps from '@/pages/Snaps/Index';
+import Pics from '@/pages/Pics/Index';
+import PicsDetail from '@/pages/PicsDetail/Index';
+import PicsWrite from '@/pages/PicsWrite/Index';
 import About from '@/pages/static/About/Index';
 import NotFound from '@/pages/NotFound/Index';
-import { DEFAULT_HOME_PATH, LOGIN_PATH, MENU_PATH, MY_PAGE_PATH, REGISTER_PATH, SETTINGS_PATH } from '@/constants/app';
+import {
+  DEFAULT_HOME_PATH,
+  FREE_BOARD_PATH,
+  FREE_BOARD_WRITE_PATH,
+  LOGIN_PATH,
+  MENU_PATH,
+  MY_PAGE_PATH,
+  MY_PAGE_COMMENTS_PATH,
+  MY_PAGE_POSTS_PATH,
+  MY_PAGE_PROFILE_PATH,
+  PICS_PATH,
+  PICS_WRITE_PATH,
+  PLAYGROUND_PATH,
+  REGISTER_PATH,
+  SETTINGS_PATH,
+  SNAPS_PATH,
+} from '@/constants/app';
 import type { AppRouteConfig, HeaderConfig, FloatingMenuConfig } from './types';
 
 const defaultHeader = (title: string): HeaderConfig => ({
@@ -75,7 +101,10 @@ export const routeConfig = [
     },
     layout: {
       header: defaultHeader('로그인'),
-      floatingMenu: defaultFloatingMenu,
+      floatingMenu: {
+        ...defaultFloatingMenu,
+        enabled: true,
+      },
     },
   },
   {
@@ -128,6 +157,54 @@ export const routeConfig = [
     roles: ['user', 'admin'],
   },
   {
+    id: 'my-page-profile',
+    path: MY_PAGE_PROFILE_PATH,
+    element: <MyPageProfile />,
+    meta: {
+      title: '내 정보',
+      description: '내 정보와 로그인 수단을 관리하는 화면입니다.',
+      robots: 'noindex',
+    },
+    layout: {
+      header: defaultHeader('내 정보'),
+      floatingMenu: defaultFloatingMenu,
+    },
+    requiresAuth: true,
+    roles: ['user', 'admin'],
+  },
+  {
+    id: 'my-page-posts',
+    path: MY_PAGE_POSTS_PATH,
+    element: <MyPosts />,
+    meta: {
+      title: '내가 작성한 글',
+      description: '내가 작성한 글을 확인하는 화면입니다.',
+      robots: 'noindex',
+    },
+    layout: {
+      header: defaultHeader('내가 작성한 글'),
+      floatingMenu: defaultFloatingMenu,
+    },
+    requiresAuth: true,
+    roles: ['user', 'admin'],
+  },
+  {
+    id: 'my-page-comments',
+    path: MY_PAGE_COMMENTS_PATH,
+    element: <MyComments />,
+    meta: {
+      title: '내가 작성한 댓글',
+      description: '내가 작성한 댓글을 확인하는 화면입니다.',
+      robots: 'noindex',
+    },
+    layout: {
+      header: defaultHeader('내가 작성한 댓글'),
+      floatingMenu: defaultFloatingMenu,
+    },
+    requiresAuth: true,
+    roles: ['user', 'admin'],
+  },
+  {
     id: 'settings',
     path: SETTINGS_PATH,
     element: <Settings />,
@@ -145,15 +222,118 @@ export const routeConfig = [
     },
   },
   {
-    id: 'gallery',
-    path: '/gallery',
-    element: <Gallery />,
+    id: 'playground',
+    path: PLAYGROUND_PATH,
+    element: <Playground />,
     meta: {
-      title: '갤러리',
-      description: '갤러리 목록 화면입니다.',
+      title: 'playground',
+      description: '커뮤니티 메뉴를 모아보는 playground 서브 메인입니다.',
     },
     layout: {
-      header: defaultHeader('갤러리'),
+      header: defaultHeader('playground'),
+      floatingMenu: {
+        ...defaultFloatingMenu,
+        enabled: true,
+      },
+    },
+  },
+  {
+    id: 'free-board',
+    path: FREE_BOARD_PATH,
+    element: <FreeBoard />,
+    meta: {
+      title: '자유게시판',
+      description: '자유게시판 목록 화면입니다.',
+    },
+    layout: {
+      header: defaultHeader('자유게시판'),
+      floatingMenu: defaultFloatingMenu,
+    },
+  },
+  {
+    id: 'free-board-write',
+    path: FREE_BOARD_WRITE_PATH,
+    element: <FreeBoardWrite />,
+    meta: {
+      title: '자유게시판 글쓰기',
+      description: '자유게시판 글 작성 화면입니다.',
+      robots: 'noindex',
+    },
+    layout: {
+      header: defaultHeader('글쓰기'),
+      floatingMenu: defaultFloatingMenu,
+    },
+    requiresAuth: true,
+    roles: ['user', 'admin'],
+  },
+  {
+    id: 'free-board-detail',
+    path: `${FREE_BOARD_PATH}/:postId`,
+    element: <FreeBoardDetail />,
+    meta: {
+      title: '자유게시판 상세',
+      description: '자유게시판 게시글 상세 화면입니다.',
+    },
+    layout: {
+      header: defaultHeader('자유게시판'),
+      floatingMenu: defaultFloatingMenu,
+    },
+  },
+  {
+    id: 'snaps',
+    path: SNAPS_PATH,
+    element: <Snaps />,
+    meta: {
+      title: 'Snaps',
+      description: '시각 콘텐츠 메뉴를 모아보는 Snaps 서브 메인입니다.',
+    },
+    layout: {
+      header: defaultHeader('Snaps'),
+      floatingMenu: {
+        ...defaultFloatingMenu,
+        enabled: true,
+      },
+    },
+  },
+  {
+    id: 'pics',
+    path: PICS_PATH,
+    element: <Pics />,
+    meta: {
+      title: 'Pics',
+      description: '이미지 중심 소셜 피드 화면입니다.',
+    },
+    layout: {
+      header: defaultHeader('Pics'),
+      floatingMenu: defaultFloatingMenu,
+    },
+  },
+  {
+    id: 'pics-write',
+    path: PICS_WRITE_PATH,
+    element: <PicsWrite />,
+    meta: {
+      title: 'Pics 작성',
+      description: 'Pics 작성 화면입니다.',
+      robots: 'noindex',
+    },
+    layout: {
+      header: defaultHeader('Pics 작성'),
+      floatingMenu: defaultFloatingMenu,
+    },
+    requiresAuth: true,
+    roles: ['user', 'admin'],
+  },
+  {
+    id: 'pics-detail',
+    path: `${PICS_PATH}/:postId`,
+    element: <PicsDetail />,
+    meta: {
+      title: 'Pics 상세',
+      description: 'Pics 상세 화면입니다.',
+    },
+    layout: {
+      header: defaultHeader('Pics'),
       floatingMenu: defaultFloatingMenu,
     },
   },

@@ -1,9 +1,15 @@
-import { Home, Menu, UserRound, LogIn } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { NavLink } from 'react-router-dom';
-import { DEFAULT_HOME_PATH, LOGIN_PATH, MENU_PATH, MY_PAGE_PATH } from '@/constants/app';
-import { useAuthStore } from '@/stores/authStore';
-import type { FloatingMenuConfig } from '@/routes/types';
+import { Gamepad2, Images, LogIn, Menu, UserRound } from "lucide-react";
+import { motion } from "framer-motion";
+import { NavLink } from "react-router-dom";
+import {
+  LOGIN_PATH,
+  MENU_PATH,
+  MY_PAGE_PATH,
+  PLAYGROUND_PATH,
+  SNAPS_PATH,
+} from "@/constants/app";
+import { useAuthStore } from "@/stores/authStore";
+import type { FloatingMenuConfig } from "@/routes/types";
 
 interface FloatingMenuProps {
   config: FloatingMenuConfig;
@@ -18,7 +24,7 @@ export const FloatingMenu = ({ config, visible }: FloatingMenuProps) => {
   }
 
   const myPageTarget = isAuthenticated ? MY_PAGE_PATH : LOGIN_PATH;
-  const myPageLabel = isAuthenticated ? '마이페이지' : '로그인';
+  const myPageLabel = isAuthenticated ? "Mypage" : "Login";
   const MyPageIcon = isAuthenticated ? UserRound : LogIn;
 
   return (
@@ -26,16 +32,23 @@ export const FloatingMenu = ({ config, visible }: FloatingMenuProps) => {
       className="floating-menu"
       aria-label="주요 메뉴"
       initial={false}
-      animate={{ y: visible ? 0 : 'calc(100% + 24px)', opacity: visible ? 1 : 0 }}
-      transition={{ duration: 0.22, ease: 'easeOut' }}
+      animate={{
+        y: visible ? 0 : "calc(100% + 24px)",
+        opacity: visible ? 1 : 0,
+      }}
+      transition={{ duration: 0.22, ease: "easeOut" }}
     >
-      <NavLink to={DEFAULT_HOME_PATH} className="floating-menu__item">
-        <Home size={20} />
-        <span>홈</span>
-      </NavLink>
       <NavLink to={MENU_PATH} className="floating-menu__item">
         <Menu size={20} />
-        <span>전체메뉴</span>
+        <span>Menu</span>
+      </NavLink>
+      <NavLink to={PLAYGROUND_PATH} className="floating-menu__item">
+        <Gamepad2 size={20} />
+        <span>Playground</span>
+      </NavLink>
+      <NavLink to={SNAPS_PATH} className="floating-menu__item">
+        <Images size={20} />
+        <span>Scene</span>
       </NavLink>
       <NavLink to={myPageTarget} className="floating-menu__item">
         <MyPageIcon size={20} />
