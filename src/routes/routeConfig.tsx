@@ -1,22 +1,22 @@
-import Home from '@/pages/Home/Index';
-import Login from '@/pages/Login/Index';
-import Register from '@/pages/Register/Index';
-import Menu from '@/pages/Menu/Index';
-import MyPage from '@/pages/MyPage/Index';
-import MyPageProfile from '@/pages/MyPageProfile/Index';
-import MyPosts from '@/pages/MyPosts/Index';
-import MyComments from '@/pages/MyComments/Index';
-import Settings from '@/pages/Settings/Index';
-import Playground from '@/pages/Playground/Index';
-import FreeBoard from '@/pages/FreeBoard/Index';
-import FreeBoardDetail from '@/pages/FreeBoardDetail/Index';
-import FreeBoardWrite from '@/pages/FreeBoardWrite/Index';
-import Snaps from '@/pages/Snaps/Index';
-import Pics from '@/pages/Pics/Index';
-import PicsDetail from '@/pages/PicsDetail/Index';
-import PicsWrite from '@/pages/PicsWrite/Index';
-import About from '@/pages/static/About/Index';
-import NotFound from '@/pages/NotFound/Index';
+import Home from "@/pages/Home/Index";
+import Login from "@/pages/Auth/Login/Index";
+import Register from "@/pages/Auth/Register/Index";
+import Menu from "@/pages/Menu/Index";
+import MyPage from "@/pages/MyPage/Index";
+import MyPageProfile from "@/pages/MyPage/Profile/Index";
+import MyPosts from "@/pages/MyPage/Posts/Index";
+import MyComments from "@/pages/MyPage/Comments/Index";
+import Settings from "@/pages/Settings/Index";
+import Playground from "@/pages/Playground/Index";
+import FreeBoard from "@/pages/Playground/FreeBoard/Index";
+import FreeBoardDetail from "@/pages/Playground/FreeBoard/Detail/Index";
+import FreeBoardWrite from "@/pages/Playground/FreeBoard/Write/Index";
+import Snaps from "@/pages/Snaps/Index";
+import Pics from "@/pages/Snaps/Pics/Index";
+import PicsDetail from "@/pages/Snaps/Pics/Detail/Index";
+import PicsWrite from "@/pages/Snaps/Pics/Write/Index";
+import About from "@/pages/Static/About/Index";
+import NotFound from "@/pages/System/NotFound/Index";
 import {
   DEFAULT_HOME_PATH,
   FREE_BOARD_PATH,
@@ -33,8 +33,8 @@ import {
   REGISTER_PATH,
   SETTINGS_PATH,
   SNAPS_PATH,
-} from '@/constants/app';
-import type { AppRouteConfig, HeaderConfig, FloatingMenuConfig } from './types';
+} from "@/constants/app";
+import type { AppRouteConfig, HeaderConfig, FloatingMenuConfig } from "./types";
 
 const defaultHeader = (title: string): HeaderConfig => ({
   enabled: true,
@@ -43,7 +43,7 @@ const defaultHeader = (title: string): HeaderConfig => ({
   hideOnScroll: true,
   showBackButton: true,
   showHomeButton: true,
-  backButton: { type: 'history', fallbackPath: DEFAULT_HOME_PATH },
+  backButton: { type: "history", fallbackPath: DEFAULT_HOME_PATH },
 });
 
 const defaultFloatingMenu: FloatingMenuConfig = {
@@ -53,16 +53,16 @@ const defaultFloatingMenu: FloatingMenuConfig = {
 
 export const routeConfig = [
   {
-    id: 'root',
-    path: '/',
+    id: "root",
+    path: "/",
     element: <Home />,
     meta: {
-      title: '홈',
-      description: 'Anoju 홈 화면입니다.',
+      title: "Anoju",
+      description: "Anoju 홈 화면입니다.",
     },
     layout: {
       header: {
-        ...defaultHeader('홈'),
+        ...defaultHeader("Anoju"),
         showBackButton: false,
       },
       floatingMenu: {
@@ -72,16 +72,16 @@ export const routeConfig = [
     },
   },
   {
-    id: 'home',
+    id: "home",
     path: DEFAULT_HOME_PATH,
     element: <Home />,
     meta: {
-      title: '홈',
-      description: 'Anoju 홈 화면입니다.',
+      title: "홈",
+      description: "Anoju 홈 화면입니다.",
     },
     layout: {
       header: {
-        ...defaultHeader('홈'),
+        ...defaultHeader("홈"),
         showBackButton: false,
       },
       floatingMenu: {
@@ -91,16 +91,16 @@ export const routeConfig = [
     },
   },
   {
-    id: 'login',
+    id: "login",
     path: LOGIN_PATH,
     element: <Login />,
     meta: {
-      title: '로그인',
-      description: 'Anoju 로그인 화면입니다.',
-      robots: 'noindex',
+      title: "로그인",
+      description: "Anoju 로그인 화면입니다.",
+      robots: "noindex",
     },
     layout: {
-      header: defaultHeader('로그인'),
+      header: defaultHeader("로그인"),
       floatingMenu: {
         ...defaultFloatingMenu,
         enabled: true,
@@ -108,29 +108,29 @@ export const routeConfig = [
     },
   },
   {
-    id: 'register',
+    id: "register",
     path: REGISTER_PATH,
     element: <Register />,
     meta: {
-      title: '회원가입',
-      description: 'Anoju 회원가입 화면입니다.',
-      robots: 'noindex',
+      title: "회원가입",
+      description: "Anoju 회원가입 화면입니다.",
+      robots: "noindex",
     },
     layout: {
-      header: defaultHeader('회원가입'),
+      header: defaultHeader("회원가입"),
       floatingMenu: defaultFloatingMenu,
     },
   },
   {
-    id: 'menu',
+    id: "menu",
     path: MENU_PATH,
     element: <Menu />,
     meta: {
-      title: '전체메뉴',
-      description: 'Anoju 전체 메뉴 화면입니다.',
+      title: "전체메뉴",
+      description: "Anoju 전체 메뉴 화면입니다.",
     },
     layout: {
-      header: defaultHeader('전체메뉴'),
+      header: defaultHeader("전체메뉴"),
       floatingMenu: {
         ...defaultFloatingMenu,
         enabled: true,
@@ -138,83 +138,83 @@ export const routeConfig = [
     },
   },
   {
-    id: 'my-page',
+    id: "my-page",
     path: MY_PAGE_PATH,
     element: <MyPage />,
     meta: {
-      title: '마이페이지',
-      description: '내 정보와 활동을 확인하는 화면입니다.',
-      robots: 'noindex',
+      title: "마이페이지",
+      description: "내 정보와 활동을 확인하는 화면입니다.",
+      robots: "noindex",
     },
     layout: {
-      header: defaultHeader('마이페이지'),
+      header: defaultHeader("마이페이지"),
       floatingMenu: {
         ...defaultFloatingMenu,
         enabled: true,
       },
     },
     requiresAuth: true,
-    roles: ['user', 'admin'],
+    roles: ["user", "admin"],
   },
   {
-    id: 'my-page-profile',
+    id: "my-page-profile",
     path: MY_PAGE_PROFILE_PATH,
     element: <MyPageProfile />,
     meta: {
-      title: '내 정보',
-      description: '내 정보와 로그인 수단을 관리하는 화면입니다.',
-      robots: 'noindex',
+      title: "내 정보",
+      description: "내 정보와 로그인 수단을 관리하는 화면입니다.",
+      robots: "noindex",
     },
     layout: {
-      header: defaultHeader('내 정보'),
+      header: defaultHeader("내 정보"),
       floatingMenu: defaultFloatingMenu,
     },
     requiresAuth: true,
-    roles: ['user', 'admin'],
+    roles: ["user", "admin"],
   },
   {
-    id: 'my-page-posts',
+    id: "my-page-posts",
     path: MY_PAGE_POSTS_PATH,
     element: <MyPosts />,
     meta: {
-      title: '내가 작성한 글',
-      description: '내가 작성한 글을 확인하는 화면입니다.',
-      robots: 'noindex',
+      title: "내가 작성한 글",
+      description: "내가 작성한 글을 확인하는 화면입니다.",
+      robots: "noindex",
     },
     layout: {
-      header: defaultHeader('내가 작성한 글'),
+      header: defaultHeader("내가 작성한 글"),
       floatingMenu: defaultFloatingMenu,
     },
     requiresAuth: true,
-    roles: ['user', 'admin'],
+    roles: ["user", "admin"],
   },
   {
-    id: 'my-page-comments',
+    id: "my-page-comments",
     path: MY_PAGE_COMMENTS_PATH,
     element: <MyComments />,
     meta: {
-      title: '내가 작성한 댓글',
-      description: '내가 작성한 댓글을 확인하는 화면입니다.',
-      robots: 'noindex',
+      title: "내가 작성한 댓글",
+      description: "내가 작성한 댓글을 확인하는 화면입니다.",
+      robots: "noindex",
     },
     layout: {
-      header: defaultHeader('내가 작성한 댓글'),
+      header: defaultHeader("내가 작성한 댓글"),
       floatingMenu: defaultFloatingMenu,
     },
     requiresAuth: true,
-    roles: ['user', 'admin'],
+    roles: ["user", "admin"],
   },
   {
-    id: 'settings',
+    id: "settings",
     path: SETTINGS_PATH,
     element: <Settings />,
     meta: {
-      title: '설정',
-      description: '테마와 글자 크기를 설정하는 화면입니다.',
-      robots: 'noindex',
+      title: "설정",
+      description: "테마와 글자 크기를 설정하는 화면입니다.",
+      robots: "noindex",
     },
     layout: {
-      header: defaultHeader('설정'),
+      header: defaultHeader("설정"),
       floatingMenu: {
         ...defaultFloatingMenu,
         enabled: true,
@@ -222,15 +222,15 @@ export const routeConfig = [
     },
   },
   {
-    id: 'playground',
+    id: "playground",
     path: PLAYGROUND_PATH,
     element: <Playground />,
     meta: {
-      title: 'playground',
-      description: '커뮤니티 메뉴를 모아보는 playground 서브 메인입니다.',
+      title: "playground",
+      description: "커뮤니티 메뉴를 모아보는 playground 서브 메인입니다.",
     },
     layout: {
-      header: defaultHeader('playground'),
+      header: defaultHeader("playground"),
       floatingMenu: {
         ...defaultFloatingMenu,
         enabled: true,
@@ -238,57 +238,57 @@ export const routeConfig = [
     },
   },
   {
-    id: 'free-board',
+    id: "free-board",
     path: FREE_BOARD_PATH,
     element: <FreeBoard />,
     meta: {
-      title: '자유게시판',
-      description: '자유게시판 목록 화면입니다.',
+      title: "자유게시판",
+      description: "자유게시판 목록 화면입니다.",
     },
     layout: {
-      header: defaultHeader('자유게시판'),
+      header: defaultHeader("자유게시판"),
       floatingMenu: defaultFloatingMenu,
     },
   },
   {
-    id: 'free-board-write',
+    id: "free-board-write",
     path: FREE_BOARD_WRITE_PATH,
     element: <FreeBoardWrite />,
     meta: {
-      title: '자유게시판 글쓰기',
-      description: '자유게시판 글 작성 화면입니다.',
-      robots: 'noindex',
+      title: "자유게시판 글쓰기",
+      description: "자유게시판 글 작성 화면입니다.",
+      robots: "noindex",
     },
     layout: {
-      header: defaultHeader('글쓰기'),
+      header: defaultHeader("글쓰기"),
       floatingMenu: defaultFloatingMenu,
     },
     requiresAuth: true,
-    roles: ['user', 'admin'],
+    roles: ["user", "admin"],
   },
   {
-    id: 'free-board-detail',
+    id: "free-board-detail",
     path: `${FREE_BOARD_PATH}/:postId`,
     element: <FreeBoardDetail />,
     meta: {
-      title: '자유게시판 상세',
-      description: '자유게시판 게시글 상세 화면입니다.',
+      title: "자유게시판 상세",
+      description: "자유게시판 게시글 상세 화면입니다.",
     },
     layout: {
-      header: defaultHeader('자유게시판'),
+      header: defaultHeader("자유게시판"),
       floatingMenu: defaultFloatingMenu,
     },
   },
   {
-    id: 'snaps',
+    id: "snaps",
     path: SNAPS_PATH,
     element: <Snaps />,
     meta: {
-      title: 'Snaps',
-      description: '시각 콘텐츠 메뉴를 모아보는 Snaps 서브 메인입니다.',
+      title: "Snaps",
+      description: "시각 콘텐츠 메뉴를 모아보는 Snaps 서브 메인입니다.",
     },
     layout: {
-      header: defaultHeader('Snaps'),
+      header: defaultHeader("Snaps"),
       floatingMenu: {
         ...defaultFloatingMenu,
         enabled: true,
@@ -296,70 +296,70 @@ export const routeConfig = [
     },
   },
   {
-    id: 'pics',
+    id: "pics",
     path: PICS_PATH,
     element: <Pics />,
     meta: {
-      title: 'Pics',
-      description: '이미지 중심 소셜 피드 화면입니다.',
+      title: "Pics",
+      description: "이미지 중심 소셜 피드 화면입니다.",
     },
     layout: {
-      header: defaultHeader('Pics'),
+      header: defaultHeader("Pics"),
       floatingMenu: defaultFloatingMenu,
     },
   },
   {
-    id: 'pics-write',
+    id: "pics-write",
     path: PICS_WRITE_PATH,
     element: <PicsWrite />,
     meta: {
-      title: 'Pics 작성',
-      description: 'Pics 작성 화면입니다.',
-      robots: 'noindex',
+      title: "Pics 작성",
+      description: "Pics 작성 화면입니다.",
+      robots: "noindex",
     },
     layout: {
-      header: defaultHeader('Pics 작성'),
+      header: defaultHeader("Pics 작성"),
       floatingMenu: defaultFloatingMenu,
     },
     requiresAuth: true,
-    roles: ['user', 'admin'],
+    roles: ["user", "admin"],
   },
   {
-    id: 'pics-detail',
+    id: "pics-detail",
     path: `${PICS_PATH}/:postId`,
     element: <PicsDetail />,
     meta: {
-      title: 'Pics 상세',
-      description: 'Pics 상세 화면입니다.',
+      title: "Pics 상세",
+      description: "Pics 상세 화면입니다.",
     },
     layout: {
-      header: defaultHeader('Pics'),
+      header: defaultHeader("Pics"),
       floatingMenu: defaultFloatingMenu,
     },
   },
   {
-    id: 'about',
-    path: '/about',
+    id: "about",
+    path: "/about",
     element: <About />,
     meta: {
-      title: '소개',
-      description: 'Anoju 소개 화면입니다.',
+      title: "소개",
+      description: "Anoju 소개 화면입니다.",
     },
     layout: {
-      header: defaultHeader('소개'),
+      header: defaultHeader("소개"),
       floatingMenu: defaultFloatingMenu,
     },
   },
   {
-    id: 'not-found',
-    path: '*',
+    id: "not-found",
+    path: "*",
     element: <NotFound />,
     meta: {
-      title: '페이지를 찾을 수 없습니다',
-      robots: 'noindex',
+      title: "페이지를 찾을 수 없습니다",
+      robots: "noindex",
     },
     layout: {
-      header: defaultHeader('오류'),
+      header: defaultHeader("오류"),
       floatingMenu: defaultFloatingMenu,
     },
   },

@@ -2,7 +2,7 @@ import type React from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { Heart, MessageCircle, Send } from 'lucide-react';
-import { Button, Img, TextArea, toast } from '@/components';
+import { Button, ImageSwipe, TextArea, toast, type ImageSwipeItem } from '@/components';
 import { communityApi, getUserMessage } from '@/apis';
 import { LOGIN_PATH, PICS_PATH } from '@/constants/app';
 import type { CommentRecord, PostImageRecord, PostRecord } from '@/types/domain';
@@ -86,6 +86,12 @@ const PicsDetail = () => {
     );
   }
 
+  const swipeItems: ImageSwipeItem[] = images.map((image) => ({
+    id: image.id,
+    src: getPostImageUrl(image),
+    alt: image.alt || post.title,
+  }));
+
   return (
     <article className="container pics-detail">
       <header className="pics-detail__author">
@@ -94,13 +100,7 @@ const PicsDetail = () => {
         <span>{formatDate(post.created)}</span>
       </header>
 
-      <div className="pics-detail__media">
-        {images.length > 0 ? (
-          images.map((image) => <Img key={image.id} src={getPostImageUrl(image)} alt={image.alt || post.title} />)
-        ) : (
-          <span>이미지 없음</span>
-        )}
-      </div>
+      <ImageSwipe items={swipeItems} label={`${post.title} 이미지`} className="pics-detail__media" />
 
       <div className="pics-detail__body">
         <h2>{post.title}</h2>

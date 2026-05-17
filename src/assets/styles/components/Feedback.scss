@@ -103,7 +103,7 @@
 .toast-region {
   position: fixed;
   right: max(var(--spacing-md), calc((100vw - var(--layout-max-width)) / 2 + var(--spacing-md)));
-  bottom: calc(var(--layout-floating-menu-height) + var(--layout-bottom-safe) + var(--spacing-xl));
+  bottom: calc(var(--layout-floating-menu-height) + var(--layout-fixed-action-height) + var(--layout-bottom-safe) + var(--spacing-xl));
   left: max(var(--spacing-md), calc((100vw - var(--layout-max-width)) / 2 + var(--spacing-md)));
   z-index: var(--z-index-toast);
   display: grid;

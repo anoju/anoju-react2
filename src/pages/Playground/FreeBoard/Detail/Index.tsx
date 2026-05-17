@@ -7,6 +7,7 @@ import { communityApi, getUserMessage } from '@/apis';
 import { FREE_BOARD_PATH, LOGIN_PATH } from '@/constants/app';
 import type { CommentRecord, PostImageRecord, PostRecord } from '@/types/domain';
 import { createContentParts, formatDate, getPostImageUrl, getRecordAuthorName } from '@/utils/community';
+import { sanitizeRichTextHtml } from '@/utils/richTextSecurity';
 import { useAuthStore } from '@/stores/authStore';
 
 const FreeBoardDetail = () => {
@@ -86,7 +87,9 @@ const FreeBoardDetail = () => {
     );
   }
 
-  const contentParts = createContentParts(post.content, images);
+  const hasLegacyImageToken = post.content.includes('[[image:');
+  const contentParts = hasLegacyImageToken ? createContentParts(post.content, images) : [];
+  const sanitizedContent = sanitizeRichTextHtml(post.content);
 
   return (
     <article className="container board-detail">
@@ -101,14 +104,18 @@ const FreeBoardDetail = () => {
       </header>
 
       <div className="board-detail__content">
-        {contentParts.map((part) =>
-          part.type === 'image' && part.image ? (
-            <figure className="board-detail__image" key={part.key}>
-              <Img src={getPostImageUrl(part.image)} alt={part.image.alt || post.title} />
-            </figure>
-          ) : (
-            <p key={part.key}>{part.text}</p>
-          ),
+        {hasLegacyImageToken ? (
+          contentParts.map((part) =>
+            part.type === 'image' && part.image ? (
+              <figure className="board-detail__image" key={part.key}>
+                <Img src={getPostImageUrl(part.image)} alt={part.image.alt || post.title} />
+              </figure>
+            ) : (
+              <p key={part.key}>{part.text}</p>
+            ),
+          )
+        ) : (
+          <div className="board-detail__editor-content" dangerouslySetInnerHTML={{ __html: sanitizedContent }} />
         )}
       </div>
 

@@ -85,11 +85,15 @@
 
   --layout-header-height: 56px;
   --layout-floating-menu-height: 64px;
+  --layout-fixed-action-height: 64px;
+  --layout-floating-buttons-size: 56px;
   --layout-bottom-safe: env(safe-area-inset-bottom);
   --layout-max-width: 768px;
 
   --z-index-header: 100;
   --z-index-floating: 90;
+  --z-index-fixed-action: 91;
+  --z-index-floating-buttons: 92;
   --z-index-overlay: 1000;
   --z-index-dialog: 1010;
   --z-index-toast: 1100;
@@ -116,25 +120,25 @@
 }
 
 html[data-theme="dark"] {
-  --color-text-primary: #f7f1ea;
-  --color-text-secondary: #d8ccc2;
-  --color-text-muted: #a99b90;
+  --color-text-primary: #f5f3ff;
+  --color-text-secondary: #d7d2e8;
+  --color-text-muted: #a7a0bb;
   --color-text-link: #caaeff;
   --color-text-danger: #ff9a9a;
 
-  --color-bg-body: #171310;
-  --color-bg-surface: #211b17;
-  --color-bg-surface-soft: #2b2420;
-  --color-bg-elevated: rgba(33, 27, 23, 0.9);
+  --color-bg-body: #111019;
+  --color-bg-surface: #1a1825;
+  --color-bg-surface-soft: #242132;
+  --color-bg-elevated: rgba(26, 24, 37, 0.9);
   --color-bg-primary-soft: rgba(166, 116, 242, 0.18);
   --color-bg-danger-soft: rgba(217, 72, 72, 0.16);
 
-  --color-border-default: #3b312b;
-  --color-border-strong: #51443b;
+  --color-border-default: #343047;
+  --color-border-strong: #49435f;
   --color-border-focus: var(--color-purple-300);
 
-  --color-icon-default: #d8ccc2;
-  --color-icon-muted: #a99b90;
+  --color-icon-default: #d7d2e8;
+  --color-icon-muted: #a7a0bb;
   --color-icon-primary: var(--color-purple-300);
 
   --color-action-primary: var(--color-purple-400);
@@ -147,18 +151,18 @@ html[data-theme="dark"] {
 
 @media (prefers-color-scheme: dark) {
   html[data-theme="auto"] {
-    --color-text-primary: #f7f1ea;
-    --color-text-secondary: #d8ccc2;
-    --color-text-muted: #a99b90;
+    --color-text-primary: #f5f3ff;
+    --color-text-secondary: #d7d2e8;
+    --color-text-muted: #a7a0bb;
     --color-text-link: #caaeff;
-    --color-bg-body: #171310;
-    --color-bg-surface: #211b17;
-    --color-bg-surface-soft: #2b2420;
-    --color-bg-elevated: rgba(33, 27, 23, 0.9);
+    --color-bg-body: #111019;
+    --color-bg-surface: #1a1825;
+    --color-bg-surface-soft: #242132;
+    --color-bg-elevated: rgba(26, 24, 37, 0.9);
     --color-bg-primary-soft: rgba(166, 116, 242, 0.18);
-    --color-border-default: #3b312b;
-    --color-border-strong: #51443b;
-    --color-icon-default: #d8ccc2;
+    --color-border-default: #343047;
+    --color-border-strong: #49435f;
+    --color-icon-default: #d7d2e8;
     --color-icon-primary: var(--color-purple-300);
     --color-action-primary: var(--color-purple-400);
     --color-action-primary-hover: var(--color-purple-300);

@@ -1,8 +1,8 @@
 import type React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Edit3, MessageCircle, Search } from 'lucide-react';
-import { Button, DataList, Input, toast } from '@/components';
+import { MessageCircle, Plus, Search } from 'lucide-react';
+import { DataList, FloatingActionButton, FloatingActions, Input, toast } from '@/components';
 import { communityApi, getUserMessage } from '@/apis';
 import { FREE_BOARD_PATH, FREE_BOARD_WRITE_PATH } from '@/constants/app';
 import type { PostRecord } from '@/types/domain';
@@ -79,16 +79,6 @@ const FreeBoard = () => {
           <h2>자유게시판</h2>
           <p>편하게 쓰고 천천히 이어가는 모바일 커뮤니티 게시판입니다.</p>
         </div>
-        {isAuthenticated ? (
-          <Link className="button-link" to={FREE_BOARD_WRITE_PATH}>
-            <Edit3 size={16} />
-            글쓰기
-          </Link>
-        ) : (
-          <Button type="button" size="sm" leftIcon={<Edit3 size={16} />} onClick={handleWriteClick}>
-            글쓰기
-          </Button>
-        )}
       </header>
 
       <form className="board-page__search" onSubmit={handleSubmitSearch}>
@@ -126,6 +116,14 @@ const FreeBoard = () => {
           </Link>
         )}
       />
+
+      <FloatingActions label="자유게시판 주요 액션">
+        {isAuthenticated ? (
+          <FloatingActionButton label="글쓰기" to={FREE_BOARD_WRITE_PATH} icon={<Plus size={24} />} />
+        ) : (
+          <FloatingActionButton label="글쓰기" icon={<Plus size={24} />} onClick={handleWriteClick} />
+        )}
+      </FloatingActions>
     </section>
   );
 };

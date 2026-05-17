@@ -70,11 +70,11 @@ Delete rule: @request.auth.role = "admin"
 | `author` | relation users | yes |  | 작성자 |
 | `status` | select | yes | `published` | `draft`, `published`, `hidden`, `deleted` |
 | `tags` | json | no | `[]` | 태그 배열 |
-| `viewCount` | number | yes | `0` | 조회수 |
-| `commentCount` | number | yes | `0` | 댓글 수 |
-| `likeCount` | number | yes | `0` | 좋아요 수 |
-| `bookmarkCount` | number | yes | `0` | 스크랩 수 |
-| `deleted` | bool | yes | `false` | soft delete 여부 |
+| `viewCount` | number | no | `0` | 조회수. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다. |
+| `commentCount` | number | no | `0` | 댓글 수. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다. |
+| `likeCount` | number | no | `0` | 좋아요 수. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다. |
+| `bookmarkCount` | number | no | `0` | 스크랩 수. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다. |
+| `deleted` | bool | no | `false` | soft delete 여부. false를 허용해야 하므로 Nonfalsey를 사용하지 않습니다. |
 | `deletedAt` | date | no |  | 삭제 시각 |
 
 권장 인덱스:
@@ -97,7 +97,7 @@ API Rules:
 ```text
 List rule: status = "published" && deleted = false || @request.auth.role = "admin"
 View rule: status = "published" && deleted = false || author = @request.auth.id || @request.auth.role = "admin"
-Create rule: @request.auth.id != "" && @request.auth.verified = true && @request.auth.status = "active"
+Create rule: @request.auth.id != "" && @request.auth.verified = true
 Update rule: (author = @request.auth.id && status != "hidden") || @request.auth.role = "admin"
 Delete rule: @request.auth.role = "admin"
 ```
@@ -133,7 +133,7 @@ API Rules:
 ```text
 List rule: status = "published" && deleted = false || @request.auth.role = "admin"
 View rule: status = "published" && deleted = false || author = @request.auth.id || @request.auth.role = "admin"
-Create rule: @request.auth.id != "" && @request.auth.verified = true && @request.auth.status = "active"
+Create rule: @request.auth.id != "" && @request.auth.verified = true
 Update rule: author = @request.auth.id || @request.auth.role = "admin"
 Delete rule: @request.auth.role = "admin"
 ```
@@ -149,8 +149,8 @@ Delete rule: @request.auth.role = "admin"
 | `post` | relation posts | yes |  | 게시글 |
 | `image` | file | yes |  | 이미지 파일 |
 | `alt` | text | no |  | 대체 텍스트 |
-| `sortOrder` | number | yes | `0` | 정렬 순서 |
-| `isCover` | bool | yes | `false` | 대표 이미지 |
+| `sortOrder` | number | no | `0` | 정렬 순서. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다. |
+| `isCover` | bool | no | `false` | 대표 이미지. false를 허용해야 하므로 Nonfalsey를 사용하지 않습니다. |
 
 API Rules:
 

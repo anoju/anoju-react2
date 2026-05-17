@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { Heart, MessageCircle, Plus, Send } from 'lucide-react';
-import { Button, DataList, Img, toast } from '@/components';
+import { DataList, FloatingActionButton, FloatingActions, ImageSwipe, toast, type ImageSwipeItem } from '@/components';
 import { communityApi, getUserMessage } from '@/apis';
 import { PICS_PATH, PICS_WRITE_PATH } from '@/constants/app';
 import type { PostImageRecord, PostRecord } from '@/types/domain';
@@ -10,7 +9,7 @@ import { useAuthStore } from '@/stores/authStore';
 
 interface PicsFeedItem {
   post: PostRecord;
-  cover?: PostImageRecord;
+  images: PostImageRecord[];
 }
 
 const PER_PAGE = 12;
@@ -42,7 +41,7 @@ const Pics = () => {
       const nextItems = await Promise.all(
         [...result.items].sort((a, b) => b.created.localeCompare(a.created)).map(async (post) => {
           const images = (await communityApi.listImages(post.id)).sort((a, b) => a.sortOrder - b.sortOrder);
-          return { post, cover: images.find((image) => image.isCover) ?? images[0] };
+          return { post, images };
         }),
       );
 
@@ -75,15 +74,6 @@ const Pics = () => {
           <h2>Pics</h2>
           <p>사진과 짧은 캡션으로 이어지는 소셜 피드입니다.</p>
         </div>
-        {isAuthenticated ? (
-          <Link className="button-link" to={PICS_WRITE_PATH}>
-            <Plus size={16} /> 올리기
-          </Link>
-        ) : (
-          <Button type="button" size="sm" leftIcon={<Plus size={16} />} onClick={handleWriteClick}>
-            올리기
-          </Button>
-        )}
       </header>
 
       <DataList
@@ -99,32 +89,47 @@ const Pics = () => {
         onLoadMore={() => void loadPics(page + 1)}
         onRetry={() => void loadPics(1)}
         className="pics-feed"
-        renderItem={({ post, cover }) => (
-          <article className="pic-card">
-            <Link to={`${PICS_PATH}/${post.id}`} className="pic-card__media">
-              {cover ? <Img src={getPostImageUrl(cover)} alt={cover.alt || post.title} /> : <span>이미지 없음</span>}
-            </Link>
-            <div className="pic-card__body">
-              <div className="pic-card__author">
-                <strong>{getRecordAuthorName(post)}</strong>
-                <span>{formatDate(post.created)}</span>
+        renderItem={({ post, images }) => {
+          const swipeItems: ImageSwipeItem[] = images.map((image) => ({
+            id: image.id,
+            src: getPostImageUrl(image),
+            alt: image.alt || post.title,
+            href: `${PICS_PATH}/${post.id}`,
+          }));
+
+          return (
+            <article className="pic-card">
+              <ImageSwipe items={swipeItems} label={`${post.title} 이미지`} className="pic-card__media" />
+              <div className="pic-card__body">
+                <div className="pic-card__author">
+                  <strong>{getRecordAuthorName(post)}</strong>
+                  <span>{formatDate(post.created)}</span>
+                </div>
+                <p>{post.content}</p>
+                <div className="pic-card__actions" aria-label="Pics 반응">
+                  <span>
+                    <Heart size={16} /> {post.likeCount ?? 0}
+                  </span>
+                  <span>
+                    <MessageCircle size={16} /> {post.commentCount ?? 0}
+                  </span>
+                  <span>
+                    <Send size={16} /> 공유
+                  </span>
+                </div>
               </div>
-              <p>{post.content}</p>
-              <div className="pic-card__actions" aria-label="Pics 반응">
-                <span>
-                  <Heart size={16} /> {post.likeCount ?? 0}
-                </span>
-                <span>
-                  <MessageCircle size={16} /> {post.commentCount ?? 0}
-                </span>
-                <span>
-                  <Send size={16} /> 공유
-                </span>
-              </div>
-            </div>
-          </article>
-        )}
+            </article>
+          );
+        }}
       />
+
+      <FloatingActions label="Pics 주요 액션">
+        {isAuthenticated ? (
+          <FloatingActionButton label="Pics 올리기" to={PICS_WRITE_PATH} icon={<Plus size={24} />} />
+        ) : (
+          <FloatingActionButton label="Pics 올리기" icon={<Plus size={24} />} onClick={handleWriteClick} />
+        )}
+      </FloatingActions>
     </section>
   );
 };

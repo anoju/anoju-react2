@@ -17,6 +17,12 @@ const providerLabels: Record<SupportedOAuthProvider, string> = {
   kakao: 'Kakao',
 };
 
+const providerIcons: Record<SupportedOAuthProvider, string> = {
+  google: 'G',
+  naver: 'N',
+  kakao: 'K',
+};
+
 const getActionText = (context: SocialLoginButtonsProps['context']) => {
   if (context === 'link') return '연결';
   if (context === 'register') return '시작하기';
@@ -64,19 +70,21 @@ export const SocialLoginButtons = ({
     <div className="social-login" aria-label="소셜 로그인">
       {providers.map((provider) => {
         const disabled = disabledProviders.includes(provider.name);
+        const label = `${providerLabels[provider.name]}로 ${getActionText(context)}`;
 
         return (
-          <Button
+          <button
             key={provider.name}
             type="button"
-            variant="outline"
-            tone="neutral"
-            fullWidth
+            className="social-login__icon-button"
+            data-provider={provider.name}
             disabled={disabled}
+            aria-label={label}
+            title={label}
             onClick={() => handleOAuth(provider.name)}
           >
-            {providerLabels[provider.name]}로 {getActionText(context)}
-          </Button>
+            <span aria-hidden="true">{providerIcons[provider.name]}</span>
+          </button>
         );
       })}
     </div>

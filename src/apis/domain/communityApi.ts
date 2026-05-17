@@ -19,6 +19,7 @@ export interface CreatePostParams {
   imageFiles?: Array<{
     id: string;
     file: File;
+    url?: string;
     alt: string;
     sortOrder: number;
     isCover: boolean;
@@ -99,7 +100,13 @@ export const communityApi = {
 
       const nextContent = imageRecords.reduce((currentContent, imageRecord, index) => {
         const sourceId = imageFiles[index]?.id;
-        return sourceId ? currentContent.replaceAll(`[[image:${sourceId}]]`, `[[image:${imageRecord.id}]]`) : currentContent;
+        const sourceUrl = imageFiles[index]?.url;
+        const imageUrl = pb.files.getURL(imageRecord, imageRecord.image);
+        const tokenReplacedContent = sourceId
+          ? currentContent.replaceAll(`[[image:${sourceId}]]`, `[[image:${imageRecord.id}]]`)
+          : currentContent;
+
+        return sourceUrl ? tokenReplacedContent.replaceAll(sourceUrl, imageUrl) : tokenReplacedContent;
       }, content);
 
       if (nextContent !== content) {

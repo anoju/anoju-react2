@@ -6,7 +6,7 @@
     align-items: end;
     overflow: hidden;
     color: var(--color-text-inverse);
-    background: #211b17;
+    background: #111019;
   }
 
   &__media {
@@ -24,7 +24,7 @@
       position: absolute;
       inset: 0;
       content: "";
-      background: linear-gradient(to top, rgba(23, 19, 16, 0.78), rgba(23, 19, 16, 0.1));
+      background: linear-gradient(to top, rgba(17, 16, 25, 0.78), rgba(17, 16, 25, 0.1));
     }
   }
 

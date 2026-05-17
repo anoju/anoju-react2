@@ -1,8 +1,8 @@
 import type React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ImagePlus } from 'lucide-react';
-import { Button, Img, Input, TextArea, toast } from '@/components';
+import { Check, ImagePlus } from 'lucide-react';
+import { Button, FixedBottomActions, Img, TextArea, toast } from '@/components';
 import { communityApi, getUserMessage } from '@/apis';
 import { PICS_PATH } from '@/constants/app';
 import { createUploadPreviews, revokeUploadPreviews, type UploadPreview } from '@/utils/uploadPolicy';
@@ -11,13 +11,12 @@ import { useUnsavedChanges } from '@/hooks/useUnsavedChanges';
 const PicsWrite = () => {
   const navigate = useNavigate();
   const [caption, setCaption] = useState('');
-  const [title, setTitle] = useState('');
   const [previews, setPreviews] = useState<UploadPreview[]>([]);
   const [submitting, setSubmitting] = useState(false);
-  const dirty = Boolean(caption.trim() || title.trim() || previews.length > 0);
+  const dirty = Boolean(caption.trim() || previews.length > 0);
   const { confirmLeave } = useUnsavedChanges(dirty && !submitting);
 
-  const resolvedTitle = useMemo(() => title.trim() || caption.trim().slice(0, 40) || 'Pics', [caption, title]);
+  const resolvedTitle = useMemo(() => caption.trim().replace(/\s+/g, ' ').slice(0, 40) || 'Pics', [caption]);
 
   useEffect(
     () => () => {
@@ -41,6 +40,15 @@ const PicsWrite = () => {
 
     setPreviews((currentPreviews) => [...currentPreviews, ...nextPreviews]);
     event.target.value = '';
+  };
+
+  const handleCoverSelect = (coverId: string) => {
+    setPreviews((currentPreviews) =>
+      currentPreviews.map((preview) => ({
+        ...preview,
+        isCover: preview.id === coverId,
+      })),
+    );
   };
 
   const handleCancel = async () => {
@@ -90,14 +98,27 @@ const PicsWrite = () => {
       </header>
 
       <form className="write-page__form" onSubmit={handleSubmit}>
-        <Input label="제목" value={title} onChange={(event) => setTitle(event.target.value)} placeholder="비워두면 캡션으로 생성됩니다." />
-        <TextArea
-          label="캡션"
-          value={caption}
-          onChange={(event) => setCaption(event.target.value)}
-          rows={6}
-          required
-        />
+        {previews.length > 0 ? (
+          <div className="write-page__previews write-page__previews--pics">
+            {previews.map((preview) => (
+              <figure key={preview.id}>
+                <Img src={preview.url} alt={preview.alt} />
+                <figcaption>
+                  <span>{preview.alt}</span>
+                  <button
+                    type="button"
+                    className="cover-select-btn"
+                    data-selected={preview.isCover}
+                    onClick={() => handleCoverSelect(preview.id)}
+                  >
+                    {preview.isCover ? <Check size={14} /> : null}
+                    {preview.isCover ? '대표' : '대표로 지정'}
+                  </button>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        ) : null}
 
         <label className="image-uploader">
           <input type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={handleImagesChange} />
@@ -106,25 +127,23 @@ const PicsWrite = () => {
           </span>
         </label>
 
-        {previews.length > 0 ? (
-          <div className="write-page__previews write-page__previews--pics">
-            {previews.map((preview) => (
-              <figure key={preview.id}>
-                <Img src={preview.url} alt={preview.alt} />
-                <figcaption>{preview.isCover ? '대표 이미지' : preview.alt}</figcaption>
-              </figure>
-            ))}
-          </div>
-        ) : null}
+        <TextArea
+          label="캡션"
+          value={caption}
+          onChange={(event) => setCaption(event.target.value)}
+          rows={6}
+          placeholder="사진에 남기고 싶은 이야기를 적어주세요."
+          required
+        />
 
-        <div className="write-page__actions">
+        <FixedBottomActions>
           <Button type="button" variant="outline" tone="neutral" onClick={handleCancel}>
             취소
           </Button>
           <Button type="submit" loading={submitting}>
             등록
           </Button>
-        </div>
+        </FixedBottomActions>
       </form>
     </section>
   );

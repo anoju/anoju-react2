@@ -58,9 +58,10 @@ export const AppLayout = ({ route, children }: AppLayoutProps) => {
   ]);
 
   const pageTitle = `${route.meta.title} | ${APP_NAME}`;
+  const appShellClassName = route.layout.floatingMenu.enabled ? 'app-shell app-shell--has-floating-menu' : 'app-shell';
 
   return (
-    <div className="app-shell">
+    <div className={appShellClassName}>
       <Helmet>
         <title>{pageTitle}</title>
         {route.meta.description ? <meta name="description" content={route.meta.description} /> : null}
