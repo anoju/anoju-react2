@@ -5,6 +5,7 @@
 ## 1. 프로젝트 개요 (Project Summary)
 * **목적:** 모바일 최우선(Mobile-First) 반응형 웹 애플리케이션 개발.
 * **기술 스택:** React, Vite, TypeScript, SCSS (Vanilla SCSS 사용), **ahooks**, **Framer Motion**, **Embla Carousel**, **Tiptap**.
+* **패키지 매니저:** `pnpm`을 사용하며, `pnpm-lock.yaml`을 단일 잠금 파일로 관리합니다.
 * **주요 기능:** SNS/이메일 회원가입(인증 포함), 자유게시판/갤러리(에디터 적용), 정적 콘텐츠 페이지 관리.
 * **운영 배포:** 프론트엔드는 시놀로지 NAS에 배포하며 운영 도메인은 `https://anoju.synology.me`를 사용합니다.
 
@@ -29,7 +30,7 @@
 *   **아이콘 정책**: 아이콘은 `lucide-react`를 기본 라이브러리로 사용하며, 아이콘 단독 버튼은 `IconButton`과 접근성 이름을 반드시 사용합니다. 특수 브랜드/서비스 아이콘을 제외하고 직접 SVG 작성을 지양합니다.
 *   **테마 지원**: 라이트(Light), 다크(Dark), 시스템 설정(Auto) 모드를 완벽 지원하며, `html`의 `data-theme="light|dark|auto"` 속성과 CSS 변수(`var(--color-...)`)를 필수적으로 활용합니다.
 *   **다크모드 컬러 제한**: 다크모드는 차콜, 쿨 그레이, 퍼플 기반으로 구성하며 브라운/에스프레소/탄/오렌지 브라운 계열을 배경, 텍스트, 테두리의 기본 컬러로 사용하지 않습니다.
-*   **글자모드 지원**: 글자모드는 `작게`, `기본`, `크게` 3단계를 지원하며, `html`의 `data-font-mode="small|base|large"` 속성과 CSS 변수(`var(--font-size-*)`, `var(--line-height-*)`)로 제어합니다.
+*   **글자모드 지원**: 글자모드는 `더작게`, `작게`, `기본`, `크게`, `더크게` 5단계를 지원하며, `html`의 `data-font-mode="xsmall|small|base|large|xlarge"` 속성과 CSS 변수(`var(--font-size-*)`, `var(--line-height-*)`)로 제어합니다. `--font-size-md` 기준 크기는 각각 `12px`, `14px`, `16px`, `18px`, `20px`입니다.
 *   **CSS 변수 단일 관리**: 디자인 토큰 CSS 변수는 `src/assets/styles/base/_tokens.scss`에서만 정의/수정하고, 다른 SCSS 파일에서는 토큰을 참조만 합니다.
 *   **토큰 네이밍 기준**: 색상 토큰은 `--color-text-*`, `--color-bg-*`, `--color-border-*`, `--color-icon-*`, `--color-action-*`처럼 역할별로 세분화하고, 글자 크기는 `--font-size-caption`, `--font-size-body-md`, `--font-size-title-lg`, `--font-size-heading-md`, `--font-size-display-sm`처럼 사용처 기반으로 관리합니다.
 *   **글자모드 레이아웃 대응**: 글자모드 변경 시 텍스트 높이, 줄 수, sticky 위치, 고정 영역 오프셋, 플로팅 버튼 위치가 달라질 수 있으므로 관련 컴포넌트는 크기와 위치를 다시 계산할 수 있게 설계합니다.
@@ -80,7 +81,7 @@
 * **화면 폴더:** 화면 컴포넌트는 `src/pages/화면명/Index.tsx` 구조를 사용하며, 화면명 폴더는 PascalCase를 사용합니다. 예: `src/pages/Home/Index.tsx`
 * **메뉴별 화면 그룹:** 화면이 늘어나는 메뉴/도메인은 `src/pages/메뉴명/화면명/Index.tsx`처럼 상위 폴더로 묶어 관리합니다. 예: `src/pages/Playground/FreeBoard/Index.tsx`, `src/pages/Snaps/Pics/Write/Index.tsx`, `src/pages/MyPage/Profile/Index.tsx`
 * **독립 화면 그룹:** 로그인/회원가입은 `src/pages/Auth`, 시스템성 오류 화면은 `src/pages/System`, 정적 콘텐츠는 `src/pages/Static` 아래로 분류합니다.
-* **라우트 경로:** 실제 화면 경로는 폴더명과 분리하여 소문자 kebab-case를 사용합니다. 예: `src/pages/Home/Index.tsx` 화면의 경로는 `/home`
+* **라우트 경로:** 실제 화면 경로는 폴더명과 분리하여 소문자 kebab-case를 사용합니다. 단, 홈 화면은 중복 경로를 만들지 않고 루트 경로(`/`)만 사용합니다.
 * **화면 전용 요소:** 특정 화면에서만 사용하는 `data.ts`, `types.ts`, `api.ts`, `hooks.ts` 등은 해당 화면 폴더 내부에 둘 수 있습니다. 여러 화면에서 재사용되면 공통 폴더로 이동합니다.
 * **컴포넌트:** 아토믹 디자인 패턴에 따라 `atoms`, `molecules`, `organisms`, `templates` 폴더 내에 각 컴포넌트별 전용 폴더를 생성하여 캡슐화합니다. 단, 스타일 파일은 컴포넌트 폴더가 아니라 `src/assets/styles/components`에서 관리합니다.
 

@@ -83,7 +83,7 @@
 - [x] `BackButtonConfig` 정의
 - [x] `RouteMeta` 정의
 - [x] `LayoutMeta` 정의
-- [x] 기본 라우트 `/home`
+- [x] 기본 라우트 `/`
 - [x] 기본 라우트 `/login`
 - [x] 기본 라우트 `/menu`
 - [x] 기본 라우트 `/my-page`

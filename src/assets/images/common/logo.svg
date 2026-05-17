@@ -1,0 +1,14 @@
+<svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="anojuLogoTitle">
+  <title id="anojuLogoTitle">Anoju A logo</title>
+  <path d="M18 84L48 14L78 84" stroke="url(#anojuLogoGradient)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M34 62H62" stroke="url(#anojuLogoGradient)" stroke-width="12" stroke-linecap="round"/>
+  <path d="M48 2L52.5 15.5L66 20L52.5 24.5L48 38L43.5 24.5L30 20L43.5 15.5L48 2Z" fill="#fff"/>
+  <path d="M48 9.5L51 17.5L59 20L51 22.5L48 30.5L45 22.5L37 20L45 17.5L48 9.5Z" fill="#8F55E8"/>
+  <defs>
+    <linearGradient id="anojuLogoGradient" x1="18" y1="86" x2="78" y2="15" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5E2BAC"/>
+      <stop offset="0.52" stop-color="#8F55E8"/>
+      <stop offset="1" stop-color="#C19CFF"/>
+    </linearGradient>
+  </defs>
+</svg>

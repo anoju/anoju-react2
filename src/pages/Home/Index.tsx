@@ -1,6 +1,5 @@
 import { motion, type Variants } from 'framer-motion';
-import { Button, Img } from '@/components';
-import heroImage from '@/assets/images/contents/hero.png';
+import { Button, StarBurstBackground } from '@/components';
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -26,7 +25,7 @@ const Home = () => (
   <div className="home-page">
     <motion.section className="home-page__hero" initial="hidden" animate="visible" variants={containerVariants}>
       <div className="home-page__media">
-        <Img src={heroImage} alt="Anoju 홈 대표 이미지" />
+        <StarBurstBackground />
       </div>
       <div className="container home-page__hero-inner">
         <motion.span variants={itemVariants} className="home-page__subtitle">

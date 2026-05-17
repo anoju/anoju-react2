@@ -54,7 +54,7 @@ const defaultFloatingMenu: FloatingMenuConfig = {
 export const routeConfig = [
   {
     id: "root",
-    path: "/",
+    path: DEFAULT_HOME_PATH,
     element: <Home />,
     meta: {
       title: "Anoju",
@@ -63,26 +63,10 @@ export const routeConfig = [
     layout: {
       header: {
         ...defaultHeader("Anoju"),
+        variant: "transparentOverlay",
+        showBrandLogo: true,
         showBackButton: false,
-      },
-      floatingMenu: {
-        ...defaultFloatingMenu,
-        enabled: true,
-      },
-    },
-  },
-  {
-    id: "home",
-    path: DEFAULT_HOME_PATH,
-    element: <Home />,
-    meta: {
-      title: "홈",
-      description: "Anoju 홈 화면입니다.",
-    },
-    layout: {
-      header: {
-        ...defaultHeader("홈"),
-        showBackButton: false,
+        showHomeButton: false,
       },
       floatingMenu: {
         ...defaultFloatingMenu,

@@ -1,6 +1,6 @@
 export const APP_NAME = 'Anoju';
 
-export const DEFAULT_HOME_PATH = '/home';
+export const DEFAULT_HOME_PATH = '/';
 
 export const LOGIN_PATH = '/login';
 

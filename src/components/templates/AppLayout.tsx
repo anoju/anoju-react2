@@ -40,13 +40,16 @@ export const AppLayout = ({ route, children }: AppLayoutProps) => {
     return isNearTop || direction === 'up';
   }, [direction, isNearTop, route.layout.floatingMenu]);
 
+  const headerOverlapsContent = route.layout.header.variant === 'transparentOverlay';
+
   useEffect(() => {
     setHeaderVisible(headerVisible);
     setFloatingMenuVisible(floatingMenuVisible);
-    setTopOffset(route.layout.header.enabled ? 56 : 0);
+    setTopOffset(route.layout.header.enabled && !headerOverlapsContent ? 56 : 0);
     setBottomOffset(route.layout.floatingMenu.enabled ? 88 : 0);
   }, [
     floatingMenuVisible,
+    headerOverlapsContent,
     headerVisible,
     revision,
     route.layout.floatingMenu.enabled,
@@ -58,7 +61,11 @@ export const AppLayout = ({ route, children }: AppLayoutProps) => {
   ]);
 
   const pageTitle = `${route.meta.title} | ${APP_NAME}`;
-  const appShellClassName = route.layout.floatingMenu.enabled ? 'app-shell app-shell--has-floating-menu' : 'app-shell';
+  const appShellClassName = [
+    'app-shell',
+    route.layout.floatingMenu.enabled ? 'app-shell--has-floating-menu' : '',
+    headerOverlapsContent ? 'app-shell--header-overlap' : '',
+  ].filter(Boolean).join(' ');
 
   return (
     <div className={appShellClassName}>

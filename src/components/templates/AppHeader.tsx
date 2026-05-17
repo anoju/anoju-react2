@@ -1,8 +1,9 @@
 import { ArrowLeft, Home } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import anojuLogo from '@/assets/images/common/logo.svg';
 import { DEFAULT_HOME_PATH } from '@/constants/app';
-import { IconButton } from '@/components/atoms';
+import { IconButton, Img } from '@/components/atoms';
 import type { HeaderConfig } from '@/routes/types';
 
 interface AppHeaderProps {
@@ -45,6 +46,7 @@ export const AppHeader = ({ config, visible }: AppHeaderProps) => {
   return (
     <motion.header
       className="app-header"
+      data-variant={config.variant ?? 'default'}
       data-visible={visible}
       initial={false}
       animate={{ y: visible ? 0 : '-100%' }}
@@ -55,7 +57,14 @@ export const AppHeader = ({ config, visible }: AppHeaderProps) => {
           {config.showBackButton ? (
             <IconButton label="뒤로가기" icon={<ArrowLeft size={20} />} onClick={handleBack} />
           ) : null}
-          {config.title ? <h1 className="app-header__title">{config.title}</h1> : null}
+          {config.showBrandLogo ? (
+            <h1 className="app-header__brand">
+              <Img src={anojuLogo} alt="Anoju 로고" className="app-header__brand-logo" />
+              <span className="app-header__brand-text">{config.title ?? 'Anoju'}</span>
+            </h1>
+          ) : config.title ? (
+            <h1 className="app-header__title">{config.title}</h1>
+          ) : null}
           <div className="app-header__slot app-header__slot--left" data-slot={config.leftSlotKey} />
         </div>
 

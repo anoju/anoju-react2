@@ -16,6 +16,8 @@ export interface RouteMeta {
 export interface HeaderConfig {
   enabled: boolean;
   title?: string;
+  variant?: 'default' | 'transparentOverlay';
+  showBrandLogo?: boolean;
   alwaysFixed?: boolean;
   hideOnScroll?: boolean;
   showBackButton?: boolean;

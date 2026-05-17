@@ -7,7 +7,7 @@
 - **스택:** **Vite + React + TypeScript + SCSS + ahooks + Framer Motion**
 - **백엔드:** **PocketBase (BaaS)** - 시놀로지 NAS Docker 환경 기반의 자체 호스팅 백엔드 사용.
 - **장점:** 기존 Create React App(CRA) 대비 압도적으로 빠른 로컬 서버 구동 및 빌드 속도
-- **패키지 매니저:** `npm` (또는 프로젝트에 맞는 패키지 매니저 사용)
+- **패키지 매니저:** `pnpm`을 사용하며, `pnpm-lock.yaml`을 단일 잠금 파일로 관리합니다.
 - **모바일 최우선 (Mobile First):** 모바일 기기 사용자 경험을 최우선으로 설계하며, 반응형 디자인 반영.
 
 ## 2. 디자인 컨셉 (Design Concept)
@@ -28,13 +28,15 @@
   - **시스템 설정(Auto)**: OS 설정에 따라 자동으로 전환 (기본값).
 - **다크모드 컬러 제한**: 다크모드에서는 브라운, 에스프레소, 탄, 오렌지 브라운 계열을 기본 배경/텍스트/테두리 컬러로 사용하지 않고, 중립 차콜과 쿨 그레이를 중심으로 구성합니다.
 - **글자모드 구성**:
-  - **작게(Small)**: 정보 밀도가 높은 화면이나 작은 글자를 선호하는 사용자용.
-  - **기본(Base)**: 서비스 기본 글자 크기.
-  - **크게(Large)**: 가독성을 우선하는 사용자용.
+  - **더작게(XSmall)**: `--font-size-md` 기준 `12px`로 가장 촘촘하게 보는 사용자용.
+  - **작게(Small)**: `--font-size-md` 기준 `14px`로 정보 밀도가 높은 화면이나 작은 글자를 선호하는 사용자용.
+  - **기본(Base)**: `--font-size-md` 기준 `16px` 서비스 기본 글자 크기.
+  - **크게(Large)**: `--font-size-md` 기준 `18px`로 가독성을 우선하는 사용자용.
+  - **더크게(XLarge)**: `--font-size-md` 기준 `20px`로 더 큰 글자가 필요한 사용자용.
 - **기술 구현**: `html` 요소의 `data-theme`, `data-font-mode` 속성과 CSS 변수(Custom Properties)를 활용하여 실시간 전환에 대응합니다.
-- **속성 예시**: 테마는 `data-theme="light|dark|auto"`, 글자모드는 `data-font-mode="small|base|large"` 형태를 기준으로 설계합니다.
+- **속성 예시**: 테마는 `data-theme="light|dark|auto"`, 글자모드는 `data-font-mode="xsmall|small|base|large|xlarge"` 형태를 기준으로 설계합니다.
 - **CSS 변수 단일 출처**: 색상, 배경, 테두리, 그림자, 타이포그래피, 간격, 고정 영역 오프셋 등 디자인 토큰 CSS 변수는 `src/assets/styles/base/_tokens.scss`에서만 정의하고 추가/수정합니다.
-- **테마별 변수 오버라이드**: 라이트/다크 및 글자모드별 차이는 `src/assets/styles/base/_tokens.scss` 안에서 `:root`, `[data-theme="dark"]`, `[data-font-mode="small"]`, `[data-font-mode="large"]` 범위로 관리합니다.
+- **테마별 변수 오버라이드**: 라이트/다크 및 글자모드별 차이는 `src/assets/styles/base/_tokens.scss` 안에서 `:root`, `[data-theme="dark"]`, `[data-font-mode="xsmall"]`, `[data-font-mode="small"]`, `[data-font-mode="large"]`, `[data-font-mode="xlarge"]` 범위로 관리합니다.
 - **토큰 사용 원칙**: 컴포넌트와 페이지 스타일은 하드코딩된 색상/글자 크기/간격 대신 `var(--color-*)`, `var(--font-size-*)`, `var(--line-height-*)`, `var(--spacing-*)`, `var(--layout-*)` 등 토큰을 참조합니다.
 - **글자모드 레이아웃 대응**: 글자모드 변경으로 높이, 줄 수, sticky 위치, 하단 고정 영역, 플로팅 버튼 위치가 달라질 수 있으므로 관련 컴포넌트는 현재 크기와 오프셋을 다시 계산할 수 있는 구조로 설계합니다.
 - **이미지 테마 대응**: 라이트/다크 모드별 이미지가 별도로 존재할 수 있으므로 모든 이미지는 공통 `Img` 컴포넌트를 통해 렌더링하고, 테마별 이미지 소스와 `alt`를 일관되게 관리합니다.
@@ -89,7 +91,7 @@
 - **화면 폴더 규칙:** 단일 화면 컴포넌트는 `src/pages/화면명/Index.tsx` 구조를 사용하며, 화면명 폴더는 PascalCase로 작성합니다.
 - **메뉴별 그룹 규칙:** 화면이 늘어나는 메뉴/도메인은 상위 메뉴 폴더로 묶고, 하위 화면은 `src/pages/메뉴명/화면명/Index.tsx` 구조를 사용합니다. 예: `src/pages/Playground/FreeBoard/Index.tsx`, `src/pages/Snaps/Pics/Detail/Index.tsx`, `src/pages/MyPage/Profile/Index.tsx`
 - **공통 분류:** 로그인/회원가입은 `src/pages/Auth`, 시스템 오류 화면은 `src/pages/System`, 정적 콘텐츠는 `src/pages/Static` 아래에 둡니다.
-- **라우트 경로 규칙:** 실제 URL 경로는 화면명과 분리하여 소문자 kebab-case로 작성합니다. 예: `src/pages/Home/Index.tsx` 화면의 경로는 `/home`
+- **라우트 경로 규칙:** 실제 URL 경로는 화면명과 분리하여 소문자 kebab-case로 작성합니다. 단, 홈 화면은 중복 경로를 만들지 않고 루트 경로(`/`)만 사용합니다.
 - **화면 전용 요소:** 특정 화면에서만 사용하는 `data.ts`, `types.ts`, `api.ts`, `hooks.ts` 등은 해당 화면 폴더 내부에 둘 수 있습니다.
 - **공통 승격 기준:** 화면 내부 요소가 2개 이상의 화면에서 재사용되면 `src/data`, `src/types`, `src/apis`, `src/hooks` 등 공통 폴더로 이동합니다.
 - **스타일 예외 없음:** 화면 전용 스타일도 화면 폴더 내부에 두지 않고 `src/assets/styles/pages`에서 관리합니다.
@@ -695,11 +697,11 @@ API 호출 규칙은 다음을 따릅니다.
 - **이메일 미인증:** 이메일 미인증 사용자는 글쓰기, 댓글, 좋아요, 스크랩 등 쓰기 액션을 제한합니다.
 - **정지 사용자:** 정지 사용자는 로그인 상태를 유지할 수 있으나 쓰기 액션과 주요 사용자 기능을 제한합니다.
 - **탈퇴 사용자:** 탈퇴 상태 사용자는 세션을 무효화하거나 로그인 이후 즉시 안내 후 로그아웃 처리합니다.
-- **로그인 성공:** redirect 경로가 있으면 해당 경로로 복귀하고, 없으면 `/home`으로 이동합니다.
+- **로그인 성공:** redirect 경로가 있으면 해당 경로로 복귀하고, 없으면 `/`로 이동합니다.
 - **자동 로그인 복원:** 앱 시작 시 저장된 인증 토큰을 기준으로 자동 로그인 복원을 시도하되, 서버 검증에 실패하거나 사용자 상태가 제한 상태이면 세션을 정리하고 적절한 안내를 표시합니다.
 - **자동 로그인 저장 범위:** 자동 로그인 선택 여부는 인증 토큰 저장 전략과 함께 관리하며, 사용자가 선택하지 않은 경우 장기 지속 저장을 사용하지 않습니다.
 - **자동 로그인 해제:** 사용자가 로그아웃하거나 자동 로그인 선택을 해제하면 장기 저장된 인증 정보와 관련 민감 캐시를 즉시 제거합니다.
-- **로그아웃 성공:** 세션 정리 후 `/home`으로 이동합니다.
+- **로그아웃 성공:** 세션 정리 후 `/`로 이동합니다.
 - **SNS 로그인 실패:** 원인을 한글 메시지로 변환하여 `Toast` 또는 폼 에러로 안내합니다.
 - **소셜 로그인/연동:** PocketBase OAuth2 흐름은 `listAuthMethods()`로 provider 목록을 확인하고, redirect 이후 `authWithOAuth2Code()`로 인증을 완료하는 방식을 기본으로 합니다.
 - **소셜 provider 관리:** 로그인 화면과 회원가입 화면에는 활성화된 provider만 노출합니다. 마이페이지에는 연결된 로그인 수단과 연결 가능한 provider를 구분해 표시합니다.
@@ -863,9 +865,9 @@ type BackButtonConfig =
 ```ts
 export const routeConfig = [
   {
-    id: 'home',
-    path: '/home',
-    title: '홈',
+    id: 'root',
+    path: '/',
+    title: 'Anoju',
     meta: {
       title: '홈',
       description: 'Anoju의 주요 콘텐츠를 확인합니다.',

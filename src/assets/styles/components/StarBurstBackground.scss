@@ -1,0 +1,26 @@
+@use "@/assets/styles/base" as *;
+
+.star-burst-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 34%, rgba(143, 85, 232, 0.3), rgba(17, 16, 25, 0) 38%),
+    linear-gradient(180deg, #111019 0%, #181322 48%, #111019 100%);
+  pointer-events: none;
+
+  &__canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  &__halo {
+    position: absolute;
+    inset: auto 8% 0;
+    height: 48%;
+    background: radial-gradient(ellipse at center, rgba(143, 85, 232, 0.28), rgba(17, 16, 25, 0) 68%);
+    filter: blur(18px);
+  }
+}

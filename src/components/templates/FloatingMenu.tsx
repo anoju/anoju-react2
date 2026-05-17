@@ -9,6 +9,7 @@ import {
   SNAPS_PATH,
 } from "@/constants/app";
 import { useAuthStore } from "@/stores/authStore";
+import { GlassSurface } from "@/components/molecules";
 import type { FloatingMenuConfig } from "@/routes/types";
 
 interface FloatingMenuProps {
@@ -38,22 +39,24 @@ export const FloatingMenu = ({ config, visible }: FloatingMenuProps) => {
       }}
       transition={{ duration: 0.22, ease: "easeOut" }}
     >
-      <NavLink to={MENU_PATH} className="floating-menu__item">
-        <Menu size={20} />
-        <span>Menu</span>
-      </NavLink>
-      <NavLink to={PLAYGROUND_PATH} className="floating-menu__item">
-        <Gamepad2 size={20} />
-        <span>Playground</span>
-      </NavLink>
-      <NavLink to={SNAPS_PATH} className="floating-menu__item">
-        <Images size={20} />
-        <span>Scene</span>
-      </NavLink>
-      <NavLink to={myPageTarget} className="floating-menu__item">
-        <MyPageIcon size={20} />
-        <span>{myPageLabel}</span>
-      </NavLink>
+      <GlassSurface className="floating-menu__surface">
+        <NavLink to={MENU_PATH} className="floating-menu__item">
+          <Menu size={20} />
+          <span>Menu</span>
+        </NavLink>
+        <NavLink to={PLAYGROUND_PATH} className="floating-menu__item">
+          <Gamepad2 size={20} />
+          <span>Playground</span>
+        </NavLink>
+        <NavLink to={SNAPS_PATH} className="floating-menu__item">
+          <Images size={20} />
+          <span>Scene</span>
+        </NavLink>
+        <NavLink to={myPageTarget} className="floating-menu__item">
+          <MyPageIcon size={20} />
+          <span>{myPageLabel}</span>
+        </NavLink>
+      </GlassSurface>
     </motion.nav>
   );
 };

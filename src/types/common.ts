@@ -1,6 +1,6 @@
 export type ThemeMode = 'light' | 'dark' | 'auto';
 
-export type FontMode = 'small' | 'base' | 'large';
+export type FontMode = 'xsmall' | 'small' | 'base' | 'large' | 'xlarge';
 
 export type UserRole = 'guest' | 'user' | 'admin';
 
