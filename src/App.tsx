@@ -9,7 +9,7 @@ function App() {
 
   useEffect(() => {
     initializeThemeAttributes();
-    initializeAuth();
+    void initializeAuth();
   }, [initializeAuth]);
 
   return (

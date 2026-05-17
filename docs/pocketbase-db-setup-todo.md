@@ -10,15 +10,25 @@ PocketBase Admin UI에서 실제 DB/인증/보안 설정을 진행하기 위한 
 - 2026-05-17: PocketBase 컬렉션/필드/API Rules 상세 문서를 작성하고, 프론트 컬렉션 상수와 도메인 타입을 보강했습니다.
 - 2026-05-17: Chrome의 PocketBase Admin UI에서 import collections로 도메인 컬렉션 7개를 생성했습니다.
 - 2026-05-17: PocketBase import 제약에 맞춰 내부 collection/field id를 15자 이하로 정리하고, `created` 기반 보조 인덱스는 추후 수동 검토로 분리했습니다.
+- 2026-05-17: 프론트 운영 도메인을 `https://anoju.synology.me`, PocketBase 운영 도메인을 `https://pocketbase.anoju.synology.me`로 분리 관리하도록 정리했습니다.
+- 2026-05-17: PocketBase `users` 컬렉션 OAuth2 설정에 Google provider를 등록했습니다. Secret 값은 문서/코드에 저장하지 않았습니다.
+- 2026-05-17: PocketBase `users` 컬렉션 OAuth2 설정에 Naver를 OpenID Connect provider(`oidc`)로 등록했습니다. Secret 값은 문서/코드에 저장하지 않았습니다.
+- 2026-05-17: Naver/Kakao 이메일 미제공 시 provider 사용자 id 기반 가상 이메일 정책을 확정했습니다.
+- 2026-05-17: PocketBase `users` 컬렉션 OAuth2 설정에 Kakao provider를 등록했습니다. 현재 Kakao 앱은 이메일 제공이 제한될 수 있어 가상 이메일 hook 구현이 필요합니다.
+- 2026-05-17: Naver/Kakao 가상 이메일 생성을 위한 `pb_hooks/oauth_virtual_email.pb.js` 원본 파일과 운영 문서를 추가했습니다.
 
 ## 1단계: 서버 및 환경 변수
 
 - [x] PocketBase 서버 헬스체크
 - [x] 프론트 `.env`의 `VITE_PB_URL` 설정
 - [ ] PocketBase SMTP 설정
-- [ ] PocketBase 운영 도메인 확인
+- [x] 프론트 운영 도메인 확인: `https://anoju.synology.me`
+- [x] PocketBase 운영 도메인 확인: `https://pocketbase.anoju.synology.me`
 - [ ] Cloudflare Turnstile Secret key 서버 환경 변수 등록
 - [ ] Google/Naver/Kakao OAuth provider 키 등록
+  - [x] Google provider 키 등록
+  - [x] Naver provider 키 등록
+  - [x] Kakao provider 키 등록
 
 ## 2단계: users 인증 컬렉션 설정
 
@@ -45,11 +55,14 @@ PocketBase Admin UI에서 실제 DB/인증/보안 설정을 진행하기 위한 
 
 ## 4단계: 소셜 로그인
 
-- [ ] Google OAuth provider 활성화
-- [ ] Naver OAuth provider 활성화
-- [ ] Kakao OAuth provider 활성화
-- [ ] 각 provider redirect URL 확인
+- [x] Google OAuth provider 활성화
+- [x] Naver OAuth provider 활성화
+- [x] Kakao OAuth provider 활성화
+- [x] 각 provider redirect URL 확인
 - [ ] 소셜 로그인 후 이메일 제공 여부 확인
+- [x] Naver/Kakao 가상 이메일 생성 hook 원본 구현
+- [ ] Naver/Kakao 가상 이메일 생성 hook NAS 서버 반영
+- [x] 가상 이메일 계정의 실제 이메일 등록/인증 UX 구현
 - [ ] 소셜 계정 연결/해제 동작 확인
 
 ## 5단계: 도메인 컬렉션 생성

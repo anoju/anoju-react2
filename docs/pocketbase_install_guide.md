@@ -50,6 +50,8 @@ services:
 ## 4. 특징 및 외부 접속 (역방향 프록시)
 
 - **역방향 프록시 설정**: 제어판 → 로그인 포털 → 고급 → 역방향 프록시에서 설정하세요.
+    - **프론트 운영 소스**: `https://anoju.synology.me` (Port 443)
+    - **프론트 대상**: NAS에 배포된 Vite 정적 빌드 또는 웹 서버 경로
     - **소스**: `https://pocketbase.anoju.synology.me` (Port 443)
     - **대상**: `http://localhost:9090` (Port 9090)
 - **메모리 점유율:** 약 30MB 수준으로 매우 낮음.

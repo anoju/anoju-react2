@@ -1,16 +1,28 @@
 import { DEFAULT_HOME_PATH } from '@/constants/app';
 import { PB_COLLECTIONS } from '@/constants/pocketbaseCollections';
+import { setAutoLoginEnabled } from '@/lib/authPersistence';
 import { pb } from '@/lib/pocketBase';
 import { useAuthStore } from '@/stores/authStore';
 import { runApi } from './apiClient';
 
 const USERS_COLLECTION = PB_COLLECTIONS.users;
 const SUPPORTED_OAUTH_PROVIDERS = ['google', 'naver', 'kakao'] as const;
+const PB_PROVIDER_BY_OAUTH_PROVIDER: Record<SupportedOAuthProvider, string> = {
+  google: 'google',
+  naver: 'oidc',
+  kakao: 'kakao',
+};
+const OAUTH_PROVIDER_BY_PB_PROVIDER: Record<string, SupportedOAuthProvider> = {
+  google: 'google',
+  oidc: 'naver',
+  kakao: 'kakao',
+};
 
 export type SupportedOAuthProvider = (typeof SUPPORTED_OAUTH_PROVIDERS)[number];
 
 export interface OAuthProviderOption {
   name: SupportedOAuthProvider;
+  providerName: string;
   displayName: string;
 }
 
@@ -22,6 +34,7 @@ export interface LinkedOAuthProvider {
 interface LoginParams {
   identity: string;
   password: string;
+  autoLogin: boolean;
 }
 
 interface RegisterParams {
@@ -36,24 +49,29 @@ interface UpdateProfileParams {
   name?: string;
 }
 
+interface RequestEmailChangeParams {
+  email: string;
+}
+
 const isSupportedOAuthProvider = (provider: string): provider is SupportedOAuthProvider =>
   SUPPORTED_OAUTH_PROVIDERS.includes(provider as SupportedOAuthProvider);
 
 const getProviderFromRecord = (record: Record<string, unknown>) => {
   const rawProvider = record.provider ?? record.name;
 
-  if (typeof rawProvider !== 'string' || !isSupportedOAuthProvider(rawProvider)) {
+  if (typeof rawProvider !== 'string') {
     return null;
   }
 
-  return rawProvider;
+  return OAUTH_PROVIDER_BY_PB_PROVIDER[rawProvider] ?? (isSupportedOAuthProvider(rawProvider) ? rawProvider : null);
 };
 
 export const authApi = {
-  login: ({ identity, password }: LoginParams) =>
+  login: ({ identity, password, autoLogin }: LoginParams) =>
     runApi(async () => {
+      setAutoLoginEnabled(autoLogin);
       const result = await pb.collection(USERS_COLLECTION).authWithPassword(identity, password);
-      useAuthStore.getState().initialize();
+      await useAuthStore.getState().initialize();
       return result;
     }),
 
@@ -78,6 +96,9 @@ export const authApi = {
 
   requestPasswordReset: (email: string) => runApi(() => pb.collection(USERS_COLLECTION).requestPasswordReset(email)),
 
+  requestEmailChange: ({ email }: RequestEmailChangeParams) =>
+    runApi(() => pb.collection(USERS_COLLECTION).requestEmailChange(email)),
+
   getOAuthProviders: () =>
     runApi(async (): Promise<OAuthProviderOption[]> => {
       const methods = await pb.collection(USERS_COLLECTION).listAuthMethods();
@@ -87,28 +108,35 @@ export const authApi = {
       }
 
       return methods.oauth2.providers.reduce<OAuthProviderOption[]>((providers, provider) => {
-        if (!isSupportedOAuthProvider(provider.name)) {
+        const providerName = OAUTH_PROVIDER_BY_PB_PROVIDER[provider.name];
+
+        if (!providerName || !isSupportedOAuthProvider(providerName)) {
           return providers;
         }
 
         providers.push({
-          name: provider.name,
-          displayName: provider.displayName || provider.name,
+          name: providerName,
+          providerName: provider.name,
+          displayName: provider.displayName || providerName,
         });
 
         return providers;
       }, []);
     }),
 
-  loginWithOAuth: (provider: SupportedOAuthProvider) =>
+  loginWithOAuth: (provider: SupportedOAuthProvider, autoLogin?: boolean) =>
     runApi(async () => {
+      if (typeof autoLogin === 'boolean') {
+        setAutoLoginEnabled(autoLogin);
+      }
+
       const result = await pb.collection(USERS_COLLECTION).authWithOAuth2({
-        provider,
+        provider: PB_PROVIDER_BY_OAUTH_PROVIDER[provider],
         createData: {
           emailVisibility: false,
         },
       });
-      useAuthStore.getState().initialize();
+      await useAuthStore.getState().initialize();
       return result;
     }),
 
@@ -146,7 +174,7 @@ export const authApi = {
         throw new Error('로그인이 필요합니다.');
       }
 
-      return pb.collection(USERS_COLLECTION).unlinkExternalAuth(userId, provider);
+      return pb.collection(USERS_COLLECTION).unlinkExternalAuth(userId, PB_PROVIDER_BY_OAUTH_PROVIDER[provider]);
     }),
 
   updateProfile: (params: UpdateProfileParams) =>
@@ -158,7 +186,7 @@ export const authApi = {
       }
 
       const result = await pb.collection(USERS_COLLECTION).update(userId, params);
-      useAuthStore.getState().initialize();
+      await useAuthStore.getState().initialize();
       return result;
     }),
 

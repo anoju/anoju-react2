@@ -1,7 +1,7 @@
 import type React from 'react';
 import { useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Button, Input, SocialLoginButtons, confirm, toast } from '@/components';
+import { Button, Checkbox, Input, SocialLoginButtons, confirm, toast } from '@/components';
 import { authApi, getUserMessage } from '@/apis';
 import { DEFAULT_HOME_PATH, REGISTER_PATH } from '@/constants/app';
 import { useOAuthProviders } from '@/hooks/useOAuthProviders';
@@ -11,6 +11,7 @@ const Login = () => {
   const location = useLocation();
   const [identity, setIdentity] = useState('');
   const [password, setPassword] = useState('');
+  const [autoLogin, setAutoLogin] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const { providers, loading: providersLoading } = useOAuthProviders();
 
@@ -30,7 +31,7 @@ const Login = () => {
     setSubmitting(true);
 
     try {
-      await authApi.login({ identity: identity.trim(), password });
+      await authApi.login({ identity: identity.trim(), password, autoLogin });
       toast('로그인되었습니다.', { tone: 'success' });
       navigate(redirectPath, { replace: true });
     } catch (error) {
@@ -87,6 +88,12 @@ const Login = () => {
           autoComplete="current-password"
           required
         />
+        <Checkbox
+          label="자동 로그인"
+          description="개인 기기에서 브라우저를 다시 열어도 로그인 상태를 유지합니다."
+          checked={autoLogin}
+          onChange={(event) => setAutoLogin(event.target.checked)}
+        />
         <Button type="submit" size="lg" fullWidth loading={submitting}>
           로그인
         </Button>
@@ -101,6 +108,7 @@ const Login = () => {
             providers={providers}
             loading={providersLoading}
             context="login"
+            autoLogin={autoLogin}
             onSuccess={() => navigate(redirectPath, { replace: true })}
           />
         </>

@@ -7,6 +7,7 @@ interface SocialLoginButtonsProps {
   loading?: boolean;
   context: 'login' | 'register' | 'link';
   disabledProviders?: SupportedOAuthProvider[];
+  autoLogin?: boolean;
   onSuccess?: () => void;
 }
 
@@ -27,11 +28,12 @@ export const SocialLoginButtons = ({
   loading = false,
   context,
   disabledProviders = [],
+  autoLogin = false,
   onSuccess,
 }: SocialLoginButtonsProps) => {
   const handleOAuth = async (provider: SupportedOAuthProvider) => {
     try {
-      await authApi.loginWithOAuth(provider);
+      await authApi.loginWithOAuth(provider, context === 'link' ? undefined : autoLogin);
       toast(
         context === 'link'
           ? `${providerLabels[provider]} 계정을 연결했습니다.`

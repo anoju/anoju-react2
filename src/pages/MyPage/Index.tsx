@@ -12,7 +12,9 @@ const MyPage = () => {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
   const [name, setName] = useState(user?.name ?? '');
+  const [actualEmail, setActualEmail] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [emailSubmitting, setEmailSubmitting] = useState(false);
   const [linkedProviders, setLinkedProviders] = useState<LinkedOAuthProvider[]>([]);
   const [linkedLoading, setLinkedLoading] = useState(true);
   const { providers, loading: providersLoading } = useOAuthProviders();
@@ -23,9 +25,9 @@ const MyPage = () => {
   );
 
   const loginMethodCount = useMemo(() => {
-    const hasEmailLogin = Boolean(user?.email);
+    const hasEmailLogin = Boolean(user?.email && !user.isVirtualEmail);
     return (hasEmailLogin ? 1 : 0) + linkedProviders.length;
-  }, [linkedProviders.length, user?.email]);
+  }, [linkedProviders.length, user?.email, user?.isVirtualEmail]);
 
   const loadLinkedProviders = useCallback(async () => {
     setLinkedLoading(true);
@@ -58,7 +60,7 @@ const MyPage = () => {
   };
 
   const handleVerificationRequest = async () => {
-    if (!user?.email) {
+    if (!user?.email || user.isVirtualEmail) {
       toast('이메일 정보가 없습니다.', { tone: 'warning' });
       return;
     }
@@ -68,6 +70,29 @@ const MyPage = () => {
       toast('이메일 인증 메일을 발송했습니다.', { tone: 'success' });
     } catch (error) {
       toast(getUserMessage(error), { tone: 'danger' });
+    }
+  };
+
+  const handleActualEmailSubmit: React.FormEventHandler<HTMLFormElement> = async (event) => {
+    event.preventDefault();
+
+    const nextEmail = actualEmail.trim();
+
+    if (!nextEmail) {
+      toast('실제 이메일을 입력해주세요.', { tone: 'warning' });
+      return;
+    }
+
+    setEmailSubmitting(true);
+
+    try {
+      await authApi.requestEmailChange({ email: nextEmail });
+      toast('이메일 변경 인증 메일을 발송했습니다.', { tone: 'success' });
+      setActualEmail('');
+    } catch (error) {
+      toast(getUserMessage(error), { tone: 'danger' });
+    } finally {
+      setEmailSubmitting(false);
     }
   };
 
@@ -121,7 +146,10 @@ const MyPage = () => {
       <dl className="my-page__summary">
         <div>
           <dt>이메일</dt>
-          <dd>{user?.email ?? '-'}</dd>
+          <dd>
+            {user?.email ?? '-'}
+            {user?.isVirtualEmail ? <span className="my-page__badge">실제 이메일 등록 필요</span> : null}
+          </dd>
         </div>
         <div>
           <dt>권한</dt>
@@ -132,6 +160,29 @@ const MyPage = () => {
           <dd>{user?.verified ? '완료' : '필요'}</dd>
         </div>
       </dl>
+
+      {user?.isVirtualEmail ? (
+        <section className="my-page__notice" aria-labelledby="actual-email-title">
+          <h3 id="actual-email-title">실제 이메일 등록</h3>
+          <p>
+            소셜 로그인에서 이메일을 받지 못해 임시 이메일이 연결되어 있습니다. 게시글 작성과 주요 기능을
+            사용하려면 실제 이메일을 등록하고 인증을 완료해주세요.
+          </p>
+          <form className="my-page__form" onSubmit={handleActualEmailSubmit}>
+            <Input
+              label="실제 이메일"
+              type="email"
+              value={actualEmail}
+              onChange={(event) => setActualEmail(event.target.value)}
+              autoComplete="email"
+              placeholder="you@example.com"
+            />
+            <Button type="submit" loading={emailSubmitting}>
+              이메일 인증 요청
+            </Button>
+          </form>
+        </section>
+      ) : null}
 
       <form className="my-page__form" onSubmit={handleSubmit}>
         <Input label="이름" value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" />

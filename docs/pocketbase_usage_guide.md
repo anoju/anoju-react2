@@ -3,6 +3,7 @@
 이 문서는 **anoju-react2** 프로젝트에서 PocketBase를 사용하여 백엔드 기능을 구현하는 방법과 규칙을 설명합니다.
 
 ## 1. 서버 정보
+- **프론트 운영 URL:** `https://anoju.synology.me`
 - **Admin UI:** `https://pocketbase.anoju.synology.me/_/`
 - **API URL:** `https://pocketbase.anoju.synology.me`
 

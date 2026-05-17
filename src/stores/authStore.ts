@@ -1,6 +1,9 @@
 import { create } from 'zustand';
 import { pb } from '@/lib/pocketBase';
 import type { AuthStatus, UserRole } from '@/types/common';
+import { isVirtualOAuthEmail } from '@/utils/oauthEmail';
+
+const USERS_COLLECTION = 'users';
 
 interface AuthUser {
   id: string;
@@ -8,16 +11,19 @@ interface AuthUser {
   name?: string;
   role: UserRole;
   verified?: boolean;
+  isVirtualEmail: boolean;
 }
 
 interface AuthState {
   status: AuthStatus;
   user: AuthUser | null;
   isAuthenticated: boolean;
-  initialize: () => void;
+  initialize: () => Promise<void>;
   setAnonymous: () => void;
   logout: () => void;
 }
+
+let unsubscribeAuthStore: (() => void) | null = null;
 
 const getUserFromStore = (): AuthUser | null => {
   const model = pb.authStore.model;
@@ -34,6 +40,7 @@ const getUserFromStore = (): AuthUser | null => {
     name: typeof model.name === 'string' ? model.name : undefined,
     role,
     verified: typeof model.verified === 'boolean' ? model.verified : undefined,
+    isVirtualEmail: isVirtualOAuthEmail(typeof model.email === 'string' ? model.email : undefined),
   };
 };
 
@@ -55,12 +62,27 @@ export const useAuthStore = create<AuthState>((set) => ({
   status: 'initializing',
   user: null,
   isAuthenticated: false,
-  initialize: () => {
+  initialize: async () => {
+    if (unsubscribeAuthStore) {
+      unsubscribeAuthStore();
+      unsubscribeAuthStore = null;
+    }
+
+    set({ status: 'initializing' });
+
+    if (pb.authStore.isValid) {
+      try {
+        await pb.collection(USERS_COLLECTION).authRefresh();
+      } catch {
+        pb.authStore.clear();
+      }
+    }
+
     const status = getStatusFromStore();
     const user = getUserFromStore();
     set({ status, user, isAuthenticated: status === 'authenticated' });
 
-    pb.authStore.onChange(() => {
+    unsubscribeAuthStore = pb.authStore.onChange(() => {
       const nextStatus = getStatusFromStore();
       const nextUser = getUserFromStore();
       set({

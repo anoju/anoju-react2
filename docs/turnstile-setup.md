@@ -8,6 +8,7 @@ Cloudflare Dashboard에서 Turnstile widget을 생성한 뒤 아래 값을 준�
 
 - Sitekey: 프론트엔드에서 사용
 - Secret key: PocketBase 서버 검증에서만 사용
+- Widget 도메인: `anoju.synology.me`
 
 ## 프론트엔드 환경 변수
 
@@ -70,7 +71,7 @@ PocketBase 서버 훅은 `turnstileToken`을 읽어 검증하고, 실제 `users`
 
 ## 운영 체크리스트
 
-- Cloudflare Turnstile widget 도메인에 운영 도메인 등록
+- Cloudflare Turnstile widget 도메인에 운영 도메인 `anoju.synology.me` 등록
 - 로컬 개발용 도메인 또는 테스트 키 사용 여부 결정
 - PocketBase 서버에 `TURNSTILE_SECRET_KEY` 등록
 - 회원가입 create hook에서 Siteverify 검증
