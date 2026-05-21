@@ -137,7 +137,7 @@ const Settings = () => {
           </div>
           <Slider
             className="settings-font-slider__slider"
-            edgePadding="md"
+            edgePadding={44}
             min={0}
             max={fontModeOptions.length - 1}
             step={1}

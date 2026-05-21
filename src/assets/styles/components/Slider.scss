@@ -1,7 +1,7 @@
 @use "@/assets/styles/base" as *;
 
 .slider {
-  --slider-edge-offset: 0;
+  --slider-edge-offset: 0px;
   --slider-value-position: 0;
   --slider-active-width: 0;
 
@@ -48,16 +48,22 @@
 
   &__range {
     position: absolute;
-    left: 0;
-    width: var(--slider-active-width);
+    top: 50%;
+    left: calc(0px - var(--slider-edge-offset));
+    width: calc(var(--slider-edge-offset) + var(--slider-active-width));
     height: 0.375rem;
     border-radius: var(--radius-full);
     background: var(--color-action-primary);
     pointer-events: none;
+    transform: translateY(-50%);
+    transition:
+      width var(--motion-base) var(--motion-ease),
+      background var(--motion-base) var(--motion-ease);
   }
 
   &__thumb {
     position: absolute;
+    top: 50%;
     left: var(--slider-value-position);
     width: 1.25rem;
     height: 1.25rem;
@@ -66,8 +72,12 @@
     background: var(--color-bg-surface);
     box-shadow: var(--shadow-sm);
     pointer-events: none;
-    transform: translateX(-50%);
-    transition: box-shadow var(--motion-base) var(--motion-ease);
+    transform: translate(-50%, -50%);
+    transition:
+      left var(--motion-base) var(--motion-ease),
+      border-color var(--motion-base) var(--motion-ease),
+      background var(--motion-base) var(--motion-ease),
+      box-shadow var(--motion-base) var(--motion-ease);
   }
 
   &__active-track {
@@ -111,18 +121,6 @@
     &[data-selected="true"] {
       color: var(--color-text-link);
     }
-  }
-
-  &--edge-sm {
-    --slider-edge-offset: clamp(1.25rem, 8%, 1.75rem);
-  }
-
-  &--edge-md {
-    --slider-edge-offset: clamp(2rem, 12%, 2.75rem);
-  }
-
-  &--edge-lg {
-    --slider-edge-offset: clamp(2.5rem, 16%, 3.5rem);
   }
 
   &--steps-2 {
@@ -212,6 +210,15 @@
   &--steps-5.slider--value-4 {
     --slider-value-position: 100%;
     --slider-active-width: 100%;
+  }
+
+  &--steps-2.slider--value-1,
+  &--steps-3.slider--value-2,
+  &--steps-4.slider--value-3,
+  &--steps-5.slider--value-4 {
+    .slider__range {
+      width: calc(100% + var(--slider-edge-offset) + var(--slider-edge-offset));
+    }
   }
 
   &--steps-4.slider--value-1 {

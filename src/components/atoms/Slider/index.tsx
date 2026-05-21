@@ -1,12 +1,13 @@
 import type React from 'react';
-import { useId, useRef } from 'react';
+import { useEffect, useId, useRef } from 'react';
 
 export interface SliderMark {
   value: number;
   label: string;
 }
 
-export type SliderEdgePadding = 'none' | 'sm' | 'md' | 'lg';
+export type SliderEdgePaddingPreset = 'none' | 'sm' | 'md' | 'lg';
+export type SliderEdgePadding = SliderEdgePaddingPreset | number;
 
 interface SliderProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'onChange' | 'role'> {
@@ -22,11 +23,25 @@ interface SliderProps
 }
 
 const clamp = (nextValue: number, min: number, max: number) => Math.min(Math.max(nextValue, min), max);
+const edgePaddingPresetMap: Record<SliderEdgePaddingPreset, number> = {
+  none: 0,
+  sm: 28,
+  md: 44,
+  lg: 56,
+};
 
 const getSteppedValue = (nextValue: number, min: number, max: number, step: number) => {
   const steppedValue = Math.round((nextValue - min) / step) * step + min;
 
   return clamp(steppedValue, min, max);
+};
+
+const getEdgePaddingValue = (edgePadding: SliderEdgePadding) => {
+  if (typeof edgePadding === 'number') {
+    return Number.isFinite(edgePadding) ? Math.max(edgePadding, 0) : 0;
+  }
+
+  return edgePaddingPresetMap[edgePadding];
 };
 
 const Slider = ({
@@ -46,20 +61,25 @@ const Slider = ({
   const generatedId = useId();
   const sliderId = id ?? generatedId;
   const labelId = label ? `${sliderId}-label` : undefined;
+  const sliderRef = useRef<HTMLDivElement>(null);
   const activeTrackRef = useRef<HTMLSpanElement>(null);
+  const edgePaddingValue = getEdgePaddingValue(edgePadding);
   const selectedMark = marks.find((mark) => mark.value === value);
   const stepCount = marks.length;
   const valueIndex = clamp(Math.round((value - min) / step), 0, Math.max(stepCount - 1, 0));
   const { ['aria-labelledby']: ariaLabelledBy, ...rootProps } = props;
   const classNames = [
     'slider',
-    `slider--edge-${edgePadding}`,
     stepCount > 0 ? `slider--steps-${stepCount}` : '',
     stepCount > 0 ? `slider--value-${valueIndex}` : '',
     className,
   ]
     .join(' ')
     .trim();
+
+  useEffect(() => {
+    sliderRef.current?.style.setProperty('--slider-edge-offset', `${edgePaddingValue}px`);
+  }, [edgePaddingValue]);
 
   const updateValueFromClientX = (clientX: number) => {
     const activeTrackElement = activeTrackRef.current;
@@ -119,6 +139,7 @@ const Slider = ({
 
   return (
     <div
+      ref={sliderRef}
       className={classNames}
       data-disabled={disabled || undefined}
       data-orientation="horizontal"
