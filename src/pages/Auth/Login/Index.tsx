@@ -68,7 +68,7 @@ const Login = () => {
     <section className="container auth-page">
       <header className="auth-page__header">
         <h2>로그인</h2>
-        <p>마이페이지처럼 로그인이 필요한 화면은 로그인 후 계속 이용할 수 있습니다.</p>
+        <p>소셜 로그인으로 간편하게 로그인하세요</p>
       </header>
 
       <form className="auth-page__form" onSubmit={handleSubmit}>
