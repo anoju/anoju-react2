@@ -2,11 +2,18 @@ import type React from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { MessageCircle } from 'lucide-react';
-import { Button, Img, ReactionActions, ShareButton, TextArea, confirm, toast } from '@/components';
+import { Avatar, Button, Img, ReactionActions, ShareButton, TextArea, confirm, toast } from '@/components';
 import { communityApi, getUserMessage, reactionApi, type ReactionType } from '@/apis';
 import { FREE_BOARD_PATH, LOGIN_PATH } from '@/constants/app';
 import type { CommentRecord, PostImageRecord, PostRecord } from '@/types/domain';
-import { compareByCreatedAsc, createContentParts, formatRelativeTime, getPostImageUrl, getRecordAuthorName } from '@/utils/community';
+import {
+  compareByCreatedAsc,
+  createContentParts,
+  formatRelativeTime,
+  getPostImageUrl,
+  getRecordAuthorAvatarUrl,
+  getRecordAuthorName,
+} from '@/utils/community';
 import { sanitizeRichTextHtml } from '@/utils/richTextSecurity';
 import { applyReactionCount, getReactionKey } from '@/utils/reactionState';
 import { useAuthStore } from '@/stores/authStore';
@@ -257,9 +264,12 @@ const FreeBoardDetail = () => {
           자유게시판
         </Link>
         <h2>{post.title}</h2>
-        <p>
-          {getRecordAuthorName(post)} · {formatRelativeTime(post.created)} · 조회 {post.viewCount ?? 0}
-        </p>
+        <div className="board-detail__author">
+          <Avatar src={getRecordAuthorAvatarUrl(post)} name={getRecordAuthorName(post)} size="md" />
+          <p>
+            {getRecordAuthorName(post)} · {formatRelativeTime(post.created)} · 조회 {post.viewCount ?? 0}
+          </p>
+        </div>
         {isAdmin ? (
           <div className="admin-actions" aria-label="관리자 게시글 관리">
             {post.status === 'hidden' || post.deleted ? (
@@ -316,9 +326,12 @@ const FreeBoardDetail = () => {
                 key={item.id}
               >
                 <div className="comment-item__header">
-                  <div className="comment-item__meta">
-                    <strong>{getRecordAuthorName(item)}</strong>
-                    <span>{formatRelativeTime(item.created)}</span>
+                  <div className="comment-item__author">
+                    <Avatar src={getRecordAuthorAvatarUrl(item)} name={getRecordAuthorName(item)} size="sm" />
+                    <div className="comment-item__meta">
+                      <strong>{getRecordAuthorName(item)}</strong>
+                      <span>{formatRelativeTime(item.created)}</span>
+                    </div>
                   </div>
                   <div className="comment-item__actions">
                     <ReactionActions

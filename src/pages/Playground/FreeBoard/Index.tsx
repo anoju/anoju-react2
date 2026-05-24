@@ -2,12 +2,12 @@ import type React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MessageCircle, Plus, Search } from 'lucide-react';
-import { DataList, FloatingActionButton, FloatingActions, Input, toast } from '@/components';
+import { Avatar, DataList, FloatingActionButton, FloatingActions, Input, toast } from '@/components';
 import { communityApi, getUserMessage } from '@/apis';
 import { FREE_BOARD_PATH, FREE_BOARD_WRITE_PATH } from '@/constants/app';
 import type { PostRecord } from '@/types/domain';
 import { createTextFilter } from '@/utils/queryString';
-import { compareByCreatedDesc, formatRelativeTime, getRecordAuthorName } from '@/utils/community';
+import { compareByCreatedDesc, formatRelativeTime, getRecordAuthorAvatarUrl, getRecordAuthorName } from '@/utils/community';
 import { useAuthStore } from '@/stores/authStore';
 
 const PER_PAGE = 20;
@@ -106,8 +106,11 @@ const FreeBoard = () => {
         renderItem={(post) => (
           <Link to={`${FREE_BOARD_PATH}/${post.id}`} className="board-list-item">
             <span className="board-list-item__title">{post.title}</span>
-            <span className="board-list-item__meta">
-              {getRecordAuthorName(post)} · {formatRelativeTime(post.created)}
+            <span className="board-list-item__meta board-list-item__meta--author">
+              <Avatar src={getRecordAuthorAvatarUrl(post)} name={getRecordAuthorName(post)} size="sm" />
+              <span>
+                {getRecordAuthorName(post)} · {formatRelativeTime(post.created)}
+              </span>
             </span>
             <span className="board-list-item__stats">
               <MessageCircle size={14} /> 댓글 {post.commentCount ?? 0} · 조회 {post.viewCount ?? 0} · 좋아요{' '}

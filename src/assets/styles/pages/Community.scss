@@ -9,7 +9,9 @@
 }
 
 .write-page {
-  padding-bottom: calc(var(--layout-fixed-action-height) + var(--layout-bottom-safe) + var(--spacing-3xl));
+  padding-bottom: calc(
+    var(--layout-fixed-action-height) + var(--layout-bottom-safe) + var(--spacing-3xl)
+  );
 }
 
 .hub-page,
@@ -150,6 +152,10 @@
     font-size: var(--font-size-xs);
     gap: var(--spacing-2xs);
   }
+
+  &__meta--author {
+    gap: var(--spacing-xs);
+  }
 }
 
 .board-detail {
@@ -178,6 +184,18 @@
     font-size: var(--font-size-sm);
     font-weight: 760;
     text-decoration: none;
+  }
+
+  &__author {
+    display: flex;
+    align-items: center;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+    gap: var(--spacing-xs);
+
+    p {
+      margin: 0;
+    }
   }
 
   &__content {
@@ -216,6 +234,7 @@
     display: grid;
     gap: var(--spacing-sm);
     white-space: normal;
+    min-height: 200px;
 
     p,
     ul,
@@ -280,7 +299,7 @@
     border-color var(--transition-base),
     box-shadow var(--transition-base);
 
-  &[data-highlighted="true"] {
+  &[data-highlighted='true'] {
     padding-right: var(--spacing-sm);
     padding-left: var(--spacing-sm);
     border-color: var(--color-border-focus);
@@ -294,6 +313,13 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--spacing-sm);
+  }
+
+  &__author {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+    gap: var(--spacing-xs);
   }
 
   &__meta {
@@ -369,11 +395,19 @@
     justify-content: space-between;
     color: var(--color-text-muted);
     font-size: var(--font-size-xs);
+    gap: var(--spacing-xs);
 
     strong {
       color: var(--color-text-primary);
       font-size: var(--font-size-sm);
     }
+  }
+
+  &__author-main {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+    gap: var(--spacing-xs);
   }
 
   &__actions {
@@ -425,6 +459,18 @@
     span {
       color: var(--color-text-muted);
       font-size: var(--font-size-xs);
+    }
+  }
+
+  &__author-main {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+
+    div {
+      display: grid;
+      min-width: 0;
+      gap: var(--spacing-2xs);
     }
   }
 
@@ -660,7 +706,7 @@
   gap: var(--spacing-2xs);
   transition: var(--transition-base);
 
-  &[data-selected="true"] {
+  &[data-selected='true'] {
     border-color: var(--color-border-focus);
     color: var(--color-text-inverse);
     background: var(--color-action-primary);

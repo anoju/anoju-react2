@@ -9,6 +9,8 @@ interface AuthUser {
   id: string;
   email?: string;
   name?: string;
+  avatar?: string;
+  avatarUrl?: string;
   role: UserRole;
   verified?: boolean;
   isVirtualEmail: boolean;
@@ -38,6 +40,8 @@ const getUserFromStore = (): AuthUser | null => {
     id: model.id,
     email: typeof model.email === 'string' ? model.email : undefined,
     name: typeof model.name === 'string' ? model.name : undefined,
+    avatar: typeof model.avatar === 'string' ? model.avatar : undefined,
+    avatarUrl: typeof model.avatar === 'string' && model.avatar ? pb.files.getURL(model, model.avatar) : undefined,
     role,
     verified: typeof model.verified === 'boolean' ? model.verified : undefined,
     isVirtualEmail: isVirtualOAuthEmail(typeof model.email === 'string' ? model.email : undefined),

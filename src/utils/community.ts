@@ -1,5 +1,6 @@
-import type { PostImageRecord } from '@/types/domain';
+import type { PostImageRecord, UserRecord } from '@/types/domain';
 import { communityApi } from '@/apis/domain';
+import { pb } from '@/lib/pocketBase';
 
 export interface ContentPart {
   type: 'text' | 'image';
@@ -11,11 +12,10 @@ export interface ContentPart {
 const IMAGE_TOKEN_PATTERN = /\[\[image:([a-zA-Z0-9_-]+)\]\]/g;
 
 export const getRecordAuthorName = (record: { expand?: Record<string, unknown>; author?: string }) => {
-  const author = record.expand?.author;
+  const author = getRecordAuthor(record);
 
-  if (author && typeof author === 'object' && !Array.isArray(author)) {
-    const authorRecord = author as Record<string, unknown>;
-    const name = authorRecord.name ?? authorRecord.nickname ?? authorRecord.email;
+  if (author) {
+    const name = author.name ?? author.nickname ?? author.email;
 
     if (typeof name === 'string' && name.trim()) {
       return name;
@@ -23,6 +23,26 @@ export const getRecordAuthorName = (record: { expand?: Record<string, unknown>; 
   }
 
   return '익명 회원';
+};
+
+export const getRecordAuthor = (record: { expand?: Record<string, unknown>; author?: string }) => {
+  const author = record.expand?.author;
+
+  if (!author || typeof author !== 'object' || Array.isArray(author)) {
+    return null;
+  }
+
+  return author as UserRecord;
+};
+
+export const getRecordAuthorAvatarUrl = (record: { expand?: Record<string, unknown>; author?: string }) => {
+  const author = getRecordAuthor(record);
+
+  if (!author?.avatar) {
+    return undefined;
+  }
+
+  return pb.files.getURL(author, author.avatar);
 };
 
 export const formatDate = (date?: string) => {

@@ -49,6 +49,8 @@ interface RegisterParams {
 
 interface UpdateProfileParams {
   name?: string;
+  avatarFile?: File;
+  removeAvatar?: boolean;
 }
 
 interface RequestEmailChangeParams {
@@ -183,7 +185,7 @@ export const authApi = {
       return pb.collection(USERS_COLLECTION).unlinkExternalAuth(userId, PB_PROVIDER_BY_OAUTH_PROVIDER[provider]);
     }),
 
-  updateProfile: (params: UpdateProfileParams) =>
+  updateProfile: ({ name, avatarFile, removeAvatar }: UpdateProfileParams) =>
     runApi(async () => {
       const userId = pb.authStore.model?.id;
 
@@ -191,7 +193,25 @@ export const authApi = {
         throw new Error('로그인이 필요합니다.');
       }
 
-      const result = await pb.collection(USERS_COLLECTION).update(userId, params);
+      let payload: FormData | Record<string, unknown>;
+
+      if (avatarFile) {
+        const formData = new FormData();
+
+        if (name !== undefined) {
+          formData.append('name', name);
+        }
+
+        formData.append('avatar', avatarFile);
+        payload = formData;
+      } else {
+        payload = {
+          ...(name !== undefined ? { name } : {}),
+          ...(removeAvatar ? { avatar: null } : {}),
+        };
+      }
+
+      const result = await pb.collection(USERS_COLLECTION).update(userId, payload);
       await useAuthStore.getState().initialize();
       return result;
     }),

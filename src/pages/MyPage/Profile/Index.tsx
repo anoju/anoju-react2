@@ -1,19 +1,33 @@
 import type React from 'react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Input, SocialLoginButtons, confirm, toast } from '@/components';
+import { Trash2, Upload } from 'lucide-react';
+import { Avatar, Button, Dialog, Input, Slider, SocialLoginButtons, confirm, toast } from '@/components';
 import { authApi, getUserMessage } from '@/apis';
 import type { LinkedOAuthProvider, SupportedOAuthProvider } from '@/apis/authApi';
 import { DEFAULT_HOME_PATH } from '@/constants/app';
 import { useOAuthProviders } from '@/hooks/useOAuthProviders';
 import { useAuthStore } from '@/stores/authStore';
+import { UPLOAD_LIMITS, validateImageFile } from '@/utils/uploadPolicy';
+
+const CROP_SIZE = 512;
 
 const MyPageProfile = () => {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cropCanvasRef = useRef<HTMLCanvasElement>(null);
   const [name, setName] = useState(user?.name ?? '');
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreviewUrl, setAvatarPreviewUrl] = useState<string | undefined>(user?.avatarUrl);
+  const [cropSourceUrl, setCropSourceUrl] = useState<string | null>(null);
+  const [cropImage, setCropImage] = useState<HTMLImageElement | null>(null);
+  const [cropZoom, setCropZoom] = useState(1);
+  const [cropOffsetX, setCropOffsetX] = useState(0);
+  const [cropOffsetY, setCropOffsetY] = useState(0);
   const [actualEmail, setActualEmail] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [avatarRemoving, setAvatarRemoving] = useState(false);
   const [emailSubmitting, setEmailSubmitting] = useState(false);
   const [linkedProviders, setLinkedProviders] = useState<LinkedOAuthProvider[]>([]);
   const [linkedLoading, setLinkedLoading] = useState(true);
@@ -42,12 +56,179 @@ const MyPageProfile = () => {
     loadLinkedProviders();
   }, [loadLinkedProviders]);
 
+  useEffect(() => {
+    setName(user?.name ?? '');
+    setAvatarPreviewUrl(user?.avatarUrl);
+  }, [user?.avatarUrl, user?.name]);
+
+  useEffect(
+    () => () => {
+      if (avatarPreviewUrl?.startsWith('blob:')) {
+        URL.revokeObjectURL(avatarPreviewUrl);
+      }
+
+      if (cropSourceUrl) {
+        URL.revokeObjectURL(cropSourceUrl);
+      }
+    },
+    [avatarPreviewUrl, cropSourceUrl],
+  );
+
+  useEffect(() => {
+    if (!cropSourceUrl) {
+      setCropImage(null);
+      return undefined;
+    }
+
+    const image = new Image();
+    image.onload = () => setCropImage(image);
+    image.src = cropSourceUrl;
+
+    return () => {
+      image.onload = null;
+    };
+  }, [cropSourceUrl]);
+
+  useEffect(() => {
+    const canvas = cropCanvasRef.current;
+
+    if (!canvas || !cropImage) {
+      return;
+    }
+
+    const context = canvas.getContext('2d');
+
+    if (!context) {
+      return;
+    }
+
+    canvas.width = CROP_SIZE;
+    canvas.height = CROP_SIZE;
+    context.clearRect(0, 0, CROP_SIZE, CROP_SIZE);
+
+    const baseScale = Math.max(CROP_SIZE / cropImage.width, CROP_SIZE / cropImage.height);
+    const scale = baseScale * cropZoom;
+    const drawWidth = cropImage.width * scale;
+    const drawHeight = cropImage.height * scale;
+    const panX = (cropOffsetX / 100) * Math.max((drawWidth - CROP_SIZE) / 2, 0);
+    const panY = (cropOffsetY / 100) * Math.max((drawHeight - CROP_SIZE) / 2, 0);
+    const drawX = (CROP_SIZE - drawWidth) / 2 + panX;
+    const drawY = (CROP_SIZE - drawHeight) / 2 + panY;
+
+    context.fillStyle = '#ffffff';
+    context.fillRect(0, 0, CROP_SIZE, CROP_SIZE);
+    context.drawImage(cropImage, drawX, drawY, drawWidth, drawHeight);
+  }, [cropImage, cropOffsetX, cropOffsetY, cropZoom]);
+
+  const closeCropDialog = () => {
+    if (cropSourceUrl) {
+      URL.revokeObjectURL(cropSourceUrl);
+    }
+
+    setCropSourceUrl(null);
+    setCropImage(null);
+    setCropZoom(1);
+    setCropOffsetX(0);
+    setCropOffsetY(0);
+  };
+
+  const handleAvatarSelect: React.ChangeEventHandler<HTMLInputElement> = (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+
+    if (!file) {
+      return;
+    }
+
+    const error = validateImageFile(file, UPLOAD_LIMITS.profileImage);
+
+    if (error) {
+      toast(error, { tone: 'danger' });
+      return;
+    }
+
+    if (cropSourceUrl) {
+      URL.revokeObjectURL(cropSourceUrl);
+    }
+
+    setCropSourceUrl(URL.createObjectURL(file));
+  };
+
+  const handleCropConfirm = async () => {
+    const canvas = cropCanvasRef.current;
+
+    if (!canvas) {
+      toast('이미지를 다시 선택해주세요.', { tone: 'warning' });
+      return;
+    }
+
+    const blob = await new Promise<Blob | null>((resolve) => {
+      canvas.toBlob(resolve, 'image/webp', 0.92);
+    });
+
+    if (!blob) {
+      toast('프로필 이미지를 만들 수 없습니다.', { tone: 'danger' });
+      return;
+    }
+
+    const nextFile = new File([blob], `profile-${user?.id ?? 'user'}.webp`, { type: 'image/webp' });
+    const nextPreviewUrl = URL.createObjectURL(nextFile);
+
+    if (avatarPreviewUrl?.startsWith('blob:')) {
+      URL.revokeObjectURL(avatarPreviewUrl);
+    }
+
+    setAvatarFile(nextFile);
+    setAvatarPreviewUrl(nextPreviewUrl);
+    closeCropDialog();
+  };
+
+  const handleAvatarRemove = async () => {
+    if (!user?.avatar && !avatarFile) {
+      setAvatarPreviewUrl(undefined);
+      return;
+    }
+
+    const confirmed = await confirm('프로필 이미지를 삭제하시겠습니까?', {
+      title: '프로필 이미지 삭제',
+      confirmLabel: '삭제',
+      tone: 'danger',
+    });
+
+    if (!confirmed) {
+      return;
+    }
+
+    if (avatarFile) {
+      if (avatarPreviewUrl?.startsWith('blob:')) {
+        URL.revokeObjectURL(avatarPreviewUrl);
+      }
+
+      setAvatarFile(null);
+      setAvatarPreviewUrl(user?.avatarUrl);
+      return;
+    }
+
+    setAvatarRemoving(true);
+
+    try {
+      await authApi.updateProfile({ removeAvatar: true });
+      setAvatarPreviewUrl(undefined);
+      toast('프로필 이미지를 삭제했습니다.', { tone: 'success' });
+    } catch (error) {
+      toast(getUserMessage(error), { tone: 'danger' });
+    } finally {
+      setAvatarRemoving(false);
+    }
+  };
+
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
     setSubmitting(true);
 
     try {
-      await authApi.updateProfile({ name: name.trim() || undefined });
+      await authApi.updateProfile({ name: name.trim() || undefined, avatarFile: avatarFile ?? undefined });
+      setAvatarFile(null);
       toast('내 정보가 저장되었습니다.', { tone: 'success' });
     } catch (error) {
       toast(getUserMessage(error), { tone: 'danger' });
@@ -174,6 +355,38 @@ const MyPageProfile = () => {
       ) : null}
 
       <form className="my-page__form" onSubmit={handleSubmit}>
+        <section className="profile-image-field" aria-labelledby="profile-image-title">
+          <div className="profile-image-field__preview">
+            <Avatar src={avatarPreviewUrl} name={name || user?.email} size="xl" />
+          </div>
+          <div className="profile-image-field__content">
+            <h3 id="profile-image-title">프로필 이미지</h3>
+            <p>jpg, png, webp 이미지를 2MB 이하로 선택하고 정사각형으로 자른 뒤 저장합니다.</p>
+            <input
+              ref={fileInputRef}
+              className="profile-image-field__input"
+              type="file"
+              accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+              onChange={handleAvatarSelect}
+            />
+            <div className="profile-image-field__actions">
+              <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                <Upload size={16} /> 이미지 선택
+              </Button>
+              {avatarPreviewUrl ? (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  tone="danger"
+                  loading={avatarRemoving}
+                  onClick={handleAvatarRemove}
+                >
+                  <Trash2 size={16} /> 이미지 삭제
+                </Button>
+              ) : null}
+            </div>
+          </div>
+        </section>
         <Input label="이름" value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" />
         <Button type="submit" loading={submitting}>
           내 정보 저장
@@ -234,6 +447,33 @@ const MyPageProfile = () => {
           onSuccess={loadLinkedProviders}
         />
       </section>
+
+      <Dialog
+        open={Boolean(cropSourceUrl)}
+        title="프로필 이미지 자르기"
+        description="미리보기 영역에 맞춰 정사각형 프로필 이미지를 만듭니다."
+        closeOnOverlayClick={false}
+        onClose={closeCropDialog}
+        footer={
+          <>
+            <Button type="button" variant="outline" tone="neutral" fullWidth onClick={closeCropDialog}>
+              취소
+            </Button>
+            <Button type="button" fullWidth onClick={handleCropConfirm}>
+              적용
+            </Button>
+          </>
+        }
+      >
+        <div className="profile-crop">
+          <canvas ref={cropCanvasRef} className="profile-crop__canvas" aria-label="정사각형 프로필 이미지 미리보기" />
+          <div className="profile-crop__controls">
+            <Slider label="확대" min={1} max={3} step={0.05} value={cropZoom} onValueChange={setCropZoom} />
+            <Slider label="가로 위치" min={-100} max={100} step={1} value={cropOffsetX} onValueChange={setCropOffsetX} />
+            <Slider label="세로 위치" min={-100} max={100} step={1} value={cropOffsetY} onValueChange={setCropOffsetY} />
+          </div>
+        </div>
+      </Dialog>
     </section>
   );
 };

@@ -1,68 +1,68 @@
-import type React from 'react';
-import { useMemo, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Button, Checkbox, Input, SocialLoginButtons, confirm, toast } from '@/components';
-import { authApi, getUserMessage } from '@/apis';
-import { DEFAULT_HOME_PATH, REGISTER_PATH } from '@/constants/app';
-import { useOAuthProviders } from '@/hooks/useOAuthProviders';
+import type React from 'react'
+import { useMemo, useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Button, Checkbox, Input, SocialLoginButtons, confirm, toast } from '@/components'
+import { authApi, getUserMessage } from '@/apis'
+import { DEFAULT_HOME_PATH, REGISTER_PATH } from '@/constants/app'
+import { useOAuthProviders } from '@/hooks/useOAuthProviders'
 
 const Login = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [identity, setIdentity] = useState('');
-  const [password, setPassword] = useState('');
-  const [autoLogin, setAutoLogin] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const { providers, loading: providersLoading } = useOAuthProviders();
+  const navigate = useNavigate()
+  const location = useLocation()
+  const [identity, setIdentity] = useState('')
+  const [password, setPassword] = useState('')
+  const [autoLogin, setAutoLogin] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const { providers, loading: providersLoading } = useOAuthProviders()
 
   const redirectPath = useMemo(() => {
-    const params = new URLSearchParams(location.search);
-    return params.get('redirect') ?? DEFAULT_HOME_PATH;
-  }, [location.search]);
+    const params = new URLSearchParams(location.search)
+    return params.get('redirect') ?? DEFAULT_HOME_PATH
+  }, [location.search])
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (event) => {
-    event.preventDefault();
+    event.preventDefault()
 
     if (!identity.trim() || !password) {
-      toast('이메일과 비밀번호를 입력해주세요.', { tone: 'warning' });
-      return;
+      toast('이메일과 비밀번호를 입력해주세요.', { tone: 'warning' })
+      return
     }
 
-    setSubmitting(true);
+    setSubmitting(true)
 
     try {
-      await authApi.login({ identity: identity.trim(), password, autoLogin });
-      toast('로그인되었습니다.', { tone: 'success' });
-      navigate(redirectPath, { replace: true });
+      await authApi.login({ identity: identity.trim(), password, autoLogin })
+      toast('로그인되었습니다.', { tone: 'success' })
+      navigate(redirectPath, { replace: true })
     } catch (error) {
-      toast(getUserMessage(error), { tone: 'danger' });
+      toast(getUserMessage(error), { tone: 'danger' })
     } finally {
-      setSubmitting(false);
+      setSubmitting(false)
     }
-  };
+  }
 
   const handlePasswordReset = async () => {
     if (!identity.trim()) {
-      toast('비밀번호 재설정을 받을 이메일을 입력해주세요.', { tone: 'warning' });
-      return;
+      toast('비밀번호 재설정을 받을 이메일을 입력해주세요.', { tone: 'warning' })
+      return
     }
 
     const confirmed = await confirm(`${identity.trim()} 주소로 비밀번호 재설정 메일을 보낼까요?`, {
       title: '비밀번호 재설정',
       confirmLabel: '발송',
-    });
+    })
 
     if (!confirmed) {
-      return;
+      return
     }
 
     try {
-      await authApi.requestPasswordReset(identity.trim());
-      toast('비밀번호 재설정 메일을 발송했습니다.', { tone: 'success' });
+      await authApi.requestPasswordReset(identity.trim())
+      toast('비밀번호 재설정 메일을 발송했습니다.', { tone: 'success' })
     } catch (error) {
-      toast(getUserMessage(error), { tone: 'danger' });
+      toast(getUserMessage(error), { tone: 'danger' })
     }
-  };
+  }
 
   return (
     <section className="container auth-page">
@@ -90,7 +90,7 @@ const Login = () => {
         />
         <Checkbox
           label="자동 로그인"
-          description="개인 기기에서 브라우저를 다시 열어도 로그인 상태를 유지합니다."
+          description="개인 기기에서만 사용하세요."
           checked={autoLogin}
           onChange={(event) => setAutoLogin(event.target.checked)}
         />
@@ -124,7 +124,7 @@ const Login = () => {
         아직 계정이 없나요? <Link to={REGISTER_PATH}>회원가입</Link>
       </p>
     </section>
-  );
-};
+  )
+}
 
-export default Login;
+export default Login
