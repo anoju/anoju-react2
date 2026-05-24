@@ -1,7 +1,10 @@
+import type React from 'react'
 import { useCallback, useEffect, useState } from 'react'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { Heart, MessageCircle, Plus, Send } from 'lucide-react'
 import {
   Avatar,
+  Checkbox,
   DataList,
   FloatingActionButton,
   FloatingActions,
@@ -10,7 +13,7 @@ import {
   type ImageSwipeItem,
 } from '@/components'
 import { communityApi, getUserMessage } from '@/apis'
-import { PICS_PATH, PICS_WRITE_PATH } from '@/constants/app'
+import { LOGIN_PATH, PICS_PATH, PICS_WRITE_PATH } from '@/constants/app'
 import type { PostImageRecord, PostRecord } from '@/types/domain'
 import {
   compareByCreatedDesc,
@@ -30,6 +33,9 @@ interface PicsFeedItem {
 const PER_PAGE = 12
 
 const Pics = () => {
+  const location = useLocation()
+  const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [items, setItems] = useState<PicsFeedItem[]>([])
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
@@ -37,6 +43,9 @@ const Pics = () => {
   const [loadingMore, setLoadingMore] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  const authStatus = useAuthStore((state) => state.status)
+  const user = useAuthStore((state) => state.user)
+  const showMyPosts = searchParams.get('mine') === '1'
 
   const loadPics = useCallback(async (nextPage = 1) => {
     if (nextPage === 1) {
@@ -47,11 +56,23 @@ const Pics = () => {
 
     setError(null)
 
+    const authorId = showMyPosts ? user?.id : undefined
+
+    if (showMyPosts && !authorId) {
+      setItems([])
+      setPage(1)
+      setTotalPages(1)
+      setLoadingInitial(false)
+      setLoadingMore(false)
+      return
+    }
+
     try {
       const result = await communityApi.listPosts({
         type: 'gallery',
         page: nextPage,
         perPage: PER_PAGE,
+        authorId,
       })
       const nextItems = await Promise.all(
         [...result.items].sort(compareByCreatedDesc).map(async (post) => {
@@ -71,16 +92,50 @@ const Pics = () => {
       setLoadingInitial(false)
       setLoadingMore(false)
     }
-  }, [])
+  }, [showMyPosts, user?.id])
 
   useEffect(() => {
     void loadPics(1)
   }, [loadPics])
 
+  useEffect(() => {
+    if (!showMyPosts || authStatus === 'initializing' || isAuthenticated) {
+      return
+    }
+
+    const redirectParams = new URLSearchParams(searchParams)
+    redirectParams.set('mine', '1')
+    const redirectSearch = redirectParams.toString()
+    const redirect = encodeURIComponent(`${location.pathname}${redirectSearch ? `?${redirectSearch}` : ''}`)
+    navigate(`${LOGIN_PATH}?redirect=${redirect}`, { replace: true })
+  }, [authStatus, isAuthenticated, location.pathname, navigate, searchParams, showMyPosts])
+
   const handleWriteClick = () => {
     if (!isAuthenticated) {
       toast('Pics 작성은 이메일 인증을 완료한 회원만 가능합니다.', { tone: 'warning' })
     }
+  }
+
+  const handleMineChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked && !isAuthenticated) {
+      const redirectParams = new URLSearchParams(searchParams)
+      redirectParams.set('mine', '1')
+      const redirect = encodeURIComponent(`${location.pathname}?${redirectParams.toString()}`)
+      navigate(`${LOGIN_PATH}?redirect=${redirect}`)
+      return
+    }
+
+    const nextParams = new URLSearchParams(searchParams)
+
+    if (event.target.checked) {
+      nextParams.set('mine', '1')
+    } else {
+      nextParams.delete('mine')
+    }
+
+    nextParams.delete('page')
+    nextParams.delete('cursor')
+    setSearchParams(nextParams)
   }
 
   const handleShareClick = (post: PostRecord) => {
@@ -102,6 +157,10 @@ const Pics = () => {
           <p>나의 순간을 공유해보세요</p>
         </div>
       </header>
+
+      <div className="content-filter">
+        <Checkbox label="내 게시물 보기" checked={showMyPosts} onChange={handleMineChange} />
+      </div>
 
       <DataList
         items={items}

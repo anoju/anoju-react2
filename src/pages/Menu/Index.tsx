@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router-dom'
 import {
   DEFAULT_HOME_PATH,
   FREE_BOARD_PATH,
@@ -9,48 +9,83 @@ import {
   REGISTER_PATH,
   SETTINGS_PATH,
   SNAPS_PATH,
-} from '@/constants/app';
-import { useAuthStore } from '@/stores/authStore';
+} from '@/constants/app'
+import { useAuthStore } from '@/stores/authStore'
+
+interface MenuItem {
+  label: string
+  path: string
+}
+
+interface MenuGroup {
+  label?: string
+  items: MenuItem[]
+}
 
 const Menu = () => {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  const memberItems: MenuItem[] = [
+    {
+      label: isAuthenticated ? '마이페이지' : '로그인',
+      path: isAuthenticated ? MY_PAGE_PATH : LOGIN_PATH,
+    },
+    ...(!isAuthenticated ? [{ label: '회원가입', path: REGISTER_PATH }] : []),
+    {
+      label: '설정',
+      path: SETTINGS_PATH,
+    },
+  ]
+  const menuGroups: MenuGroup[] = [
+    {
+      label: 'Home',
+      items: [
+        { label: '홈', path: DEFAULT_HOME_PATH },
+        { label: '소개', path: '/about' },
+      ],
+    },
+    {
+      label: 'playground',
+      items: [
+        { label: 'playground Home', path: PLAYGROUND_PATH },
+        { label: '자유게시판', path: FREE_BOARD_PATH },
+      ],
+    },
+    {
+      label: 'Snaps',
+      items: [
+        { label: 'Snaps Home', path: SNAPS_PATH },
+        { label: 'Pics', path: PICS_PATH },
+      ],
+    },
+    {
+      label: 'Member',
+      items: memberItems,
+    },
+  ]
 
   return (
     <section className="container simple-page">
       <h2 className="simple-page__title">전체메뉴</h2>
       <nav className="menu-list" aria-label="전체메뉴">
-        <NavLink to={DEFAULT_HOME_PATH} className="menu-list__item">
-          홈
-        </NavLink>
-        <NavLink to={PLAYGROUND_PATH} className="menu-list__item">
-          playground
-        </NavLink>
-        <NavLink to={FREE_BOARD_PATH} className="menu-list__item">
-          자유게시판
-        </NavLink>
-        <NavLink to={SNAPS_PATH} className="menu-list__item">
-          Snaps
-        </NavLink>
-        <NavLink to={PICS_PATH} className="menu-list__item">
-          Pics
-        </NavLink>
-        <NavLink to="/about" className="menu-list__item">
-          소개
-        </NavLink>
-        <NavLink to={isAuthenticated ? MY_PAGE_PATH : LOGIN_PATH} className="menu-list__item">
-          {isAuthenticated ? '마이페이지' : '로그인'}
-        </NavLink>
-        {!isAuthenticated ? (
-          <NavLink to={REGISTER_PATH} className="menu-list__item">
-            회원가입
-          </NavLink>
-        ) : null}
-        <NavLink to={SETTINGS_PATH} className="menu-list__item">
-          설정
-        </NavLink>
+        {menuGroups.map((group, groupIndex) => (
+          <section
+            className="menu-list__group"
+            aria-label={group.label ?? '1뎁스 메뉴'}
+            key={group.label ?? groupIndex}
+          >
+            {group.label ? <h3 className="menu-list__group-title">{group.label}</h3> : null}
+            <div className="menu-list__items">
+              {group.items.map((item) => (
+                <NavLink to={item.path} className="menu-list__item" key={item.path}>
+                  {item.label}
+                </NavLink>
+              ))}
+            </div>
+          </section>
+        ))}
       </nav>
     </section>
-  );
-};
+  )
+}
 
-export default Menu;
+export default Menu

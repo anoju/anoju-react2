@@ -1,10 +1,10 @@
 import type React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { MessageCircle, Plus, Search } from 'lucide-react';
-import { Avatar, DataList, FloatingActionButton, FloatingActions, Input, toast } from '@/components';
+import { Avatar, Checkbox, DataList, FloatingActionButton, FloatingActions, Input, toast } from '@/components';
 import { communityApi, getUserMessage } from '@/apis';
-import { FREE_BOARD_PATH, FREE_BOARD_WRITE_PATH } from '@/constants/app';
+import { FREE_BOARD_PATH, FREE_BOARD_WRITE_PATH, LOGIN_PATH } from '@/constants/app';
 import type { PostRecord } from '@/types/domain';
 import { createTextFilter } from '@/utils/queryString';
 import { compareByCreatedDesc, formatRelativeTime, getRecordAuthorAvatarUrl, getRecordAuthorName } from '@/utils/community';
@@ -13,6 +13,9 @@ import { useAuthStore } from '@/stores/authStore';
 const PER_PAGE = 20;
 
 const FreeBoard = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [posts, setPosts] = useState<PostRecord[]>([]);
   const [keyword, setKeyword] = useState('');
   const [page, setPage] = useState(1);
@@ -21,6 +24,9 @@ const FreeBoard = () => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const authStatus = useAuthStore((state) => state.status);
+  const user = useAuthStore((state) => state.user);
+  const showMyPosts = searchParams.get('mine') === '1';
 
   const filter = useMemo(() => createTextFilter(keyword, ['title', 'content']), [keyword]);
 
@@ -34,12 +40,24 @@ const FreeBoard = () => {
 
       setError(null);
 
+      const authorId = showMyPosts ? user?.id : undefined;
+
+      if (showMyPosts && !authorId) {
+        setPosts([]);
+        setPage(1);
+        setTotalPages(1);
+        setLoadingInitial(false);
+        setLoadingMore(false);
+        return;
+      }
+
       try {
         const result = await communityApi.listPosts({
           type: 'board',
           page: nextPage,
           perPage: PER_PAGE,
           filter,
+          authorId,
         });
 
         const sortedItems = [...result.items].sort(compareByCreatedDesc);
@@ -53,12 +71,24 @@ const FreeBoard = () => {
         setLoadingMore(false);
       }
     },
-    [filter],
+    [filter, showMyPosts, user?.id],
   );
 
   useEffect(() => {
     void loadPosts(1);
   }, [loadPosts]);
+
+  useEffect(() => {
+    if (!showMyPosts || authStatus === 'initializing' || isAuthenticated) {
+      return;
+    }
+
+    const redirectParams = new URLSearchParams(searchParams);
+    redirectParams.set('mine', '1');
+    const redirectSearch = redirectParams.toString();
+    const redirect = encodeURIComponent(`${location.pathname}${redirectSearch ? `?${redirectSearch}` : ''}`);
+    navigate(`${LOGIN_PATH}?redirect=${redirect}`, { replace: true });
+  }, [authStatus, isAuthenticated, location.pathname, navigate, searchParams, showMyPosts]);
 
   const handleSubmitSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -69,6 +99,28 @@ const FreeBoard = () => {
     if (!isAuthenticated) {
       toast('글 작성은 이메일 인증을 완료한 회원만 가능합니다.', { tone: 'warning' });
     }
+  };
+
+  const handleMineChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked && !isAuthenticated) {
+      const redirectParams = new URLSearchParams(searchParams);
+      redirectParams.set('mine', '1');
+      const redirect = encodeURIComponent(`${location.pathname}?${redirectParams.toString()}`);
+      navigate(`${LOGIN_PATH}?redirect=${redirect}`);
+      return;
+    }
+
+    const nextParams = new URLSearchParams(searchParams);
+
+    if (event.target.checked) {
+      nextParams.set('mine', '1');
+    } else {
+      nextParams.delete('mine');
+    }
+
+    nextParams.delete('page');
+    nextParams.delete('cursor');
+    setSearchParams(nextParams);
   };
 
   return (
@@ -90,6 +142,10 @@ const FreeBoard = () => {
           leftIcon={<Search size={16} />}
         />
       </form>
+
+      <div className="content-filter">
+        <Checkbox label="내 게시물 보기" checked={showMyPosts} onChange={handleMineChange} />
+      </div>
 
       <DataList
         items={posts}

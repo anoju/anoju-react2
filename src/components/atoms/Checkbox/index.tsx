@@ -11,17 +11,17 @@ const Checkbox = ({ label, description, id, className = '', ...props }: Checkbox
   const generatedId = useId();
   const checkboxId = id ?? generatedId;
 
-  const classNames = ['choice', 'choice--checkbox', className].join(' ').trim();
+  const classNames = ['checkbox', className].join(' ').trim();
 
   return (
     <label className={classNames} htmlFor={checkboxId}>
-      <input id={checkboxId} className="choice__input" type="checkbox" {...props} />
-      <span className="choice__box" aria-hidden="true">
+      <input id={checkboxId} className="checkbox__input" type="checkbox" {...props} />
+      <span className="checkbox__box" aria-hidden="true">
         <Check size={14} />
       </span>
-      <span className="choice__content">
-        <span className="choice__label">{label}</span>
-        {description ? <span className="choice__description">{description}</span> : null}
+      <span className="checkbox__content">
+        <span className="checkbox__label">{label}</span>
+        {description ? <span className="checkbox__description">{description}</span> : null}
       </span>
     </label>
   );

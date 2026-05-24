@@ -1,11 +1,9 @@
 import type React from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Trash2, Upload } from 'lucide-react';
 import { Avatar, Button, Dialog, Input, Slider, SocialLoginButtons, confirm, toast } from '@/components';
 import { authApi, getUserMessage } from '@/apis';
 import type { LinkedOAuthProvider, SupportedOAuthProvider } from '@/apis/authApi';
-import { DEFAULT_HOME_PATH } from '@/constants/app';
 import { useOAuthProviders } from '@/hooks/useOAuthProviders';
 import { useAuthStore } from '@/stores/authStore';
 import { UPLOAD_LIMITS, validateImageFile } from '@/utils/uploadPolicy';
@@ -13,7 +11,6 @@ import { UPLOAD_LIMITS, validateImageFile } from '@/utils/uploadPolicy';
 const CROP_SIZE = 512;
 
 const MyPageProfile = () => {
-  const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cropCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -273,19 +270,6 @@ const MyPageProfile = () => {
     }
   };
 
-  const handleLogout = async () => {
-    const confirmed = await confirm('로그아웃하시겠습니까?', {
-      title: '로그아웃',
-      confirmLabel: '로그아웃',
-    });
-
-    if (!confirmed) return;
-
-    authApi.logout();
-    toast('로그아웃되었습니다.', { tone: 'success' });
-    navigate(DEFAULT_HOME_PATH, { replace: true });
-  };
-
   const handleUnlinkProvider = async (provider: SupportedOAuthProvider) => {
     if (loginMethodCount <= 1) {
       toast('마지막 로그인 수단은 해제할 수 없습니다.', { tone: 'warning' });
@@ -399,9 +383,6 @@ const MyPageProfile = () => {
             이메일 인증 재요청
           </Button>
         ) : null}
-        <Button type="button" variant="outline" tone="neutral" onClick={handleLogout}>
-          로그아웃
-        </Button>
       </div>
 
       <section className="my-page__social" aria-labelledby="social-login-title">

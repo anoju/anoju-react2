@@ -50,7 +50,7 @@ export const FloatingMenu = ({ config, visible }: FloatingMenuProps) => {
         </NavLink>
         <NavLink to={SNAPS_PATH} className="floating-menu__item">
           <Images size={20} />
-          <span>Scene</span>
+          <span>Snaps</span>
         </NavLink>
         <NavLink to={myPageTarget} className="floating-menu__item">
           <MyPageIcon size={20} />

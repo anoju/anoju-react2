@@ -1,5 +1,8 @@
 import { motion, type Variants } from 'framer-motion';
-import { Button, StarBurstBackground } from '@/components';
+import { NavLink } from 'react-router-dom';
+import { StarBurstBackground } from '@/components';
+import { PLAYGROUND_PATH, REGISTER_PATH } from '@/constants/app';
+import { useAuthStore } from '@/stores/authStore';
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -21,8 +24,12 @@ const itemVariants: Variants = {
   },
 };
 
-const Home = () => (
-  <div className="home-page">
+const Home = () => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const startPath = isAuthenticated ? PLAYGROUND_PATH : REGISTER_PATH;
+
+  return (
+    <div className="home-page">
     <motion.section className="home-page__hero" initial="hidden" animate="visible" variants={containerVariants}>
       <div className="home-page__media">
         <StarBurstBackground />
@@ -38,10 +45,12 @@ const Home = () => (
           가장 편안한 마음으로 소통하고 기록하는 우리만의 공간입니다.
         </motion.p>
         <motion.div variants={itemVariants} className="home-page__actions">
-          <Button size="lg">시작하기</Button>
-          <Button variant="outline" size="lg">
+          <NavLink to={startPath} className="button button--solid button--primary button--lg">
+            시작하기
+          </NavLink>
+          <NavLink to="/about" className="button button--outline button--primary button--lg">
             둘러보기
-          </Button>
+          </NavLink>
         </motion.div>
       </div>
     </motion.section>
@@ -60,7 +69,8 @@ const Home = () => (
         ))}
       </div>
     </section>
-  </div>
-);
+    </div>
+  );
+};
 
 export default Home;

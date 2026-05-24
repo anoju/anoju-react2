@@ -10,6 +10,7 @@ const getPublishedFilter = (type: PostType, extraFilter?: string) =>
 
 export interface PostListParams extends ListParams {
   type: PostType;
+  authorId?: string;
 }
 
 export interface CreatePostParams {
@@ -32,11 +33,14 @@ export interface CreateCommentParams {
 }
 
 export const communityApi = {
-  listPosts: ({ type, page = 1, perPage = 20, filter, expand = 'author' }: PostListParams) =>
+  listPosts: ({ type, page = 1, perPage = 20, filter, authorId, expand = 'author' }: PostListParams) =>
     runApi(() =>
       pb.collection(PB_COLLECTIONS.posts).getList<PostRecord>(page, perPage, {
         $autoCancel: false,
-        filter: getPublishedFilter(type, filter),
+        filter: getPublishedFilter(
+          type,
+          [filter, authorId ? `author = "${authorId}"` : ''].filter(Boolean).join(' && '),
+        ),
         expand,
       }),
     ),

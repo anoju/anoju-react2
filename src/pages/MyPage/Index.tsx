@@ -1,11 +1,27 @@
-import { FileText, MessageSquareText, UserRound } from 'lucide-react';
-import { NavLink } from 'react-router-dom';
-import { MY_PAGE_COMMENTS_PATH, MY_PAGE_POSTS_PATH, MY_PAGE_PROFILE_PATH } from '@/constants/app';
+import { FileText, LogOut, MessageSquareText, UserRound } from 'lucide-react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { authApi } from '@/apis';
+import { Button, confirm, toast } from '@/components';
+import { DEFAULT_HOME_PATH, MY_PAGE_COMMENTS_PATH, MY_PAGE_POSTS_PATH, MY_PAGE_PROFILE_PATH } from '@/constants/app';
 import { useAuthStore } from '@/stores/authStore';
 
 const MyPage = () => {
+  const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
   const displayName = user?.name ?? user?.email ?? '사용자';
+
+  const handleLogout = async () => {
+    const confirmed = await confirm('로그아웃하시겠습니까?', {
+      title: '로그아웃',
+      confirmLabel: '로그아웃',
+    });
+
+    if (!confirmed) return;
+
+    authApi.logout();
+    toast('로그아웃되었습니다.', { tone: 'success' });
+    navigate(DEFAULT_HOME_PATH, { replace: true });
+  };
 
   return (
     <section className="container my-page my-page-hub">
@@ -43,6 +59,12 @@ const MyPage = () => {
           </span>
         </NavLink>
       </nav>
+
+      <div className="my-page__actions">
+        <Button type="button" variant="outline" tone="neutral" onClick={handleLogout}>
+          <LogOut size={16} /> 로그아웃
+        </Button>
+      </div>
     </section>
   );
 };
