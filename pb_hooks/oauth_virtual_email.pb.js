@@ -5,6 +5,9 @@ var PROVIDER_ALIASES = {
   kakao: 'kakao',
 };
 
+var DEFAULT_USER_ROLE = 'user';
+var DEFAULT_USER_STATUS = 'active';
+
 function isBlank(value) {
   return typeof value !== 'string' || value.trim() === '';
 }
@@ -51,8 +54,22 @@ function buildVirtualEmail(providerName, oAuth2User) {
   return provider + '_' + providerUserId + '@' + VIRTUAL_EMAIL_DOMAIN;
 }
 
+function applyDefaultUserFields(createData) {
+  if (isBlank(createData.role)) {
+    createData.role = DEFAULT_USER_ROLE;
+  }
+
+  if (isBlank(createData.status)) {
+    createData.status = DEFAULT_USER_STATUS;
+  }
+}
+
 onRecordAuthWithOAuth2Request(function (e) {
   var provider = normalizeProvider(e.providerName);
+
+  if (!e.record && e.isNewRecord) {
+    applyDefaultUserFields(e.createData);
+  }
 
   if (provider !== 'naver' && provider !== 'kakao') {
     e.next();

@@ -72,6 +72,7 @@ export interface PostRecord extends RecordModel {
   viewCount: number;
   commentCount: number;
   likeCount: number;
+  dislikeCount?: number;
   bookmarkCount: number;
   deleted: boolean;
   deletedAt?: string;
@@ -84,6 +85,7 @@ export interface CommentRecord extends RecordModel {
   parentComment?: string;
   status: CommentStatus;
   likeCount: number;
+  dislikeCount?: number;
   deleted: boolean;
   deletedAt?: string;
 }
@@ -100,7 +102,7 @@ export interface ReactionRecord extends RecordModel {
   targetType: 'post' | 'comment';
   targetId: string;
   user: string;
-  type: 'like';
+  type: 'like' | 'dislike';
 }
 
 export interface BookmarkRecord extends RecordModel {

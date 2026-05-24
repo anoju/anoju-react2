@@ -4,6 +4,7 @@ import { AnimatePresence } from 'framer-motion';
 import { Alert } from '../Alert';
 import { Confirm } from '../Confirm';
 import { Toast, type ToastItem } from '../Toast';
+import { createClientId } from '@/utils/id';
 import {
   FEEDBACK_EVENTS,
   feedbackTarget,
@@ -32,7 +33,7 @@ export const FeedbackProvider = ({ children }: FeedbackProviderProps) => {
 
     const handleToast = (event: Event) => {
       const detail = (event as CustomEvent<ToastRequest>).detail;
-      const id = crypto.randomUUID();
+      const id = createClientId('toast');
       const duration = detail.duration ?? 3000;
 
       setToasts((current) => [...current, { id, message: detail.message, tone: detail.tone ?? 'info' }]);

@@ -6,6 +6,8 @@ import { useAuthStore } from '@/stores/authStore';
 import { runApi } from './apiClient';
 
 const USERS_COLLECTION = PB_COLLECTIONS.users;
+const DEFAULT_USER_ROLE = 'user';
+const DEFAULT_USER_STATUS = 'active';
 const SUPPORTED_OAUTH_PROVIDERS = ['google', 'naver', 'kakao'] as const;
 const PB_PROVIDER_BY_OAUTH_PROVIDER: Record<SupportedOAuthProvider, string> = {
   google: 'google',
@@ -85,6 +87,8 @@ export const authApi = {
       const { turnstileToken, ...createParams } = params;
       const user = await pb.collection(USERS_COLLECTION).create({
         ...createParams,
+        role: DEFAULT_USER_ROLE,
+        status: DEFAULT_USER_STATUS,
         turnstileToken,
       });
       await pb.collection(USERS_COLLECTION).requestVerification(params.email);
@@ -134,6 +138,8 @@ export const authApi = {
         provider: PB_PROVIDER_BY_OAUTH_PROVIDER[provider],
         createData: {
           emailVisibility: false,
+          role: DEFAULT_USER_ROLE,
+          status: DEFAULT_USER_STATUS,
         },
       });
       await useAuthStore.getState().initialize();

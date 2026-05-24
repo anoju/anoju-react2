@@ -7,7 +7,7 @@ import { communityApi, getUserMessage } from '@/apis';
 import { FREE_BOARD_PATH, FREE_BOARD_WRITE_PATH } from '@/constants/app';
 import type { PostRecord } from '@/types/domain';
 import { createTextFilter } from '@/utils/queryString';
-import { formatDate, getRecordAuthorName } from '@/utils/community';
+import { compareByCreatedDesc, formatRelativeTime, getRecordAuthorName } from '@/utils/community';
 import { useAuthStore } from '@/stores/authStore';
 
 const PER_PAGE = 20;
@@ -42,7 +42,7 @@ const FreeBoard = () => {
           filter,
         });
 
-        const sortedItems = [...result.items].sort((a, b) => b.created.localeCompare(a.created));
+        const sortedItems = [...result.items].sort(compareByCreatedDesc);
         setPosts((currentPosts) => (nextPage === 1 ? sortedItems : [...currentPosts, ...sortedItems]));
         setPage(result.page);
         setTotalPages(result.totalPages);
@@ -107,11 +107,11 @@ const FreeBoard = () => {
           <Link to={`${FREE_BOARD_PATH}/${post.id}`} className="board-list-item">
             <span className="board-list-item__title">{post.title}</span>
             <span className="board-list-item__meta">
-              {getRecordAuthorName(post)} · {formatDate(post.created)}
+              {getRecordAuthorName(post)} · {formatRelativeTime(post.created)}
             </span>
             <span className="board-list-item__stats">
               <MessageCircle size={14} /> 댓글 {post.commentCount ?? 0} · 조회 {post.viewCount ?? 0} · 좋아요{' '}
-              {post.likeCount ?? 0}
+              {post.likeCount ?? 0} · 싫어요 {post.dislikeCount ?? 0}
             </span>
           </Link>
         )}

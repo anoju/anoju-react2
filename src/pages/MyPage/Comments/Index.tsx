@@ -4,7 +4,7 @@ import { DataList } from '@/components';
 import { communityApi, getUserMessage } from '@/apis';
 import { FREE_BOARD_PATH, PICS_PATH } from '@/constants/app';
 import type { CommentRecord, PostRecord } from '@/types/domain';
-import { formatDate } from '@/utils/community';
+import { compareByCreatedDesc, formatRelativeTime } from '@/utils/community';
 
 interface MyCommentItem {
   comment: CommentRecord;
@@ -22,7 +22,7 @@ const MyComments = () => {
 
     try {
       const nextComments = await communityApi.listMyComments();
-      const sortedComments = [...nextComments].sort((a, b) => b.created.localeCompare(a.created));
+      const sortedComments = [...nextComments].sort(compareByCreatedDesc);
       const items = await Promise.all(
         sortedComments.map(async (comment) => {
           try {
@@ -65,7 +65,7 @@ const MyComments = () => {
         onRetry={() => void loadComments()}
         renderItem={({ comment, post }) => (
           <Link className="activity-item" to={`${post?.type === 'gallery' ? PICS_PATH : FREE_BOARD_PATH}/${comment.post}`}>
-            <span className="activity-item__type">{post?.type === 'gallery' ? 'Pics' : '자유게시판'} · {formatDate(comment.created)}</span>
+            <span className="activity-item__type">{post?.type === 'gallery' ? 'Pics' : '자유게시판'} · {formatRelativeTime(comment.created)}</span>
             <strong>{comment.content}</strong>
             <span>{post?.title ?? '연결된 글'}로 이동</span>
           </Link>

@@ -1,4 +1,5 @@
 import { toast } from '@/components/feedback';
+import { createClientId } from '@/utils/id';
 
 const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const BOARD_ATTACHMENT_TYPES = [
@@ -78,7 +79,7 @@ export const createUploadPreviews = (files: File[], maxSize = UPLOAD_LIMITS.post
     }
 
     previews.push({
-      id: crypto.randomUUID(),
+      id: createClientId('upload'),
       file,
       url: URL.createObjectURL(file),
       sortOrder: index,
@@ -146,7 +147,7 @@ export const createFileAttachmentPreviews = (
     }
 
     previews.push({
-      id: crypto.randomUUID(),
+      id: createClientId('attachment'),
       file,
       name: file.name,
       size: file.size,

@@ -97,6 +97,37 @@
     }
   }
 
+  &__password-toggle {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 0;
+    border-radius: var(--radius-sm);
+    color: var(--color-icon-muted);
+    background: transparent;
+    cursor: pointer;
+    transition: var(--transition-base);
+
+    &:hover:not(:disabled),
+    &:focus-visible:not(:disabled) {
+      color: var(--color-icon-primary);
+      background: var(--color-bg-surface-soft);
+    }
+
+    &:focus-visible {
+      outline: 0;
+      box-shadow: inset 0 0 0 2px var(--color-border-focus);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.56;
+    }
+  }
+
   &__select {
     appearance: none;
     padding-right: 2.75rem;

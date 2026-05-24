@@ -73,6 +73,7 @@ Delete rule: @request.auth.role = "admin"
 | `viewCount` | number | no | `0` | 조회수. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다. |
 | `commentCount` | number | no | `0` | 댓글 수. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다. |
 | `likeCount` | number | no | `0` | 좋아요 수. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다. |
+| `dislikeCount` | number | no | `0` | 싫어요 수. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다. |
 | `bookmarkCount` | number | no | `0` | 스크랩 수. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다. |
 | `deleted` | bool | no | `false` | soft delete 여부. false를 허용해야 하므로 Nonfalsey를 사용하지 않습니다. |
 | `deletedAt` | date | no |  | 삭제 시각 |
@@ -115,8 +116,9 @@ Delete rule: @request.auth.role = "admin"
 | `content` | text | yes |  | 댓글 내용 |
 | `parentComment` | relation comments | no |  | 대댓글 부모 |
 | `status` | select | yes | `published` | `published`, `hidden`, `deleted` |
-| `likeCount` | number | yes | `0` | 좋아요 수 |
-| `deleted` | bool | yes | `false` | soft delete 여부 |
+| `likeCount` | number | no | `0` | 좋아요 수. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다. |
+| `dislikeCount` | number | no | `0` | 싫어요 수. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다. |
+| `deleted` | bool | no | `false` | soft delete 여부. `false` 값을 허용해야 하므로 Nonempty를 사용하지 않습니다. |
 | `deletedAt` | date | no |  | 삭제 시각 |
 
 현재 import 적용 인덱스: 없음
@@ -164,7 +166,7 @@ Delete rule: post.author = @request.auth.id || @request.auth.role = "admin"
 
 ## reactions
 
-좋아요 컬렉션입니다.
+좋아요/싫어요 컬렉션입니다.
 
 필드:
 
@@ -173,12 +175,12 @@ Delete rule: post.author = @request.auth.id || @request.auth.role = "admin"
 | `targetType` | select | yes |  | `post`, `comment` |
 | `targetId` | text | yes |  | 대상 record id |
 | `user` | relation users | yes |  | 사용자 |
-| `type` | select | yes | `like` | `like` |
+| `type` | select | yes | `like` | `like`, `dislike` |
 
 권장 인덱스:
 
 ```text
-CREATE UNIQUE INDEX idx_reactions_unique ON reactions (targetType, targetId, user, type);
+CREATE UNIQUE INDEX idx_reactions_unique ON reactions (targetType, targetId, user);
 CREATE INDEX idx_reactions_target ON reactions (targetType, targetId);
 ```
 

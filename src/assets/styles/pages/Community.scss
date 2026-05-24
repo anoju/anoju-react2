@@ -191,6 +191,15 @@
     }
   }
 
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    gap: var(--spacing-md);
+  }
+
   &__image {
     margin: 0;
     overflow: hidden;
@@ -264,10 +273,51 @@
   display: grid;
   padding: var(--spacing-sm) 0;
   border-bottom: 1px solid var(--color-border-default);
-  gap: var(--spacing-2xs);
+  gap: var(--spacing-xs);
+  scroll-margin-top: calc(var(--layout-header-height, 3.5rem) + var(--spacing-md));
+  transition:
+    background-color var(--transition-base),
+    border-color var(--transition-base),
+    box-shadow var(--transition-base);
 
-  strong {
-    font-size: var(--font-size-sm);
+  &[data-highlighted="true"] {
+    padding-right: var(--spacing-sm);
+    padding-left: var(--spacing-sm);
+    border-color: var(--color-border-focus);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-primary-soft);
+    box-shadow: 0 0 0 1px var(--color-border-focus);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+  }
+
+  &__meta {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    min-width: 0;
+    gap: var(--spacing-2xs);
+
+    strong {
+      font-size: var(--font-size-sm);
+    }
+
+    span {
+      color: var(--color-text-muted);
+      font-size: var(--font-size-xs);
+    }
+  }
+
+  &__actions {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: var(--spacing-xs);
   }
 
   p {
@@ -275,10 +325,17 @@
     line-height: var(--line-height-base);
   }
 
-  span {
-    color: var(--color-text-muted);
+  .reaction-actions,
+  .share-button {
     font-size: var(--font-size-xs);
   }
+}
+
+.admin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-xs);
 }
 
 .pics-feed .data-list__items {
@@ -326,10 +383,26 @@
     font-size: var(--font-size-sm);
     gap: var(--spacing-md);
 
-    span {
+    span,
+    button {
       display: inline-flex;
       align-items: center;
+      padding: 0;
+      border: 0;
+      color: inherit;
+      background: transparent;
+      cursor: pointer;
+      font: inherit;
       gap: var(--spacing-2xs);
+    }
+
+    button:hover,
+    button:focus-visible {
+      color: var(--color-text-link);
+    }
+
+    .reaction-actions {
+      display: contents;
     }
   }
 }
@@ -363,7 +436,6 @@
     display: grid;
     gap: var(--spacing-sm);
 
-    h2,
     p {
       margin: 0;
     }

@@ -8,3 +8,5 @@ export { ErrorState } from './ErrorState';
 export { GlassSurface } from './GlassSurface/Index';
 export { ImageSwipe, type ImageSwipeItem } from './ImageSwipe';
 export { RichTextEditor } from './RichTextEditor';
+export { ReactionActions } from './ReactionActions';
+export { ShareButton } from './ShareButton';

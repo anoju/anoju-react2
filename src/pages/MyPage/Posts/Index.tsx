@@ -4,7 +4,7 @@ import { DataList } from '@/components';
 import { communityApi, getUserMessage } from '@/apis';
 import { FREE_BOARD_PATH, PICS_PATH } from '@/constants/app';
 import type { PostRecord } from '@/types/domain';
-import { formatDate } from '@/utils/community';
+import { compareByCreatedDesc, formatRelativeTime } from '@/utils/community';
 
 const getPostPath = (post: PostRecord) => `${post.type === 'gallery' ? PICS_PATH : FREE_BOARD_PATH}/${post.id}`;
 const getPostTypeLabel = (post: PostRecord) => (post.type === 'gallery' ? 'Pics' : '자유게시판');
@@ -20,7 +20,7 @@ const MyPosts = () => {
 
     try {
       const nextPosts = await communityApi.listMyPosts();
-      setPosts([...nextPosts].sort((a, b) => b.created.localeCompare(a.created)));
+      setPosts([...nextPosts].sort(compareByCreatedDesc));
     } catch (loadError) {
       setError(getUserMessage(loadError));
     } finally {
@@ -52,7 +52,7 @@ const MyPosts = () => {
             <span className="activity-item__type">{getPostTypeLabel(post)}</span>
             <strong>{post.title}</strong>
             <span>
-              {formatDate(post.created)} · 댓글 {post.commentCount ?? 0} · 좋아요 {post.likeCount ?? 0}
+              {formatRelativeTime(post.created)} · 댓글 {post.commentCount ?? 0} · 좋아요 {post.likeCount ?? 0}
             </span>
           </Link>
         )}

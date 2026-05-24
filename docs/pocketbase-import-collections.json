@@ -126,6 +126,18 @@
         "onlyInt": true
       },
       {
+        "id": "num_post_dlike",
+        "name": "dislikeCount",
+        "type": "number",
+        "system": false,
+        "required": false,
+        "presentable": false,
+        "hidden": false,
+        "min": 0,
+        "max": null,
+        "onlyInt": true
+      },
+      {
         "id": "num_post_book",
         "name": "bookmarkCount",
         "type": "number",
@@ -245,7 +257,19 @@
         "name": "likeCount",
         "type": "number",
         "system": false,
-        "required": true,
+        "required": false,
+        "presentable": false,
+        "hidden": false,
+        "min": 0,
+        "max": null,
+        "onlyInt": true
+      },
+      {
+        "id": "num_comm_dlike",
+        "name": "dislikeCount",
+        "type": "number",
+        "system": false,
+        "required": false,
         "presentable": false,
         "hidden": false,
         "min": 0,
@@ -257,7 +281,7 @@
         "name": "deleted",
         "type": "bool",
         "system": false,
-        "required": true,
+        "required": false,
         "presentable": false,
         "hidden": false
       },
@@ -415,12 +439,13 @@
         "hidden": false,
         "maxSelect": 1,
         "values": [
-          "like"
+          "like",
+          "dislike"
         ]
       }
     ],
     "indexes": [
-      "CREATE UNIQUE INDEX `idx_reactions_unique` ON `reactions` (`targetType`, `targetId`, `user`, `type`)",
+      "CREATE UNIQUE INDEX `idx_reactions_unique` ON `reactions` (`targetType`, `targetId`, `user`)",
       "CREATE INDEX `idx_reactions_target` ON `reactions` (`targetType`, `targetId`)"
     ]
   },

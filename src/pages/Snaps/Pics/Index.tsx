@@ -4,7 +4,8 @@ import { DataList, FloatingActionButton, FloatingActions, ImageSwipe, toast, typ
 import { communityApi, getUserMessage } from '@/apis';
 import { PICS_PATH, PICS_WRITE_PATH } from '@/constants/app';
 import type { PostImageRecord, PostRecord } from '@/types/domain';
-import { formatDate, getPostImageUrl, getRecordAuthorName } from '@/utils/community';
+import { compareByCreatedDesc, formatRelativeTime, getPostImageUrl, getRecordAuthorName } from '@/utils/community';
+import { shareContent } from '@/utils/share';
 import { useAuthStore } from '@/stores/authStore';
 
 interface PicsFeedItem {
@@ -39,7 +40,7 @@ const Pics = () => {
         perPage: PER_PAGE,
       });
       const nextItems = await Promise.all(
-        [...result.items].sort((a, b) => b.created.localeCompare(a.created)).map(async (post) => {
+        [...result.items].sort(compareByCreatedDesc).map(async (post) => {
           const images = (await communityApi.listImages(post.id)).sort((a, b) => a.sortOrder - b.sortOrder);
           return { post, images };
         }),
@@ -64,6 +65,16 @@ const Pics = () => {
     if (!isAuthenticated) {
       toast('Pics 작성은 이메일 인증을 완료한 회원만 가능합니다.', { tone: 'warning' });
     }
+  };
+
+  const handleShareClick = (post: PostRecord) => {
+    const url = new URL(`${PICS_PATH}/${post.id}`, window.location.origin).toString();
+
+    void shareContent({
+      title: post.title,
+      text: post.content,
+      url,
+    });
   };
 
   return (
@@ -103,7 +114,7 @@ const Pics = () => {
               <div className="pic-card__body">
                 <div className="pic-card__author">
                   <strong>{getRecordAuthorName(post)}</strong>
-                  <span>{formatDate(post.created)}</span>
+                  <span>{formatRelativeTime(post.created)}</span>
                 </div>
                 <p>{post.content}</p>
                 <div className="pic-card__actions" aria-label="Pics 반응">
@@ -113,9 +124,9 @@ const Pics = () => {
                   <span>
                     <MessageCircle size={16} /> {post.commentCount ?? 0}
                   </span>
-                  <span>
+                  <button type="button" onClick={() => handleShareClick(post)} aria-label={`${post.title} 공유하기`}>
                     <Send size={16} /> 공유
-                  </span>
+                  </button>
                 </div>
               </div>
             </article>

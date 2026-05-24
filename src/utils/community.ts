@@ -36,6 +36,70 @@ export const formatDate = (date?: string) => {
   }).format(new Date(date));
 };
 
+export const formatRelativeTime = (date?: string) => {
+  if (!date) {
+    return '';
+  }
+
+  const time = Date.parse(date);
+
+  if (Number.isNaN(time)) {
+    return '';
+  }
+
+  const diffSeconds = Math.max(0, Math.floor((Date.now() - time) / 1000));
+
+  if (diffSeconds < 60) {
+    return '방금 전';
+  }
+
+  const diffMinutes = Math.floor(diffSeconds / 60);
+
+  if (diffMinutes < 60) {
+    return `${diffMinutes}분 전`;
+  }
+
+  const diffHours = Math.floor(diffMinutes / 60);
+
+  if (diffHours < 24) {
+    return `${diffHours}시간 전`;
+  }
+
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffDays < 7) {
+    return `${diffDays}일 전`;
+  }
+
+  return formatDate(date);
+};
+
+const getRecordCreated = (record: unknown) => {
+  if (!record || typeof record !== 'object' || !('created' in record)) {
+    return undefined;
+  }
+
+  const created = record.created;
+
+  return typeof created === 'string' ? created : undefined;
+};
+
+const getDateTime = (date?: string) => {
+  if (!date) {
+    return 0;
+  }
+
+  const time = Date.parse(date);
+
+  return Number.isNaN(time) ? 0 : time;
+};
+
+export const compareByCreatedDesc = (a: unknown, b: unknown) =>
+  getDateTime(getRecordCreated(b)) - getDateTime(getRecordCreated(a));
+
+export const compareByCreatedAsc = (a: unknown, b: unknown) =>
+  getDateTime(getRecordCreated(a)) - getDateTime(getRecordCreated(b));
+
 export const createContentParts = (content: string, images: PostImageRecord[]): ContentPart[] => {
   const imageMap = new Map(images.map((image) => [image.id, image]));
   const parts: ContentPart[] = [];

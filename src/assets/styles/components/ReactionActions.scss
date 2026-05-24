@@ -1,0 +1,42 @@
+@use "@/assets/styles/base" as *;
+
+.reaction-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-xs);
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2rem;
+    padding: 0;
+    border: 0;
+    color: var(--color-text-secondary);
+    background: transparent;
+    cursor: pointer;
+    font: inherit;
+    gap: var(--spacing-3xs);
+    transition: var(--transition-base);
+
+    &:hover:not(:disabled),
+    &:focus-visible:not(:disabled),
+    &[data-selected="true"] {
+      color: var(--color-text-link);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.56;
+    }
+  }
+
+  &[data-compact="true"] {
+    gap: var(--spacing-sm);
+
+    button {
+      min-height: 1.5rem;
+      gap: var(--spacing-2xs);
+    }
+  }
+}
