@@ -117,6 +117,31 @@
     align-items: center;
     min-width: 0;
   }
+
+  &__notification {
+    position: relative;
+    display: inline-flex;
+  }
+
+  &__notification-badge {
+    position: absolute;
+    top: 0.15rem;
+    right: 0.1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1rem;
+    height: 1rem;
+    padding: 0 0.25rem;
+    border: 2px solid var(--color-bg-elevated);
+    border-radius: var(--radius-full);
+    color: var(--color-text-inverse);
+    background: var(--color-action-danger);
+    font-size: 0.625rem;
+    font-weight: 800;
+    line-height: 1;
+    pointer-events: none;
+  }
 }
 
 .floating-menu {

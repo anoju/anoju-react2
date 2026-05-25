@@ -5,6 +5,7 @@ import {
   FREE_BOARD_PATH,
   LOGIN_PATH,
   MY_PAGE_PATH,
+  MY_PAGE_NOTIFICATIONS_PATH,
   PICS_PATH,
   PLAYGROUND_PATH,
   REGISTER_PATH,
@@ -30,6 +31,7 @@ const Menu = () => {
       label: isAuthenticated ? '마이페이지' : '로그인',
       path: isAuthenticated ? MY_PAGE_PATH : LOGIN_PATH,
     },
+    ...(isAuthenticated ? [{ label: '알림함', path: MY_PAGE_NOTIFICATIONS_PATH }] : []),
     ...(!isAuthenticated ? [{ label: '회원가입', path: REGISTER_PATH }] : []),
     {
       label: '설정',
@@ -60,7 +62,7 @@ const Menu = () => {
       ],
     },
     {
-      label: 'Member',
+      label: 'Members',
       items: memberItems,
     },
   ]

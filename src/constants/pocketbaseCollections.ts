@@ -7,6 +7,7 @@ export const PB_COLLECTIONS = {
   bookmarks: 'bookmarks',
   reports: 'reports',
   notices: 'notices',
+  notifications: 'notifications',
   deviceReports: 'device_reports',
   picLogs: 'pic_logs',
   picLogEntries: 'pic_log_entries',
@@ -31,6 +32,15 @@ export const REPORT_TARGET_TYPES = ['post', 'comment', 'user'] as const;
 export const REPORT_STATUSES = ['pending', 'reviewed', 'rejected', 'resolved'] as const;
 
 export const NOTICE_PLACEMENTS = ['global', 'board', 'gallery'] as const;
+
+export const NOTIFICATION_TYPES = [
+  'post_comment',
+  'comment_reply',
+  'mention',
+  'pic_log_invite',
+  'pic_log_order_request',
+  'system',
+] as const;
 
 export const DEVICE_REPORT_STATUSES = ['published', 'hidden', 'deleted'] as const;
 

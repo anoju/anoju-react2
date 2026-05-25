@@ -2,6 +2,7 @@ import type { RecordModel } from 'pocketbase';
 import type {
   COMMENT_STATUSES,
   NOTICE_PLACEMENTS,
+  NOTIFICATION_TYPES,
   POST_STATUSES,
   POST_TYPES,
   REPORT_STATUSES,
@@ -30,6 +31,8 @@ export type ReportTargetType = (typeof REPORT_TARGET_TYPES)[number];
 export type ReportStatus = (typeof REPORT_STATUSES)[number];
 
 export type NoticePlacement = (typeof NOTICE_PLACEMENTS)[number];
+
+export type NotificationType = (typeof NOTIFICATION_TYPES)[number];
 
 export type DeviceReportStatus = (typeof DEVICE_REPORT_STATUSES)[number];
 
@@ -140,6 +143,20 @@ export interface NoticeRecord extends RecordModel {
   active: boolean;
   startsAt?: string;
   endsAt?: string;
+}
+
+export interface NotificationRecord extends RecordModel {
+  recipient: string;
+  actor?: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  targetUrl: string;
+  targetType: 'post' | 'comment' | 'picLog' | 'picLogOrderRequest' | 'system';
+  targetId?: string;
+  isRead: boolean;
+  readAt?: string;
+  hidden?: boolean;
 }
 
 export interface DeviceReportRecord extends RecordModel {

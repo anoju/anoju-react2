@@ -16,6 +16,8 @@ export const MY_PAGE_POSTS_PATH = '/my-page/posts';
 
 export const MY_PAGE_COMMENTS_PATH = '/my-page/comments';
 
+export const MY_PAGE_NOTIFICATIONS_PATH = '/my-page/notifications';
+
 export const SETTINGS_PATH = '/settings';
 
 export const PLAYGROUND_PATH = '/playground';

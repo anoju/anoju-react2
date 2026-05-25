@@ -6,6 +6,7 @@ import MyPage from "@/pages/MyPage/Index";
 import MyPageProfile from "@/pages/MyPage/Profile/Index";
 import MyPosts from "@/pages/MyPage/Posts/Index";
 import MyComments from "@/pages/MyPage/Comments/Index";
+import Notifications from "@/pages/MyPage/Notifications/Index";
 import Settings from "@/pages/Settings/Index";
 import Playground from "@/pages/Playground/Index";
 import DeviceInfo from "@/pages/Playground/DeviceInfo/Index";
@@ -40,6 +41,7 @@ import {
   MENU_PATH,
   MY_PAGE_PATH,
   MY_PAGE_COMMENTS_PATH,
+  MY_PAGE_NOTIFICATIONS_PATH,
   MY_PAGE_POSTS_PATH,
   MY_PAGE_PROFILE_PATH,
   PICS_PATH,
@@ -203,6 +205,22 @@ export const routeConfig = [
     },
     layout: {
       header: defaultHeader("내가 작성한 댓글"),
+      floatingMenu: defaultFloatingMenu,
+    },
+    requiresAuth: true,
+    roles: ["user", "admin"],
+  },
+  {
+    id: "my-page-notifications",
+    path: MY_PAGE_NOTIFICATIONS_PATH,
+    element: <Notifications />,
+    meta: {
+      title: "알림함",
+      description: "내 댓글, 답글, 태그 알림을 확인하는 화면입니다.",
+      robots: "noindex",
+    },
+    layout: {
+      header: defaultHeader("알림함"),
       floatingMenu: defaultFloatingMenu,
     },
     requiresAuth: true,

@@ -371,3 +371,113 @@
     line-height: var(--line-height-base);
   }
 }
+
+.notification-page {
+  &__toolbar {
+    display: grid;
+    gap: var(--spacing-sm);
+  }
+
+  &__filters {
+    display: flex;
+    gap: var(--spacing-xs);
+    overflow-x: auto;
+    padding-bottom: var(--spacing-2xs);
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  &__filter {
+    flex: 0 0 auto;
+    min-height: 2.25rem;
+    padding: 0 var(--spacing-sm);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-full);
+    color: var(--color-text-secondary);
+    background: var(--color-bg-surface);
+    cursor: pointer;
+    font-size: var(--font-size-sm);
+    font-weight: 760;
+    transition: var(--transition-base);
+
+    &[data-active='true'],
+    &:hover,
+    &:focus-visible {
+      color: var(--color-action-primary);
+      border-color: var(--color-border-focus);
+      background: var(--color-bg-primary-soft);
+    }
+  }
+}
+
+.notification-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  padding: var(--spacing-md) 0;
+  border-bottom: 1px solid var(--color-border-default);
+  color: var(--color-text-primary);
+  gap: var(--spacing-sm);
+  text-decoration: none;
+
+  &[data-read='true'] {
+    opacity: 0.72;
+  }
+
+  &__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: var(--radius-full);
+    color: var(--color-icon-primary);
+    background: var(--color-bg-primary-soft);
+  }
+
+  &__content {
+    display: grid;
+    min-width: 0;
+    gap: var(--spacing-2xs);
+  }
+
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-base);
+    gap: var(--spacing-xs);
+  }
+
+  strong {
+    overflow: hidden;
+    font-size: var(--font-size-md);
+    line-height: var(--line-height-tight);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__content > span:last-child {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-base);
+  }
+
+  &__badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.5rem;
+    padding: 0 var(--spacing-xs);
+    border-radius: var(--radius-full);
+    color: var(--color-text-inverse);
+    background: var(--color-action-primary);
+    font-size: var(--font-size-xs);
+    font-weight: 800;
+    white-space: nowrap;
+  }
+}

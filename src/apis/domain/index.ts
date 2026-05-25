@@ -4,6 +4,7 @@ export { communityApi } from './communityApi';
 export { createCrudApi } from './createCrudApi';
 export { deviceReportApi } from './deviceReportApi';
 export { noticeApi } from './noticeApi';
+export { notificationApi } from './notificationApi';
 export { picLogApi } from './picLogApi';
 export { postApi } from './postApi';
 export { reactionApi, type ReactionType } from './reactionApi';

@@ -313,6 +313,49 @@ Update rule: @request.auth.role = "admin"
 Delete rule: @request.auth.role = "admin"
 ```
 
+## notifications
+
+사용자별 알림함 컬렉션입니다.
+
+필드:
+
+| 필드 | 타입 | 필수 | 기본값 | 설명 |
+| --- | --- | --- | --- | --- |
+| `recipient` | text | yes |  | 알림을 받을 사용자 id |
+| `actor` | text | no |  | 알림을 발생시킨 사용자 id |
+| `type` | text | yes |  | `post_comment`, `comment_reply`, `mention`, `pic_log_invite`, `pic_log_order_request`, `system` |
+| `title` | text | yes |  | 알림 제목 |
+| `message` | text | yes |  | 알림 설명 |
+| `targetUrl` | text | yes |  | 클릭 시 이동할 프론트 경로 |
+| `targetType` | text | yes |  | `post`, `comment`, `picLog`, `picLogOrderRequest`, `system` |
+| `targetId` | text | no |  | 연결 대상 record id |
+| `isRead` | bool | no | `false` | 읽음 여부. false를 허용해야 하므로 required로 설정하지 않습니다. |
+| `readAt` | date | no |  | 읽은 시각 |
+| `hidden` | bool | no | `false` | 사용자 숨김 여부. false를 허용해야 하므로 required로 설정하지 않습니다. |
+
+권장 인덱스:
+
+```text
+CREATE INDEX idx_notifications_recipient_created ON notifications (recipient, created);
+CREATE INDEX idx_notifications_recipient_read ON notifications (recipient, isRead);
+```
+
+API Rules:
+
+```text
+List rule: recipient = @request.auth.id || @request.auth.role = "admin"
+View rule: recipient = @request.auth.id || @request.auth.role = "admin"
+Create rule: @request.auth.id != ""
+Update rule: recipient = @request.auth.id || @request.auth.role = "admin"
+Delete rule: @request.auth.role = "admin"
+```
+
+주의:
+
+- 1차 프론트 구현은 댓글 작성, picLog 태그, picLog 순서 변경 요청 시 클라이언트에서 알림을 생성합니다.
+- 운영 안정성을 높이려면 이후 PocketBase hook에서 알림 생성을 서버 책임으로 옮겨 중복 생성과 권한 우회를 방지합니다.
+- 사용자가 자기 글 또는 자기 댓글에 직접 남긴 액션은 프론트에서 자기 알림을 만들지 않습니다.
+
 ## Turnstile 회원가입 서버 훅 개요
 
 회원가입 요청 body의 `turnstileToken`을 읽어 Cloudflare Siteverify API로 검증합니다.

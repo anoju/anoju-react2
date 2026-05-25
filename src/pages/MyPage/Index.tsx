@@ -1,8 +1,14 @@
-import { FileText, LogOut, MessageSquareText, UserRound } from 'lucide-react';
+import { Bell, FileText, LogOut, MessageSquareText, UserRound } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { authApi } from '@/apis';
 import { Button, confirm, toast } from '@/components';
-import { DEFAULT_HOME_PATH, MY_PAGE_COMMENTS_PATH, MY_PAGE_POSTS_PATH, MY_PAGE_PROFILE_PATH } from '@/constants/app';
+import {
+  DEFAULT_HOME_PATH,
+  MY_PAGE_COMMENTS_PATH,
+  MY_PAGE_NOTIFICATIONS_PATH,
+  MY_PAGE_POSTS_PATH,
+  MY_PAGE_PROFILE_PATH,
+} from '@/constants/app';
 import { useAuthStore } from '@/stores/authStore';
 
 const MyPage = () => {
@@ -56,6 +62,15 @@ const MyPage = () => {
           <span className="hub-card__content">
             <strong>내가 작성한 댓글</strong>
             <span>내 댓글과 연결된 게시글로 다시 이동합니다.</span>
+          </span>
+        </NavLink>
+        <NavLink to={MY_PAGE_NOTIFICATIONS_PATH} className="hub-card">
+          <span className="hub-card__icon" aria-hidden="true">
+            <Bell size={22} />
+          </span>
+          <span className="hub-card__content">
+            <strong>알림함</strong>
+            <span>댓글, 답글, 태그와 picLog 요청을 확인합니다.</span>
           </span>
         </NavLink>
       </nav>

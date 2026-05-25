@@ -1,10 +1,13 @@
-import { ArrowLeft, Home } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { ArrowLeft, Bell, Home } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import anojuLogo from '@/assets/images/common/logo.svg';
-import { DEFAULT_HOME_PATH } from '@/constants/app';
+import { notificationApi } from '@/apis';
+import { DEFAULT_HOME_PATH, MY_PAGE_NOTIFICATIONS_PATH } from '@/constants/app';
 import { IconButton, Img } from '@/components/atoms';
 import type { HeaderConfig } from '@/routes/types';
+import { useAuthStore } from '@/stores/authStore';
 
 interface AppHeaderProps {
   config: HeaderConfig;
@@ -13,6 +16,52 @@ interface AppHeaderProps {
 
 export const AppHeader = ({ config, visible }: AppHeaderProps) => {
   const navigate = useNavigate();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const loadUnreadCount = useCallback(async () => {
+    if (!isAuthenticated) {
+      setUnreadCount(0);
+      return;
+    }
+
+    try {
+      setUnreadCount(await notificationApi.getUnreadCount());
+    } catch {
+      setUnreadCount(0);
+    }
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    void loadUnreadCount();
+  }, [loadUnreadCount]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      return undefined;
+    }
+
+    let unsubscribe: (() => void) | null = null;
+    let mounted = true;
+
+    void notificationApi.subscribeMine(() => {
+      void loadUnreadCount();
+    }).then((nextUnsubscribe) => {
+      if (!mounted) {
+        nextUnsubscribe?.();
+        return;
+      }
+
+      unsubscribe = nextUnsubscribe;
+    }).catch(() => {
+      unsubscribe = null;
+    });
+
+    return () => {
+      mounted = false;
+      unsubscribe?.();
+    };
+  }, [isAuthenticated, loadUnreadCount]);
 
   if (!config.enabled) {
     return null;
@@ -70,6 +119,20 @@ export const AppHeader = ({ config, visible }: AppHeaderProps) => {
 
         <div className="app-header__right">
           <div className="app-header__slot app-header__slot--right" data-slot={config.rightSlotKey} />
+          {isAuthenticated ? (
+            <span className="app-header__notification">
+              <IconButton
+                label={unreadCount > 0 ? `알림함, 읽지 않은 알림 ${unreadCount}개` : '알림함'}
+                icon={<Bell size={20} />}
+                onClick={() => navigate(MY_PAGE_NOTIFICATIONS_PATH)}
+              />
+              {unreadCount > 0 ? (
+                <span className="app-header__notification-badge" aria-hidden="true">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              ) : null}
+            </span>
+          ) : null}
           {config.showHomeButton ? (
             <IconButton label="홈" icon={<Home size={20} />} onClick={() => navigate(DEFAULT_HOME_PATH)} />
           ) : null}

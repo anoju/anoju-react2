@@ -1,4 +1,5 @@
 import { PB_COLLECTIONS } from '@/constants/pocketbaseCollections';
+import { PIC_LOG_PATH } from '@/constants/app';
 import { pb } from '@/lib/pocketBase';
 import type {
   PicLogCommentRecord,
@@ -8,6 +9,7 @@ import type {
   PicLogVisibility,
 } from '@/types/domain';
 import { runApi } from '../apiClient';
+import { notificationApi } from './notificationApi';
 
 interface CreatePicLogParams {
   title: string;
@@ -168,10 +170,11 @@ export const picLogApi = {
     }),
 
   createComment: ({ logId, chapter, content, taggedUserId }: CreatePicLogCommentParams) =>
-    runApi(() => {
+    runApi(async () => {
       const author = getCurrentUserId();
+      const log = await pb.collection(PB_COLLECTIONS.picLogs).getOne<PicLogRecord>(logId, { $autoCancel: false });
 
-      return pb.collection(PB_COLLECTIONS.picLogComments).create<PicLogCommentRecord>(
+      const comment = await pb.collection(PB_COLLECTIONS.picLogComments).create<PicLogCommentRecord>(
         {
           log: logId,
           chapter,
@@ -183,13 +186,33 @@ export const picLogApi = {
         },
         { $autoCancel: false, expand: 'author,taggedUser' },
       );
+
+      try {
+        if (taggedUserId) {
+          await notificationApi.createSafely({
+            recipientId: taggedUserId,
+            actorId: author,
+            type: 'mention',
+            title: 'picLog에서 회원님을 태그했습니다.',
+            message: `"${log.title}" ${chapter} 챕터 댓글에서 회원님을 태그했습니다.`,
+            targetUrl: `${PIC_LOG_PATH}/${logId}?chapter=${encodeURIComponent(chapter)}#comment-${comment.id}`,
+            targetType: 'picLog',
+            targetId: logId,
+          });
+        }
+      } catch {
+        // 알림 생성은 댓글 작성 흐름을 막지 않습니다.
+      }
+
+      return comment;
     }),
 
   createOrderRequest: ({ logId, targetUserId }: CreateOrderRequestParams) =>
-    runApi(() => {
+    runApi(async () => {
       const requester = getCurrentUserId();
+      const log = await pb.collection(PB_COLLECTIONS.picLogs).getOne<PicLogRecord>(logId, { $autoCancel: false });
 
-      return pb.collection(PB_COLLECTIONS.picLogOrderRequests).create<PicLogOrderRequestRecord>(
+      const request = await pb.collection(PB_COLLECTIONS.picLogOrderRequests).create<PicLogOrderRequestRecord>(
         {
           log: logId,
           requester,
@@ -198,6 +221,23 @@ export const picLogApi = {
         },
         { $autoCancel: false, expand: 'requester,targetUser' },
       );
+
+      try {
+        await notificationApi.createSafely({
+          recipientId: targetUserId,
+          actorId: requester,
+          type: 'pic_log_order_request',
+          title: 'picLog 순서 변경 요청이 도착했습니다.',
+          message: `"${log.title}" 참여자 순서 변경 요청이 있습니다.`,
+          targetUrl: `${PIC_LOG_PATH}/${logId}`,
+          targetType: 'picLogOrderRequest',
+          targetId: request.id,
+        });
+      } catch {
+        // 알림 생성은 요청 생성 흐름을 막지 않습니다.
+      }
+
+      return request;
     }),
 
   respondOrderRequest: async (request: PicLogOrderRequestRecord, accepted: boolean) =>

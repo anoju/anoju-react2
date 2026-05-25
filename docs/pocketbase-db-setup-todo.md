@@ -74,6 +74,7 @@ PocketBase Admin UI에서 실제 DB/인증/보안 설정을 진행하기 위한 
 - [x] `bookmarks`
 - [x] `reports`
 - [x] `notices`
+- [x] `notifications`
 
 ## 5.5단계: 프론트 타입/상수
 
@@ -107,4 +108,5 @@ PocketBase Admin UI에서 실제 DB/인증/보안 설정을 진행하기 위한 
 - [ ] 게시글 목록 조회 확인
 - [ ] 게시글 작성 확인
 - [ ] 댓글 작성 확인
+- [ ] 알림함 목록/읽음 처리 확인
 - [ ] 파일 업로드 확인
