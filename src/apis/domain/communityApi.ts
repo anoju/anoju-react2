@@ -27,8 +27,20 @@ export interface CreatePostParams {
   }>;
 }
 
+export interface UpdatePostParams {
+  postId: string;
+  title: string;
+  content: string;
+}
+
 export interface CreateCommentParams {
   postId: string;
+  content: string;
+  parentCommentId?: string;
+}
+
+export interface UpdateCommentParams {
+  commentId: string;
   content: string;
 }
 
@@ -123,7 +135,19 @@ export const communityApi = {
       return post;
     }),
 
-  createComment: ({ postId, content }: CreateCommentParams) =>
+  updatePost: ({ postId, title, content }: UpdatePostParams) =>
+    runApi(() =>
+      pb.collection(PB_COLLECTIONS.posts).update<PostRecord>(
+        postId,
+        {
+          title,
+          content,
+        },
+        { $autoCancel: false, expand: 'author' },
+      ),
+    ),
+
+  createComment: ({ postId, content, parentCommentId }: CreateCommentParams) =>
     runApi(async () => {
       const author = pb.authStore.model?.id;
 
@@ -135,6 +159,7 @@ export const communityApi = {
         post: postId,
         author,
         content,
+        ...(parentCommentId ? { parentComment: parentCommentId } : {}),
         status: 'published',
         likeCount: 0,
         dislikeCount: 0,
@@ -150,6 +175,41 @@ export const communityApi = {
         );
       } catch {
         // 댓글 수 집계 갱신은 서버 권한 설정에 따라 실패할 수 있으므로 댓글 등록 성공을 우선합니다.
+      }
+
+      return comment;
+    }),
+
+  updateComment: ({ commentId, content }: UpdateCommentParams) =>
+    runApi(() =>
+      pb.collection(PB_COLLECTIONS.comments).update<CommentRecord>(
+        commentId,
+        { content },
+        { $autoCancel: false, expand: 'author' },
+      ),
+    ),
+
+  hideComment: (commentId: string) =>
+    runApi(async () => {
+      const comment = await pb.collection(PB_COLLECTIONS.comments).update<CommentRecord>(
+        commentId,
+        {
+          status: 'hidden',
+          deleted: true,
+          deletedAt: new Date().toISOString(),
+        },
+        { $autoCancel: false, expand: 'author' },
+      );
+
+      try {
+        const post = await pb.collection(PB_COLLECTIONS.posts).getOne<PostRecord>(comment.post, { $autoCancel: false });
+        await pb.collection(PB_COLLECTIONS.posts).update<PostRecord>(
+          comment.post,
+          { commentCount: Math.max(0, (post.commentCount ?? 0) - 1) },
+          { $autoCancel: false },
+        );
+      } catch {
+        // 댓글 수 집계 갱신은 서버 권한 설정에 따라 실패할 수 있으므로 댓글 숨김 성공을 우선합니다.
       }
 
       return comment;

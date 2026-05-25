@@ -1,6 +1,6 @@
-import { MessageCircle, Sparkles } from 'lucide-react';
+import { MonitorSmartphone, MessageCircle } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
-import { FREE_BOARD_PATH } from '@/constants/app';
+import { DEVICE_INFO_PATH, FREE_BOARD_PATH } from '@/constants/app';
 
 const Playground = () => (
   <section className="container hub-page">
@@ -20,15 +20,15 @@ const Playground = () => (
           <span>일상, 질문, 잡담을 모바일 리스트로 빠르게 둘러봅니다.</span>
         </span>
       </NavLink>
-      <article className="hub-card hub-card--muted">
+      <NavLink to={DEVICE_INFO_PATH} className="hub-card">
         <span className="hub-card__icon" aria-hidden="true">
-          <Sparkles size={22} />
+          <MonitorSmartphone size={22} />
         </span>
         <span className="hub-card__content">
-          <strong>다음 놀거리</strong>
-          <span>새 게시판이 생기면 이곳에 이어서 추가됩니다.</span>
+          <strong>디바이스정보</strong>
+          <span>모바일 기기별 웹 해상도와 표시 설정을 확인합니다.</span>
         </span>
-      </article>
+      </NavLink>
     </nav>
   </section>
 );

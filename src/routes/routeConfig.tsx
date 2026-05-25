@@ -8,17 +8,27 @@ import MyPosts from "@/pages/MyPage/Posts/Index";
 import MyComments from "@/pages/MyPage/Comments/Index";
 import Settings from "@/pages/Settings/Index";
 import Playground from "@/pages/Playground/Index";
+import DeviceInfo from "@/pages/Playground/DeviceInfo/Index";
+import DeviceInfoDetail from "@/pages/Playground/DeviceInfo/Detail/Index";
+import DeviceInfoEdit from "@/pages/Playground/DeviceInfo/Edit/Index";
+import DeviceInfoWrite from "@/pages/Playground/DeviceInfo/Write/Index";
 import FreeBoard from "@/pages/Playground/FreeBoard/Index";
 import FreeBoardDetail from "@/pages/Playground/FreeBoard/Detail/Index";
+import FreeBoardEdit from "@/pages/Playground/FreeBoard/Edit/Index";
 import FreeBoardWrite from "@/pages/Playground/FreeBoard/Write/Index";
 import Snaps from "@/pages/Snaps/Index";
 import Pics from "@/pages/Snaps/Pics/Index";
 import PicsDetail from "@/pages/Snaps/Pics/Detail/Index";
+import PicsEdit from "@/pages/Snaps/Pics/Edit/Index";
 import PicsWrite from "@/pages/Snaps/Pics/Write/Index";
 import About from "@/pages/Static/About/Index";
 import NotFound from "@/pages/System/NotFound/Index";
 import {
   DEFAULT_HOME_PATH,
+  DEVICE_INFO_PATH,
+  DEVICE_INFO_EDIT_PATH,
+  DEVICE_INFO_WRITE_PATH,
+  FREE_BOARD_EDIT_PATH,
   FREE_BOARD_PATH,
   FREE_BOARD_WRITE_PATH,
   LOGIN_PATH,
@@ -28,6 +38,7 @@ import {
   MY_PAGE_POSTS_PATH,
   MY_PAGE_PROFILE_PATH,
   PICS_PATH,
+  PICS_EDIT_PATH,
   PICS_WRITE_PATH,
   PLAYGROUND_PATH,
   REGISTER_PATH,
@@ -264,6 +275,80 @@ export const routeConfig = [
     },
   },
   {
+    id: "free-board-edit",
+    path: FREE_BOARD_EDIT_PATH,
+    element: <FreeBoardEdit />,
+    meta: {
+      title: "자유게시판 수정",
+      description: "자유게시판 게시글 수정 화면입니다.",
+      robots: "noindex",
+    },
+    layout: {
+      header: defaultHeader("게시글 수정"),
+      floatingMenu: defaultFloatingMenu,
+    },
+    requiresAuth: true,
+    roles: ["user", "admin"],
+  },
+  {
+    id: "device-info",
+    path: DEVICE_INFO_PATH,
+    element: <DeviceInfo />,
+    meta: {
+      title: "디바이스정보",
+      description: "모바일 디바이스별 웹 해상도 데이터 목록 화면입니다.",
+    },
+    layout: {
+      header: defaultHeader("디바이스정보"),
+      floatingMenu: defaultFloatingMenu,
+    },
+  },
+  {
+    id: "device-info-write",
+    path: DEVICE_INFO_WRITE_PATH,
+    element: <DeviceInfoWrite />,
+    meta: {
+      title: "디바이스정보 작성",
+      description: "모바일 디바이스 웹 해상도 데이터 작성 화면입니다.",
+      robots: "noindex",
+    },
+    layout: {
+      header: defaultHeader("디바이스정보 작성"),
+      floatingMenu: defaultFloatingMenu,
+    },
+    requiresAuth: true,
+    roles: ["user", "admin"],
+  },
+  {
+    id: "device-info-detail",
+    path: `${DEVICE_INFO_PATH}/:deviceReportId`,
+    element: <DeviceInfoDetail />,
+    meta: {
+      title: "디바이스정보 상세",
+      description: "모바일 디바이스 웹 해상도 데이터 상세 화면입니다.",
+    },
+    layout: {
+      header: defaultHeader("디바이스정보"),
+      floatingMenu: defaultFloatingMenu,
+    },
+  },
+  {
+    id: "device-info-edit",
+    path: DEVICE_INFO_EDIT_PATH,
+    element: <DeviceInfoEdit />,
+    meta: {
+      title: "디바이스정보 수정",
+      description: "모바일 디바이스 웹 해상도 데이터 수정 화면입니다.",
+      robots: "noindex",
+    },
+    layout: {
+      header: defaultHeader("디바이스정보 수정"),
+      floatingMenu: defaultFloatingMenu,
+    },
+    requiresAuth: true,
+    roles: ["user", "admin"],
+  },
+  {
     id: "snaps",
     path: SNAPS_PATH,
     element: <Snaps />,
@@ -320,6 +405,22 @@ export const routeConfig = [
       header: defaultHeader("Pics"),
       floatingMenu: defaultFloatingMenu,
     },
+  },
+  {
+    id: "pics-edit",
+    path: PICS_EDIT_PATH,
+    element: <PicsEdit />,
+    meta: {
+      title: "Pics 수정",
+      description: "Pics 캡션 수정 화면입니다.",
+      robots: "noindex",
+    },
+    layout: {
+      header: defaultHeader("Pics 수정"),
+      floatingMenu: defaultFloatingMenu,
+    },
+    requiresAuth: true,
+    roles: ["user", "admin"],
   },
   {
     id: "about",

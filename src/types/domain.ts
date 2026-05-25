@@ -8,6 +8,8 @@ import type {
   REPORT_TARGET_TYPES,
   USER_ROLES,
   USER_STATUSES,
+  DEVICE_ORIENTATIONS,
+  DEVICE_REPORT_STATUSES,
 } from '@/constants/pocketbaseCollections';
 
 export type UserRoleValue = (typeof USER_ROLES)[number];
@@ -25,6 +27,10 @@ export type ReportTargetType = (typeof REPORT_TARGET_TYPES)[number];
 export type ReportStatus = (typeof REPORT_STATUSES)[number];
 
 export type NoticePlacement = (typeof NOTICE_PLACEMENTS)[number];
+
+export type DeviceReportStatus = (typeof DEVICE_REPORT_STATUSES)[number];
+
+export type DeviceOrientation = (typeof DEVICE_ORIENTATIONS)[number];
 
 export type AppRecord = RecordModel & {
   title?: string;
@@ -126,4 +132,24 @@ export interface NoticeRecord extends RecordModel {
   active: boolean;
   startsAt?: string;
   endsAt?: string;
+}
+
+export interface DeviceReportRecord extends RecordModel {
+  manufacturer: string;
+  model: string;
+  screenWidth: number;
+  screenHeight: number;
+  windowWidthMin: number;
+  windowWidthMax: number;
+  windowHeightMin: number;
+  windowHeightMax: number;
+  devicePixelRatio: number;
+  orientation: DeviceOrientation;
+  userAgent: string;
+  displaySetting: number;
+  description?: string;
+  author: string;
+  status: DeviceReportStatus;
+  deleted: boolean;
+  deletedAt?: string;
 }

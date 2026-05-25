@@ -252,6 +252,42 @@ Update rule: @request.auth.role = "admin"
 Delete rule: @request.auth.role = "admin"
 ```
 
+## device_reports
+
+모바일 디바이스별 웹 해상도 측정 데이터 컬렉션입니다.
+
+필드:
+
+| 필드 | 타입 | 필수 | 기본값 | 설명 |
+| --- | --- | --- | --- | --- |
+| `manufacturer` | text | yes |  | 제조사 |
+| `model` | text | yes |  | 모델 |
+| `screenWidth` | number | yes |  | `window.screen.width` |
+| `screenHeight` | number | yes |  | `window.screen.height` |
+| `windowWidthMin` | number | yes |  | 작성 중 관측된 최소 `window.innerWidth` |
+| `windowWidthMax` | number | yes |  | 작성 중 관측된 최대 `window.innerWidth` |
+| `windowHeightMin` | number | yes |  | 작성 중 관측된 최소 `window.innerHeight` |
+| `windowHeightMax` | number | yes |  | 작성 중 관측된 최대 `window.innerHeight` |
+| `devicePixelRatio` | number | yes |  | `window.devicePixelRatio` |
+| `orientation` | select | yes | `portrait` | `portrait`, `landscape` |
+| `userAgent` | text | yes |  | 브라우저 userAgent |
+| `displaySetting` | number | yes | `0` | Android 표시 크기 단계. iOS는 0으로 고정 |
+| `description` | text | no |  | 추가 설명 |
+| `author` | relation users | yes |  | 작성자 |
+| `status` | select | yes | `published` | `published`, `hidden`, `deleted` |
+| `deleted` | bool | no | `false` | soft delete 여부. false를 허용해야 하므로 required로 설정하지 않습니다. |
+| `deletedAt` | date | no |  | 삭제 시각 |
+
+API Rules:
+
+```text
+List rule: status = "published" && deleted = false || @request.auth.role = "admin"
+View rule: status = "published" && deleted = false || author = @request.auth.id || @request.auth.role = "admin"
+Create rule: @request.auth.id != "" && @request.auth.verified = true
+Update rule: (author = @request.auth.id && status != "hidden") || @request.auth.role = "admin"
+Delete rule: @request.auth.role = "admin"
+```
+
 ## notices
 
 공지 컬렉션입니다.

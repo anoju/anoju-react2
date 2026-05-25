@@ -24,11 +24,21 @@ export const FREE_BOARD_PATH = '/playground/free-board';
 
 export const FREE_BOARD_WRITE_PATH = '/playground/free-board/write';
 
+export const FREE_BOARD_EDIT_PATH = '/playground/free-board/:postId/edit';
+
+export const DEVICE_INFO_PATH = '/playground/device';
+
+export const DEVICE_INFO_WRITE_PATH = '/playground/device/write';
+
+export const DEVICE_INFO_EDIT_PATH = '/playground/device/:deviceReportId/edit';
+
 export const SNAPS_PATH = '/snaps';
 
 export const PICS_PATH = '/snaps/pics';
 
 export const PICS_WRITE_PATH = '/snaps/pics/write';
+
+export const PICS_EDIT_PATH = '/snaps/pics/:postId/edit';
 
 export const STORAGE_KEYS = {
   theme: 'anoju-theme',

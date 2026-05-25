@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import {
   DEFAULT_HOME_PATH,
+  DEVICE_INFO_PATH,
   FREE_BOARD_PATH,
   LOGIN_PATH,
   MY_PAGE_PATH,
@@ -48,6 +49,7 @@ const Menu = () => {
       items: [
         { label: 'playground Home', path: PLAYGROUND_PATH },
         { label: '자유게시판', path: FREE_BOARD_PATH },
+        { label: '디바이스정보', path: DEVICE_INFO_PATH },
       ],
     },
     {

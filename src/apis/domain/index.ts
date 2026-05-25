@@ -2,6 +2,7 @@ export { bookmarkApi } from './bookmarkApi';
 export { commentApi } from './commentApi';
 export { communityApi } from './communityApi';
 export { createCrudApi } from './createCrudApi';
+export { deviceReportApi } from './deviceReportApi';
 export { noticeApi } from './noticeApi';
 export { postApi } from './postApi';
 export { reactionApi, type ReactionType } from './reactionApi';

@@ -61,6 +61,10 @@ export const RichTextEditor = ({
   }, [editor, value]);
 
   const handleImageButtonClick = () => {
+    if (!onImagesAdd) {
+      return;
+    }
+
     imageInputRef.current?.click();
   };
 
@@ -159,19 +163,23 @@ export const RichTextEditor = ({
           size="sm"
           onClick={() => editor?.chain().focus().unsetLink().run()}
         />
-        <IconButton label="이미지 첨부" icon={<ImagePlus size={18} />} size="sm" onClick={handleImageButtonClick} />
+        {onImagesAdd ? (
+          <IconButton label="이미지 첨부" icon={<ImagePlus size={18} />} size="sm" onClick={handleImageButtonClick} />
+        ) : null}
         <IconButton label="실행 취소" icon={<Undo2 size={18} />} size="sm" onClick={() => editor?.chain().focus().undo().run()} />
         <IconButton label="다시 실행" icon={<Redo2 size={18} />} size="sm" onClick={() => editor?.chain().focus().redo().run()} />
       </div>
       <EditorContent editor={editor} />
-      <input
-        ref={imageInputRef}
-        type="file"
-        accept="image/jpeg,image/png,image/webp"
-        multiple
-        className="rich-text-editor__file"
-        onChange={handleImagesChange}
-      />
+      {onImagesAdd ? (
+        <input
+          ref={imageInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          multiple
+          className="rich-text-editor__file"
+          onChange={handleImagesChange}
+        />
+      ) : null}
     </div>
   );
 };

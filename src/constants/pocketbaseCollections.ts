@@ -7,6 +7,7 @@ export const PB_COLLECTIONS = {
   bookmarks: 'bookmarks',
   reports: 'reports',
   notices: 'notices',
+  deviceReports: 'device_reports',
 } as const;
 
 export type PocketBaseCollectionName = (typeof PB_COLLECTIONS)[keyof typeof PB_COLLECTIONS];
@@ -26,3 +27,7 @@ export const REPORT_TARGET_TYPES = ['post', 'comment', 'user'] as const;
 export const REPORT_STATUSES = ['pending', 'reviewed', 'rejected', 'resolved'] as const;
 
 export const NOTICE_PLACEMENTS = ['global', 'board', 'gallery'] as const;
+
+export const DEVICE_REPORT_STATUSES = ['published', 'hidden', 'deleted'] as const;
+
+export const DEVICE_ORIENTATIONS = ['portrait', 'landscape'] as const;
