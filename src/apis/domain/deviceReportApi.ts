@@ -34,6 +34,15 @@ export interface UpdateDeviceReportParams {
   reportId: string;
   manufacturer: string;
   model: string;
+  screenWidth: number;
+  screenHeight: number;
+  windowWidthMin: number;
+  windowWidthMax: number;
+  windowHeightMin: number;
+  windowHeightMax: number;
+  devicePixelRatio: number;
+  orientation: DeviceOrientation;
+  userAgent: string;
   displaySetting: number;
   description?: string;
 }
@@ -103,13 +112,37 @@ export const deviceReportApi = {
       );
     }),
 
-  updateReport: ({ reportId, manufacturer, model, displaySetting, description }: UpdateDeviceReportParams) =>
+  updateReport: ({
+    reportId,
+    manufacturer,
+    model,
+    screenWidth,
+    screenHeight,
+    windowWidthMin,
+    windowWidthMax,
+    windowHeightMin,
+    windowHeightMax,
+    devicePixelRatio,
+    orientation,
+    userAgent,
+    displaySetting,
+    description,
+  }: UpdateDeviceReportParams) =>
     runApi(() =>
       pb.collection(PB_COLLECTIONS.deviceReports).update<DeviceReportRecord>(
         reportId,
         {
           manufacturer: manufacturer.trim(),
           model: model.trim(),
+          screenWidth,
+          screenHeight,
+          windowWidthMin,
+          windowWidthMax,
+          windowHeightMin,
+          windowHeightMax,
+          devicePixelRatio,
+          orientation,
+          userAgent: userAgent.trim(),
           displaySetting,
           description: description?.trim() ?? '',
         },

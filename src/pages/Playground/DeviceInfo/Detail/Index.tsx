@@ -122,7 +122,13 @@ const DeviceInfoDetail = () => {
         </div>
         <div>
           <dt>디스플레이설정</dt>
-          <dd>{report.displaySetting}</dd>
+          <dd>
+            <strong>{report.displaySetting}</strong>
+            <span className="device-detail__hint">
+              Android 등 설정의 화면 크기/표시 크기 단계 기준입니다. 설정에서 가장 왼쪽을 1로 보고 현재 단계를
+              입력합니다. iPhone나 iPad등 설정을 바꿀수 없을경우 0으로 입력해주세요.
+            </span>
+          </dd>
         </div>
         <div className="device-detail__row--wide">
           <dt>userAgent</dt>

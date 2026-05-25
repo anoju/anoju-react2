@@ -8,6 +8,10 @@ export const PB_COLLECTIONS = {
   reports: 'reports',
   notices: 'notices',
   deviceReports: 'device_reports',
+  picLogs: 'pic_logs',
+  picLogEntries: 'pic_log_entries',
+  picLogComments: 'pic_log_comments',
+  picLogOrderRequests: 'pic_log_order_requests',
 } as const;
 
 export type PocketBaseCollectionName = (typeof PB_COLLECTIONS)[keyof typeof PB_COLLECTIONS];
@@ -31,3 +35,9 @@ export const NOTICE_PLACEMENTS = ['global', 'board', 'gallery'] as const;
 export const DEVICE_REPORT_STATUSES = ['published', 'hidden', 'deleted'] as const;
 
 export const DEVICE_ORIENTATIONS = ['portrait', 'landscape'] as const;
+
+export const PIC_LOG_VISIBILITIES = ['private', 'invited', 'link', 'public'] as const;
+
+export const PIC_LOG_STATUSES = ['published', 'hidden', 'deleted'] as const;
+
+export const PIC_LOG_ORDER_REQUEST_STATUSES = ['pending', 'accepted', 'rejected', 'expired'] as const;

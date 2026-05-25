@@ -8,7 +8,7 @@ import { useAuthStore } from '@/stores/authStore';
 const MyPage = () => {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
-  const displayName = user?.name ?? user?.email ?? '사용자';
+  const displayName = user?.nickname ?? user?.email ?? '사용자';
 
   const handleLogout = async () => {
     const confirmed = await confirm('로그아웃하시겠습니까?', {

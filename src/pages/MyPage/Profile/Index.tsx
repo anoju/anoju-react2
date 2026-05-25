@@ -6,6 +6,7 @@ import { authApi, getUserMessage } from '@/apis';
 import type { LinkedOAuthProvider, SupportedOAuthProvider } from '@/apis/authApi';
 import { useOAuthProviders } from '@/hooks/useOAuthProviders';
 import { useAuthStore } from '@/stores/authStore';
+import { isNicknameConflictMessage, normalizeNickname, validateNickname } from '@/utils/nickname';
 import { UPLOAD_LIMITS, validateImageFile } from '@/utils/uploadPolicy';
 
 const CROP_SIZE = 512;
@@ -14,7 +15,8 @@ const MyPageProfile = () => {
   const user = useAuthStore((state) => state.user);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cropCanvasRef = useRef<HTMLCanvasElement>(null);
-  const [name, setName] = useState(user?.name ?? '');
+  const [nickname, setNickname] = useState(user?.nickname ?? '');
+  const [nicknameError, setNicknameError] = useState('');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreviewUrl, setAvatarPreviewUrl] = useState<string | undefined>(user?.avatarUrl);
   const [cropSourceUrl, setCropSourceUrl] = useState<string | null>(null);
@@ -54,9 +56,9 @@ const MyPageProfile = () => {
   }, [loadLinkedProviders]);
 
   useEffect(() => {
-    setName(user?.name ?? '');
+    setNickname(user?.nickname ?? '');
     setAvatarPreviewUrl(user?.avatarUrl);
-  }, [user?.avatarUrl, user?.name]);
+  }, [user?.avatarUrl, user?.nickname]);
 
   useEffect(
     () => () => {
@@ -221,14 +223,44 @@ const MyPageProfile = () => {
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
+    const nextNicknameError = validateNickname(nickname);
+
+    if (nextNicknameError) {
+      setNicknameError(nextNicknameError);
+      toast(nextNicknameError, { tone: 'warning' });
+      return;
+    }
+
     setSubmitting(true);
 
     try {
-      await authApi.updateProfile({ name: name.trim() || undefined, avatarFile: avatarFile ?? undefined });
+      const normalizedNickname = normalizeNickname(nickname);
+      const nicknameAvailable = await authApi
+        .isNicknameAvailable(normalizedNickname, user?.id)
+        .catch(() => true);
+
+      if (!nicknameAvailable) {
+        setNicknameError('이미 사용 중인 닉네임입니다.');
+        toast('이미 사용 중인 닉네임입니다.', { tone: 'warning' });
+        return;
+      }
+
+      await authApi.updateProfile({
+        nickname: normalizedNickname,
+        avatarFile: avatarFile ?? undefined,
+      });
       setAvatarFile(null);
       toast('내 정보가 저장되었습니다.', { tone: 'success' });
     } catch (error) {
-      toast(getUserMessage(error), { tone: 'danger' });
+      const message = getUserMessage(error);
+
+      if (isNicknameConflictMessage(message)) {
+        setNicknameError('이미 사용 중인 닉네임입니다.');
+        toast('이미 사용 중인 닉네임입니다.', { tone: 'warning' });
+        return;
+      }
+
+      toast(message, { tone: 'danger' });
     } finally {
       setSubmitting(false);
     }
@@ -297,7 +329,7 @@ const MyPageProfile = () => {
     <section className="container my-page">
       <header className="my-page__header">
         <h2>내 정보</h2>
-        <p>{user?.name ?? user?.email ?? '사용자'}님의 정보를 확인하고 수정합니다.</p>
+        <p>{user?.nickname ?? user?.email ?? '사용자'}님의 정보를 확인하고 수정합니다.</p>
       </header>
 
       <dl className="my-page__summary">
@@ -341,7 +373,7 @@ const MyPageProfile = () => {
       <form className="my-page__form" onSubmit={handleSubmit}>
         <section className="profile-image-field" aria-labelledby="profile-image-title">
           <div className="profile-image-field__preview">
-            <Avatar src={avatarPreviewUrl} name={name || user?.email} size="xl" />
+            <Avatar src={avatarPreviewUrl} name={nickname || user?.email} size="xl" />
           </div>
           <div className="profile-image-field__content">
             <h3 id="profile-image-title">프로필 이미지</h3>
@@ -371,7 +403,19 @@ const MyPageProfile = () => {
             </div>
           </div>
         </section>
-        <Input label="이름" value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" />
+        <Input
+          label="닉네임"
+          value={nickname}
+          onBlur={() => setNicknameError(validateNickname(nickname))}
+          onChange={(event) => {
+            setNickname(normalizeNickname(event.target.value));
+            setNicknameError('');
+          }}
+          autoComplete="nickname"
+          description="댓글 태그에 사용되며 중복될 수 없습니다."
+          error={nicknameError}
+          required
+        />
         <Button type="submit" loading={submitting}>
           내 정보 저장
         </Button>

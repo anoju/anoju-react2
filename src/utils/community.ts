@@ -15,7 +15,7 @@ export const getRecordAuthorName = (record: { expand?: Record<string, unknown>; 
   const author = getRecordAuthor(record);
 
   if (author) {
-    const name = author.name ?? author.nickname ?? author.email;
+    const name = author.nickname ?? author.email;
 
     if (typeof name === 'string' && name.trim()) {
       return name;

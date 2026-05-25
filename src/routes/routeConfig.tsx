@@ -21,6 +21,11 @@ import Pics from "@/pages/Snaps/Pics/Index";
 import PicsDetail from "@/pages/Snaps/Pics/Detail/Index";
 import PicsEdit from "@/pages/Snaps/Pics/Edit/Index";
 import PicsWrite from "@/pages/Snaps/Pics/Write/Index";
+import PicLog from "@/pages/Snaps/PicLog/Index";
+import PicLogAdd from "@/pages/Snaps/PicLog/Add/Index";
+import PicLogDetail from "@/pages/Snaps/PicLog/Detail/Index";
+import PicLogEdit from "@/pages/Snaps/PicLog/Edit/Index";
+import PicLogNew from "@/pages/Snaps/PicLog/New/Index";
 import About from "@/pages/Static/About/Index";
 import NotFound from "@/pages/System/NotFound/Index";
 import {
@@ -40,6 +45,10 @@ import {
   PICS_PATH,
   PICS_EDIT_PATH,
   PICS_WRITE_PATH,
+  PIC_LOG_ADD_PATH,
+  PIC_LOG_EDIT_PATH,
+  PIC_LOG_NEW_PATH,
+  PIC_LOG_PATH,
   PLAYGROUND_PATH,
   REGISTER_PATH,
   SETTINGS_PATH,
@@ -417,6 +426,80 @@ export const routeConfig = [
     },
     layout: {
       header: defaultHeader("Pics 수정"),
+      floatingMenu: defaultFloatingMenu,
+    },
+    requiresAuth: true,
+    roles: ["user", "admin"],
+  },
+  {
+    id: "pic-log",
+    path: PIC_LOG_PATH,
+    element: <PicLog />,
+    meta: {
+      title: "picLog",
+      description: "시간 챕터별 하루 사진 로그 목록 화면입니다.",
+    },
+    layout: {
+      header: defaultHeader("picLog"),
+      floatingMenu: defaultFloatingMenu,
+    },
+  },
+  {
+    id: "pic-log-new",
+    path: PIC_LOG_NEW_PATH,
+    element: <PicLogNew />,
+    meta: {
+      title: "picLog 만들기",
+      description: "새 picLog를 만드는 화면입니다.",
+      robots: "noindex",
+    },
+    layout: {
+      header: defaultHeader("picLog 만들기"),
+      floatingMenu: defaultFloatingMenu,
+    },
+    requiresAuth: true,
+    roles: ["user", "admin"],
+  },
+  {
+    id: "pic-log-detail",
+    path: `${PIC_LOG_PATH}/:logId`,
+    element: <PicLogDetail />,
+    meta: {
+      title: "picLog 상세",
+      description: "시간 챕터별 picLog 상세 화면입니다.",
+    },
+    layout: {
+      header: defaultHeader("picLog"),
+      floatingMenu: defaultFloatingMenu,
+    },
+  },
+  {
+    id: "pic-log-add",
+    path: PIC_LOG_ADD_PATH,
+    element: <PicLogAdd />,
+    meta: {
+      title: "picLog 사진 추가",
+      description: "picLog 시간 챕터에 사진을 추가하는 화면입니다.",
+      robots: "noindex",
+    },
+    layout: {
+      header: defaultHeader("사진 추가"),
+      floatingMenu: defaultFloatingMenu,
+    },
+    requiresAuth: true,
+    roles: ["user", "admin"],
+  },
+  {
+    id: "pic-log-edit",
+    path: PIC_LOG_EDIT_PATH,
+    element: <PicLogEdit />,
+    meta: {
+      title: "picLog 사진 수정",
+      description: "picLog 사진과 메모를 수정하는 화면입니다.",
+      robots: "noindex",
+    },
+    layout: {
+      header: defaultHeader("사진 수정"),
       floatingMenu: defaultFloatingMenu,
     },
     requiresAuth: true,

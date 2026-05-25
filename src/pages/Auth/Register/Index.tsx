@@ -6,10 +6,12 @@ import { authApi } from '@/apis';
 import { DEFAULT_HOME_PATH, LOGIN_PATH } from '@/constants/app';
 import { getUserMessage } from '@/apis/apiError';
 import { useOAuthProviders } from '@/hooks/useOAuthProviders';
+import { isNicknameConflictMessage, normalizeNickname, validateNickname } from '@/utils/nickname';
 
 const Register = () => {
   const navigate = useNavigate();
-  const [name, setName] = useState('');
+  const [nickname, setNickname] = useState('');
+  const [nicknameError, setNicknameError] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
@@ -18,6 +20,8 @@ const Register = () => {
   const { providers, loading: providersLoading } = useOAuthProviders();
 
   const validate = () => {
+    const nextNicknameError = validateNickname(nickname);
+    if (nextNicknameError) return nextNicknameError;
     if (!email.trim()) return '이메일을 입력해주세요.';
     if (!password) return '비밀번호를 입력해주세요.';
     if (password.length < 8) return '비밀번호는 8자 이상 입력해주세요.';
@@ -38,17 +42,27 @@ const Register = () => {
     setSubmitting(true);
 
     try {
+      const normalizedNickname = normalizeNickname(nickname);
+
       await authApi.register({
         email: email.trim(),
         password,
         passwordConfirm,
-        name: name.trim() || undefined,
+        nickname: normalizedNickname,
         turnstileToken,
       });
       toast('회원가입이 완료되었습니다. 이메일 인증을 확인해주세요.', { tone: 'success' });
       navigate(LOGIN_PATH, { replace: true });
     } catch (submitError) {
-      toast(getUserMessage(submitError), { tone: 'danger' });
+      const message = getUserMessage(submitError);
+
+      if (isNicknameConflictMessage(message)) {
+        setNicknameError('이미 사용 중인 닉네임입니다.');
+        toast('이미 사용 중인 닉네임입니다.', { tone: 'warning' });
+        return;
+      }
+
+      toast(message, { tone: 'danger' });
     } finally {
       setSubmitting(false);
     }
@@ -62,7 +76,19 @@ const Register = () => {
       </header>
 
       <form className="auth-page__form" onSubmit={handleSubmit}>
-        <Input label="이름" value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" />
+        <Input
+          label="닉네임"
+          value={nickname}
+          onBlur={() => setNicknameError(validateNickname(nickname))}
+          onChange={(event) => {
+            setNickname(normalizeNickname(event.target.value));
+            setNicknameError('');
+          }}
+          autoComplete="nickname"
+          description="댓글 태그에 사용되며 중복될 수 없습니다."
+          error={nicknameError}
+          required
+        />
         <Input
           label="이메일"
           type="email"

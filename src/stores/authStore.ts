@@ -8,7 +8,7 @@ const USERS_COLLECTION = 'users';
 interface AuthUser {
   id: string;
   email?: string;
-  name?: string;
+  nickname?: string;
   avatar?: string;
   avatarUrl?: string;
   role: UserRole;
@@ -39,7 +39,7 @@ const getUserFromStore = (): AuthUser | null => {
   return {
     id: model.id,
     email: typeof model.email === 'string' ? model.email : undefined,
-    name: typeof model.name === 'string' ? model.name : undefined,
+    nickname: typeof model.nickname === 'string' ? model.nickname : undefined,
     avatar: typeof model.avatar === 'string' ? model.avatar : undefined,
     avatarUrl: typeof model.avatar === 'string' && model.avatar ? pb.files.getURL(model, model.avatar) : undefined,
     role,

@@ -10,6 +10,9 @@ import type {
   USER_STATUSES,
   DEVICE_ORIENTATIONS,
   DEVICE_REPORT_STATUSES,
+  PIC_LOG_ORDER_REQUEST_STATUSES,
+  PIC_LOG_STATUSES,
+  PIC_LOG_VISIBILITIES,
 } from '@/constants/pocketbaseCollections';
 
 export type UserRoleValue = (typeof USER_ROLES)[number];
@@ -31,6 +34,12 @@ export type NoticePlacement = (typeof NOTICE_PLACEMENTS)[number];
 export type DeviceReportStatus = (typeof DEVICE_REPORT_STATUSES)[number];
 
 export type DeviceOrientation = (typeof DEVICE_ORIENTATIONS)[number];
+
+export type PicLogVisibility = (typeof PIC_LOG_VISIBILITIES)[number];
+
+export type PicLogStatus = (typeof PIC_LOG_STATUSES)[number];
+
+export type PicLogOrderRequestStatus = (typeof PIC_LOG_ORDER_REQUEST_STATUSES)[number];
 
 export type AppRecord = RecordModel & {
   title?: string;
@@ -59,7 +68,6 @@ export interface SearchParamsState {
 
 export interface UserRecord extends RecordModel {
   email?: string;
-  name?: string;
   nickname?: string;
   avatar?: string;
   bio?: string;
@@ -152,4 +160,47 @@ export interface DeviceReportRecord extends RecordModel {
   status: DeviceReportStatus;
   deleted: boolean;
   deletedAt?: string;
+}
+
+export interface PicLogRecord extends RecordModel {
+  title: string;
+  logDate: string;
+  author: string;
+  participants: string[];
+  participantOrder: string[];
+  visibility: PicLogVisibility;
+  status: PicLogStatus;
+  deleted: boolean;
+  deletedAt?: string;
+}
+
+export interface PicLogEntryRecord extends RecordModel {
+  log: string;
+  author: string;
+  logDate: string;
+  chapter: string;
+  image: string;
+  alt?: string;
+  memo: string;
+  deleted: boolean;
+  deletedAt?: string;
+}
+
+export interface PicLogCommentRecord extends RecordModel {
+  log: string;
+  chapter: string;
+  author: string;
+  content: string;
+  taggedUser?: string;
+  parentComment?: string;
+  status: CommentStatus;
+  deleted: boolean;
+  deletedAt?: string;
+}
+
+export interface PicLogOrderRequestRecord extends RecordModel {
+  log: string;
+  requester: string;
+  targetUser: string;
+  status: PicLogOrderRequestStatus;
 }

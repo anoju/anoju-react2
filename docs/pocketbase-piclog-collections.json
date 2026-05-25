@@ -1,0 +1,471 @@
+[
+  {
+    "id": "anoju_piclogs",
+    "name": "pic_logs",
+    "type": "base",
+    "system": false,
+    "listRule": "status = \"published\" && deleted = false && (visibility = \"public\" || visibility = \"link\" || participants ?= @request.auth.id || author = @request.auth.id || @request.auth.role = \"admin\")",
+    "viewRule": "status = \"published\" && deleted = false && (visibility = \"public\" || visibility = \"link\" || participants ?= @request.auth.id || author = @request.auth.id || @request.auth.role = \"admin\")",
+    "createRule": "@request.auth.id != \"\" && @request.auth.verified = true",
+    "updateRule": "(author = @request.auth.id && status != \"hidden\") || @request.auth.role = \"admin\"",
+    "deleteRule": "@request.auth.role = \"admin\"",
+    "fields": [
+      {
+        "id": "txt_pl_title",
+        "name": "title",
+        "type": "text",
+        "system": false,
+        "required": true,
+        "presentable": true,
+        "hidden": false,
+        "min": 1,
+        "max": 80,
+        "pattern": "",
+        "autogeneratePattern": ""
+      },
+      {
+        "id": "txt_pl_date",
+        "name": "logDate",
+        "type": "text",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "min": 10,
+        "max": 10,
+        "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+        "autogeneratePattern": ""
+      },
+      {
+        "id": "rel_pl_author",
+        "name": "author",
+        "type": "relation",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "collectionId": "_pb_users_auth_",
+        "cascadeDelete": false,
+        "minSelect": 1,
+        "maxSelect": 1
+      },
+      {
+        "id": "rel_pl_parts",
+        "name": "participants",
+        "type": "relation",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "collectionId": "_pb_users_auth_",
+        "cascadeDelete": false,
+        "minSelect": 1,
+        "maxSelect": 30
+      },
+      {
+        "id": "json_pl_order",
+        "name": "participantOrder",
+        "type": "json",
+        "system": false,
+        "required": false,
+        "presentable": false,
+        "hidden": false,
+        "maxSize": 200000
+      },
+      {
+        "id": "sel_pl_vis",
+        "name": "visibility",
+        "type": "select",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "maxSelect": 1,
+        "values": ["private", "invited", "link", "public"]
+      },
+      {
+        "id": "sel_pl_stat",
+        "name": "status",
+        "type": "select",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "maxSelect": 1,
+        "values": ["published", "hidden", "deleted"]
+      },
+      {
+        "id": "bool_pl_del",
+        "name": "deleted",
+        "type": "bool",
+        "system": false,
+        "required": false,
+        "presentable": false,
+        "hidden": false
+      },
+      {
+        "id": "date_pl_delat",
+        "name": "deletedAt",
+        "type": "date",
+        "system": false,
+        "required": false,
+        "presentable": false,
+        "hidden": false,
+        "min": "",
+        "max": ""
+      }
+    ],
+    "indexes": [
+      "CREATE INDEX `idx_pic_logs_date` ON `pic_logs` (`logDate`)",
+      "CREATE INDEX `idx_pic_logs_status_deleted` ON `pic_logs` (`status`, `deleted`)"
+    ]
+  },
+  {
+    "id": "anoju_plentry",
+    "name": "pic_log_entries",
+    "type": "base",
+    "system": false,
+    "listRule": "deleted = false && log.status = \"published\" && log.deleted = false && (log.visibility = \"public\" || log.visibility = \"link\" || log.participants ?= @request.auth.id || log.author = @request.auth.id || @request.auth.role = \"admin\")",
+    "viewRule": "deleted = false && log.status = \"published\" && log.deleted = false && (log.visibility = \"public\" || log.visibility = \"link\" || log.participants ?= @request.auth.id || log.author = @request.auth.id || @request.auth.role = \"admin\")",
+    "createRule": "@request.auth.id != \"\" && @request.auth.verified = true && log.participants ?= @request.auth.id && log.status = \"published\" && log.deleted = false",
+    "updateRule": "author = @request.auth.id || log.author = @request.auth.id || @request.auth.role = \"admin\"",
+    "deleteRule": "@request.auth.role = \"admin\"",
+    "fields": [
+      {
+        "id": "rel_ple_log",
+        "name": "log",
+        "type": "relation",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "collectionId": "anoju_piclogs",
+        "cascadeDelete": true,
+        "minSelect": 1,
+        "maxSelect": 1
+      },
+      {
+        "id": "rel_ple_author",
+        "name": "author",
+        "type": "relation",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "collectionId": "_pb_users_auth_",
+        "cascadeDelete": false,
+        "minSelect": 1,
+        "maxSelect": 1
+      },
+      {
+        "id": "txt_ple_date",
+        "name": "logDate",
+        "type": "text",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "min": 10,
+        "max": 10,
+        "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+        "autogeneratePattern": ""
+      },
+      {
+        "id": "sel_ple_chap",
+        "name": "chapter",
+        "type": "select",
+        "system": false,
+        "required": true,
+        "presentable": true,
+        "hidden": false,
+        "maxSelect": 1,
+        "values": [
+          "08:00",
+          "09:00",
+          "10:00",
+          "11:00",
+          "12:00",
+          "13:00",
+          "14:00",
+          "15:00",
+          "16:00",
+          "17:00",
+          "18:00",
+          "19:00",
+          "20:00",
+          "21:00",
+          "22:00"
+        ]
+      },
+      {
+        "id": "file_ple_img",
+        "name": "image",
+        "type": "file",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "maxSelect": 1,
+        "maxSize": 5242880,
+        "mimeTypes": ["image/jpeg", "image/png", "image/webp"],
+        "thumbs": [],
+        "protected": false
+      },
+      {
+        "id": "txt_ple_alt",
+        "name": "alt",
+        "type": "text",
+        "system": false,
+        "required": false,
+        "presentable": false,
+        "hidden": false,
+        "min": 0,
+        "max": 200,
+        "pattern": "",
+        "autogeneratePattern": ""
+      },
+      {
+        "id": "txt_ple_memo",
+        "name": "memo",
+        "type": "text",
+        "system": false,
+        "required": false,
+        "presentable": false,
+        "hidden": false,
+        "min": 0,
+        "max": 500,
+        "pattern": "",
+        "autogeneratePattern": ""
+      },
+      {
+        "id": "bool_ple_del",
+        "name": "deleted",
+        "type": "bool",
+        "system": false,
+        "required": false,
+        "presentable": false,
+        "hidden": false
+      },
+      {
+        "id": "date_ple_delat",
+        "name": "deletedAt",
+        "type": "date",
+        "system": false,
+        "required": false,
+        "presentable": false,
+        "hidden": false,
+        "min": "",
+        "max": ""
+      }
+    ],
+    "indexes": [
+      "CREATE INDEX `idx_pic_log_entries_log_date` ON `pic_log_entries` (`log`, `logDate`)",
+      "CREATE INDEX `idx_pic_log_entries_chapter` ON `pic_log_entries` (`chapter`)"
+    ]
+  },
+  {
+    "id": "anoju_plcom",
+    "name": "pic_log_comments",
+    "type": "base",
+    "system": false,
+    "listRule": "status = \"published\" && deleted = false && log.status = \"published\" && log.deleted = false && (log.visibility = \"public\" || log.visibility = \"link\" || log.participants ?= @request.auth.id || log.author = @request.auth.id || @request.auth.role = \"admin\")",
+    "viewRule": "status = \"published\" && deleted = false && log.status = \"published\" && log.deleted = false && (log.visibility = \"public\" || log.visibility = \"link\" || log.participants ?= @request.auth.id || log.author = @request.auth.id || @request.auth.role = \"admin\")",
+    "createRule": "@request.auth.id != \"\" && @request.auth.verified = true && log.participants ?= @request.auth.id",
+    "updateRule": "author = @request.auth.id || @request.auth.role = \"admin\"",
+    "deleteRule": "@request.auth.role = \"admin\"",
+    "fields": [
+      {
+        "id": "rel_plc_log",
+        "name": "log",
+        "type": "relation",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "collectionId": "anoju_piclogs",
+        "cascadeDelete": true,
+        "minSelect": 1,
+        "maxSelect": 1
+      },
+      {
+        "id": "sel_plc_chap",
+        "name": "chapter",
+        "type": "select",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "maxSelect": 1,
+        "values": [
+          "08:00",
+          "09:00",
+          "10:00",
+          "11:00",
+          "12:00",
+          "13:00",
+          "14:00",
+          "15:00",
+          "16:00",
+          "17:00",
+          "18:00",
+          "19:00",
+          "20:00",
+          "21:00",
+          "22:00"
+        ]
+      },
+      {
+        "id": "rel_plc_author",
+        "name": "author",
+        "type": "relation",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "collectionId": "_pb_users_auth_",
+        "cascadeDelete": false,
+        "minSelect": 1,
+        "maxSelect": 1
+      },
+      {
+        "id": "txt_plc_body",
+        "name": "content",
+        "type": "text",
+        "system": false,
+        "required": true,
+        "presentable": true,
+        "hidden": false,
+        "min": 1,
+        "max": 1000,
+        "pattern": "",
+        "autogeneratePattern": ""
+      },
+      {
+        "id": "rel_plc_tag",
+        "name": "taggedUser",
+        "type": "relation",
+        "system": false,
+        "required": false,
+        "presentable": false,
+        "hidden": false,
+        "collectionId": "_pb_users_auth_",
+        "cascadeDelete": false,
+        "minSelect": 0,
+        "maxSelect": 1
+      },
+      {
+        "id": "rel_plc_parent",
+        "name": "parentComment",
+        "type": "relation",
+        "system": false,
+        "required": false,
+        "presentable": false,
+        "hidden": false,
+        "collectionId": "anoju_plcom",
+        "cascadeDelete": false,
+        "minSelect": 0,
+        "maxSelect": 1
+      },
+      {
+        "id": "sel_plc_stat",
+        "name": "status",
+        "type": "select",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "maxSelect": 1,
+        "values": ["published", "hidden", "deleted"]
+      },
+      {
+        "id": "bool_plc_del",
+        "name": "deleted",
+        "type": "bool",
+        "system": false,
+        "required": false,
+        "presentable": false,
+        "hidden": false
+      },
+      {
+        "id": "date_plc_delat",
+        "name": "deletedAt",
+        "type": "date",
+        "system": false,
+        "required": false,
+        "presentable": false,
+        "hidden": false,
+        "min": "",
+        "max": ""
+      }
+    ],
+    "indexes": [
+      "CREATE INDEX `idx_pic_log_comments_log_chapter` ON `pic_log_comments` (`log`, `chapter`)"
+    ]
+  },
+  {
+    "id": "anoju_plorder",
+    "name": "pic_log_order_requests",
+    "type": "base",
+    "system": false,
+    "listRule": "log.participants ?= @request.auth.id || @request.auth.role = \"admin\"",
+    "viewRule": "log.participants ?= @request.auth.id || @request.auth.role = \"admin\"",
+    "createRule": "@request.auth.id != \"\" && @request.auth.verified = true && log.participants ?= @request.auth.id",
+    "updateRule": "targetUser = @request.auth.id || @request.auth.role = \"admin\"",
+    "deleteRule": "@request.auth.role = \"admin\"",
+    "fields": [
+      {
+        "id": "rel_plo_log",
+        "name": "log",
+        "type": "relation",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "collectionId": "anoju_piclogs",
+        "cascadeDelete": true,
+        "minSelect": 1,
+        "maxSelect": 1
+      },
+      {
+        "id": "rel_plo_req",
+        "name": "requester",
+        "type": "relation",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "collectionId": "_pb_users_auth_",
+        "cascadeDelete": false,
+        "minSelect": 1,
+        "maxSelect": 1
+      },
+      {
+        "id": "rel_plo_target",
+        "name": "targetUser",
+        "type": "relation",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "collectionId": "_pb_users_auth_",
+        "cascadeDelete": false,
+        "minSelect": 1,
+        "maxSelect": 1
+      },
+      {
+        "id": "sel_plo_stat",
+        "name": "status",
+        "type": "select",
+        "system": false,
+        "required": true,
+        "presentable": true,
+        "hidden": false,
+        "maxSelect": 1,
+        "values": ["pending", "accepted", "rejected", "expired"]
+      }
+    ],
+    "indexes": [
+      "CREATE UNIQUE INDEX `idx_pic_log_order_pending` ON `pic_log_order_requests` (`log`, `requester`, `targetUser`) WHERE status = 'pending'"
+    ]
+  }
+]

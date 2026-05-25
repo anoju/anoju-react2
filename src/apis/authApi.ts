@@ -3,6 +3,8 @@ import { PB_COLLECTIONS } from '@/constants/pocketbaseCollections';
 import { setAutoLoginEnabled } from '@/lib/authPersistence';
 import { pb } from '@/lib/pocketBase';
 import { useAuthStore } from '@/stores/authStore';
+import type { UserRecord } from '@/types/domain';
+import { createTemporaryNickname, normalizeNickname } from '@/utils/nickname';
 import { runApi } from './apiClient';
 
 const USERS_COLLECTION = PB_COLLECTIONS.users;
@@ -43,12 +45,12 @@ interface RegisterParams {
   email: string;
   password: string;
   passwordConfirm: string;
-  name?: string;
+  nickname: string;
   turnstileToken: string;
 }
 
 interface UpdateProfileParams {
-  name?: string;
+  nickname?: string;
   avatarFile?: File;
   removeAvatar?: boolean;
 }
@@ -70,6 +72,8 @@ const getProviderFromRecord = (record: Record<string, unknown>) => {
   return OAUTH_PROVIDER_BY_PB_PROVIDER[rawProvider] ?? (isSupportedOAuthProvider(rawProvider) ? rawProvider : null);
 };
 
+const escapeFilterValue = (value: string) => value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+
 export const authApi = {
   login: ({ identity, password, autoLogin }: LoginParams) =>
     runApi(async () => {
@@ -87,14 +91,41 @@ export const authApi = {
   register: (params: RegisterParams) =>
     runApi(async () => {
       const { turnstileToken, ...createParams } = params;
+      const nickname = normalizeNickname(createParams.nickname);
       const user = await pb.collection(USERS_COLLECTION).create({
         ...createParams,
+        nickname,
         role: DEFAULT_USER_ROLE,
         status: DEFAULT_USER_STATUS,
         turnstileToken,
       });
       await pb.collection(USERS_COLLECTION).requestVerification(params.email);
       return user;
+    }),
+
+  isNicknameAvailable: (nickname: string, excludeUserId?: string) =>
+    runApi(async () => {
+      const normalizedNickname = normalizeNickname(nickname);
+
+      if (!normalizedNickname) {
+        return false;
+      }
+
+      try {
+        const existingUser = await pb
+          .collection(USERS_COLLECTION)
+          .getFirstListItem<UserRecord>(`nickname = "${escapeFilterValue(normalizedNickname)}"`, {
+            $autoCancel: false,
+          });
+
+        return existingUser.id === excludeUserId;
+      } catch (error) {
+        if (error && typeof error === 'object' && 'status' in error && error.status === 404) {
+          return true;
+        }
+
+        throw error;
+      }
     }),
 
   requestEmailVerification: (email: string) =>
@@ -140,6 +171,7 @@ export const authApi = {
         provider: PB_PROVIDER_BY_OAUTH_PROVIDER[provider],
         createData: {
           emailVisibility: false,
+          nickname: createTemporaryNickname(),
           role: DEFAULT_USER_ROLE,
           status: DEFAULT_USER_STATUS,
         },
@@ -185,7 +217,7 @@ export const authApi = {
       return pb.collection(USERS_COLLECTION).unlinkExternalAuth(userId, PB_PROVIDER_BY_OAUTH_PROVIDER[provider]);
     }),
 
-  updateProfile: ({ name, avatarFile, removeAvatar }: UpdateProfileParams) =>
+  updateProfile: ({ nickname, avatarFile, removeAvatar }: UpdateProfileParams) =>
     runApi(async () => {
       const userId = pb.authStore.model?.id;
 
@@ -198,15 +230,15 @@ export const authApi = {
       if (avatarFile) {
         const formData = new FormData();
 
-        if (name !== undefined) {
-          formData.append('name', name);
+        if (nickname !== undefined) {
+          formData.append('nickname', normalizeNickname(nickname));
         }
 
         formData.append('avatar', avatarFile);
         payload = formData;
       } else {
         payload = {
-          ...(name !== undefined ? { name } : {}),
+          ...(nickname !== undefined ? { nickname: normalizeNickname(nickname) } : {}),
           ...(removeAvatar ? { avatar: null } : {}),
         };
       }

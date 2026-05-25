@@ -40,6 +40,14 @@ export const PICS_WRITE_PATH = '/snaps/pics/write';
 
 export const PICS_EDIT_PATH = '/snaps/pics/:postId/edit';
 
+export const PIC_LOG_PATH = '/snaps/pic-log';
+
+export const PIC_LOG_NEW_PATH = '/snaps/pic-log/new';
+
+export const PIC_LOG_ADD_PATH = '/snaps/pic-log/:logId/add';
+
+export const PIC_LOG_EDIT_PATH = '/snaps/pic-log/:logId/edit';
+
 export const STORAGE_KEYS = {
   theme: 'anoju-theme',
   fontMode: 'anoju-font-mode',

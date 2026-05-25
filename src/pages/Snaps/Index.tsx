@@ -1,6 +1,6 @@
 import { Camera, Images } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
-import { PICS_PATH } from '@/constants/app';
+import { PICS_PATH, PIC_LOG_PATH } from '@/constants/app';
 
 const Snaps = () => (
   <section className="container hub-page">
@@ -20,15 +20,15 @@ const Snaps = () => (
           <span>이미지와 캡션을 중심으로 보는 소셜 피드입니다.</span>
         </span>
       </NavLink>
-      <article className="hub-card hub-card--muted">
+      <NavLink to={PIC_LOG_PATH} className="hub-card">
         <span className="hub-card__icon" aria-hidden="true">
           <Images size={22} />
         </span>
         <span className="hub-card__content">
-          <strong>다음 장면</strong>
-          <span>새 갤러리 메뉴가 생기면 이곳에 이어서 추가됩니다.</span>
+          <strong>picLog</strong>
+          <span>친구들과 하루를 시간별 사진 로그로 채웁니다.</span>
         </span>
-      </article>
+      </NavLink>
     </nav>
   </section>
 );
