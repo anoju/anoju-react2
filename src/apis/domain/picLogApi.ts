@@ -46,6 +46,20 @@ interface CreateOrderRequestParams {
   targetUserId: string;
 }
 
+interface JoinPicLogParams {
+  logId: string;
+  invitePassword: string;
+}
+
+const INVITE_PASSWORD_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+const createInvitePassword = () => {
+  const randomValues = new Uint32Array(6);
+  crypto.getRandomValues(randomValues);
+
+  return Array.from(randomValues, (value) => INVITE_PASSWORD_CHARS[value % INVITE_PASSWORD_CHARS.length]).join('');
+};
+
 const getCurrentUserId = () => {
   const userId = pb.authStore.model?.id;
 
@@ -123,6 +137,7 @@ export const picLogApi = {
           author,
           participants: [author],
           participantOrder: [author],
+          invitePassword: createInvitePassword(),
           visibility,
           status: 'published',
           deleted: false,
@@ -266,6 +281,39 @@ export const picLogApi = {
       return pb.collection(PB_COLLECTIONS.picLogs).update<PicLogRecord>(
         log.id,
         { participantOrder: nextOrder },
+        { $autoCancel: false, expand: 'participants,author' },
+      );
+    }),
+
+  regenerateInvitePassword: (logId: string) =>
+    runApi(() =>
+      pb.collection(PB_COLLECTIONS.picLogs).update<PicLogRecord>(
+        logId,
+        { invitePassword: createInvitePassword() },
+        { $autoCancel: false, expand: 'participants,author' },
+      ),
+    ),
+
+  joinLog: ({ logId, invitePassword }: JoinPicLogParams) =>
+    runApi(async () => {
+      const userId = getCurrentUserId();
+      const log = await pb.collection(PB_COLLECTIONS.picLogs).getOne<PicLogRecord>(logId, { $autoCancel: false });
+
+      if (log.participants.includes(userId)) {
+        return log;
+      }
+
+      const participantOrder = Array.isArray(log.participantOrder) ? [...log.participantOrder] : [...log.participants];
+      const nextParticipants = log.participants.includes(userId) ? log.participants : [...log.participants, userId];
+      const nextOrder = participantOrder.includes(userId) ? participantOrder : [...participantOrder, userId];
+
+      return pb.collection(PB_COLLECTIONS.picLogs).update<PicLogRecord>(
+        logId,
+        {
+          participants: nextParticipants,
+          participantOrder: nextOrder,
+          invitePassword,
+        },
         { $autoCancel: false, expand: 'participants,author' },
       );
     }),

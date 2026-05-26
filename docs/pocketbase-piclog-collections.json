@@ -5,9 +5,9 @@
     "type": "base",
     "system": false,
     "listRule": "status = \"published\" && deleted = false && (visibility = \"public\" || visibility = \"link\" || participants ?= @request.auth.id || author = @request.auth.id || @request.auth.role = \"admin\")",
-    "viewRule": "status = \"published\" && deleted = false && (visibility = \"public\" || visibility = \"link\" || participants ?= @request.auth.id || author = @request.auth.id || @request.auth.role = \"admin\")",
+    "viewRule": "status = \"published\" && deleted = false && (visibility = \"public\" || visibility = \"link\" || participants ?= @request.auth.id || author = @request.auth.id || @request.auth.role = \"admin\" || (@request.auth.id != \"\" && @request.auth.verified = true && visibility != \"private\"))",
     "createRule": "@request.auth.id != \"\" && @request.auth.verified = true",
-    "updateRule": "(author = @request.auth.id && status != \"hidden\") || @request.auth.role = \"admin\"",
+    "updateRule": "(author = @request.auth.id && status != \"hidden\") || @request.auth.role = \"admin\" || (@request.auth.id != \"\" && @request.auth.verified = true && visibility != \"private\" && invitePassword = @request.body.invitePassword && @request.body.participants ?= @request.auth.id)",
     "deleteRule": "@request.auth.role = \"admin\"",
     "fields": [
       {
@@ -71,6 +71,19 @@
         "presentable": false,
         "hidden": false,
         "maxSize": 200000
+      },
+      {
+        "id": "txt_pl_invite",
+        "name": "invitePassword",
+        "type": "text",
+        "system": false,
+        "required": false,
+        "presentable": false,
+        "hidden": false,
+        "min": 4,
+        "max": 20,
+        "pattern": "",
+        "autogeneratePattern": ""
       },
       {
         "id": "sel_pl_vis",

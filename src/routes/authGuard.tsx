@@ -21,7 +21,7 @@ export const AuthGuard = ({ route, children }: AuthGuardProps) => {
     return <PageLoading label="인증 상태를 확인하고 있습니다." />;
   }
 
-  if (status === 'anonymous') {
+  if (status === 'anonymous' || (status === 'authenticated' && route.requiresAuth && !user?.id)) {
     const redirect = encodeURIComponent(`${location.pathname}${location.search}`);
     return <Navigate to={`${LOGIN_PATH}?redirect=${redirect}`} replace />;
   }
@@ -32,6 +32,11 @@ export const AuthGuard = ({ route, children }: AuthGuardProps) => {
 
   if (status === 'suspended' || status === 'withdrawn') {
     return <Navigate to={`${LOGIN_PATH}?reason=${status}`} replace />;
+  }
+
+  if (route.requiresAuth && status !== 'authenticated') {
+    const redirect = encodeURIComponent(`${location.pathname}${location.search}`);
+    return <Navigate to={`${LOGIN_PATH}?redirect=${redirect}`} replace />;
   }
 
   if (route.adminOnly && user?.role !== 'admin') {

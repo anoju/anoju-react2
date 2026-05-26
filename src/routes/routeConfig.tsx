@@ -26,6 +26,7 @@ import PicLog from "@/pages/Snaps/PicLog/Index";
 import PicLogAdd from "@/pages/Snaps/PicLog/Add/Index";
 import PicLogDetail from "@/pages/Snaps/PicLog/Detail/Index";
 import PicLogEdit from "@/pages/Snaps/PicLog/Edit/Index";
+import PicLogJoin from "@/pages/Snaps/PicLog/Join/Index";
 import PicLogNew from "@/pages/Snaps/PicLog/New/Index";
 import About from "@/pages/Static/About/Index";
 import NotFound from "@/pages/System/NotFound/Index";
@@ -49,6 +50,7 @@ import {
   PICS_WRITE_PATH,
   PIC_LOG_ADD_PATH,
   PIC_LOG_EDIT_PATH,
+  PIC_LOG_JOIN_PATH,
   PIC_LOG_NEW_PATH,
   PIC_LOG_PATH,
   PLAYGROUND_PATH,
@@ -64,6 +66,7 @@ const defaultHeader = (title: string): HeaderConfig => ({
   alwaysFixed: false,
   hideOnScroll: true,
   showBackButton: true,
+  showNotificationButton: false,
   showHomeButton: true,
   backButton: { type: "history", fallbackPath: DEFAULT_HOME_PATH },
 });
@@ -88,6 +91,7 @@ export const routeConfig = [
         variant: "transparentOverlay",
         showBrandLogo: true,
         showBackButton: false,
+        showNotificationButton: true,
         showHomeButton: false,
       },
       floatingMenu: {
@@ -473,6 +477,22 @@ export const routeConfig = [
     },
     layout: {
       header: defaultHeader("picLog 만들기"),
+      floatingMenu: defaultFloatingMenu,
+    },
+    requiresAuth: true,
+    roles: ["user", "admin"],
+  },
+  {
+    id: "pic-log-join",
+    path: PIC_LOG_JOIN_PATH,
+    element: <PicLogJoin />,
+    meta: {
+      title: "picLog 초대 입장",
+      description: "초대 패스워드로 picLog에 입장하는 화면입니다.",
+      robots: "noindex",
+    },
+    layout: {
+      header: defaultHeader("picLog 초대"),
       floatingMenu: defaultFloatingMenu,
     },
     requiresAuth: true,

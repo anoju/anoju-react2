@@ -2,7 +2,7 @@ import type React from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Trash2, Upload } from 'lucide-react';
 import { Avatar, Button, Dialog, Input, Slider, SocialLoginButtons, confirm, toast } from '@/components';
-import { authApi, getUserMessage } from '@/apis';
+import { authApi, getUserMessage, toAppError } from '@/apis';
 import type { LinkedOAuthProvider, SupportedOAuthProvider } from '@/apis/authApi';
 import { useOAuthProviders } from '@/hooks/useOAuthProviders';
 import { useAuthStore } from '@/stores/authStore';
@@ -253,8 +253,10 @@ const MyPageProfile = () => {
       toast('내 정보가 저장되었습니다.', { tone: 'success' });
     } catch (error) {
       const message = getUserMessage(error);
+      const appError = toAppError(error);
+      const originalMessage = appError.rawMessage ?? appError.message;
 
-      if (isNicknameConflictMessage(message)) {
+      if (isNicknameConflictMessage(originalMessage)) {
         setNicknameError('이미 사용 중인 닉네임입니다.');
         toast('이미 사용 중인 닉네임입니다.', { tone: 'warning' });
         return;

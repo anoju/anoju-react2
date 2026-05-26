@@ -1,4 +1,3 @@
-import type { UnsubscribeFunc } from 'pocketbase';
 import { PB_COLLECTIONS } from '@/constants/pocketbaseCollections';
 import { MY_PAGE_NOTIFICATIONS_PATH } from '@/constants/app';
 import { pb } from '@/lib/pocketBase';
@@ -167,24 +166,6 @@ export const notificationApi = {
           targetId,
         }),
       ),
-    );
-  },
-
-  subscribeMine: async (onChange: () => void): Promise<UnsubscribeFunc | null> => {
-    const userId = pb.authStore.model?.id;
-
-    if (!userId) {
-      return null;
-    }
-
-    return pb.collection(PB_COLLECTIONS.notifications).subscribe(
-      '*',
-      () => {
-        onChange();
-      },
-      {
-        filter: `recipient = "${escapeFilterValue(userId)}"`,
-      },
     );
   },
 

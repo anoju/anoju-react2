@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button, Input, SocialLoginButtons, TurnstileWidget, toast } from '@/components';
 import { authApi } from '@/apis';
 import { DEFAULT_HOME_PATH, LOGIN_PATH } from '@/constants/app';
-import { getUserMessage } from '@/apis/apiError';
+import { getUserMessage, toAppError } from '@/apis/apiError';
 import { useOAuthProviders } from '@/hooks/useOAuthProviders';
 import { isNicknameConflictMessage, normalizeNickname, validateNickname } from '@/utils/nickname';
 
@@ -55,8 +55,10 @@ const Register = () => {
       navigate(LOGIN_PATH, { replace: true });
     } catch (submitError) {
       const message = getUserMessage(submitError);
+      const appError = toAppError(submitError);
+      const originalMessage = appError.rawMessage ?? appError.message;
 
-      if (isNicknameConflictMessage(message)) {
+      if (isNicknameConflictMessage(originalMessage)) {
         setNicknameError('이미 사용 중인 닉네임입니다.');
         toast('이미 사용 중인 닉네임입니다.', { tone: 'warning' });
         return;

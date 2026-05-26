@@ -21,6 +21,7 @@ export interface HeaderConfig {
   alwaysFixed?: boolean;
   hideOnScroll?: boolean;
   showBackButton?: boolean;
+  showNotificationButton?: boolean;
   showHomeButton?: boolean;
   backButton?: BackButtonConfig;
   leftSlotKey?: string;

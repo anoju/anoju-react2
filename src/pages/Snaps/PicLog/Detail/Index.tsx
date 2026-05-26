@@ -1,15 +1,42 @@
-import type React from 'react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import useEmblaCarousel from 'embla-carousel-react';
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { CalendarDays, Check, ImagePlus, MessageCircle, Plus, Repeat2, Send, X } from 'lucide-react';
-import { getUserMessage, picLogApi } from '@/apis';
-import { Avatar, Button, Dialog, EmptyState, IconButton, Img, TextArea, toast } from '@/components';
-import { PIC_LOG_PATH } from '@/constants/app';
-import { useAuthStore } from '@/stores/authStore';
-import type { PicLogCommentRecord, PicLogEntryRecord, PicLogOrderRequestRecord } from '@/types/domain';
-import { formatRelativeTime } from '@/utils/community';
-import { formatMention, normalizeNickname } from '@/utils/nickname';
+import type React from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import useEmblaCarousel from 'embla-carousel-react'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import {
+  CalendarDays,
+  Check,
+  Copy,
+  ImagePlus,
+  MessageCircle,
+  Plus,
+  RefreshCw,
+  Repeat2,
+  Send,
+  UserPlus,
+  X,
+} from 'lucide-react'
+import { getUserMessage, picLogApi } from '@/apis'
+import {
+  Avatar,
+  BottomSheet,
+  Button,
+  Dialog,
+  EmptyState,
+  IconButton,
+  Img,
+  Input,
+  TextArea,
+  toast,
+} from '@/components'
+import { PIC_LOG_PATH } from '@/constants/app'
+import { useAuthStore } from '@/stores/authStore'
+import type {
+  PicLogCommentRecord,
+  PicLogEntryRecord,
+  PicLogOrderRequestRecord,
+} from '@/types/domain'
+import { formatRelativeTime } from '@/utils/community'
+import { formatMention, normalizeNickname } from '@/utils/nickname'
 import {
   formatPicLogDate,
   getChapterLabel,
@@ -20,37 +47,40 @@ import {
   getVisiblePicLogDates,
   sortEntriesByParticipantOrder,
   type PicLogBundle,
-} from '../data';
+} from '../data'
 
 interface PreviewImage {
-  src: string;
-  alt: string;
-  title: string;
+  src: string
+  alt: string
+  title: string
 }
 
 const PicLogDetail = () => {
-  const { logId = '' } = useParams();
-  const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const user = useAuthStore((state) => state.user);
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  const [bundle, setBundle] = useState<PicLogBundle | null>(null);
-  const [comments, setComments] = useState<PicLogCommentRecord[]>([]);
-  const [activeChapter, setActiveChapter] = useState('');
-  const [commentValue, setCommentValue] = useState('');
-  const [previewImage, setPreviewImage] = useState<PreviewImage | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [emblaRef, emblaApi] = useEmblaCarousel({ align: 'start', containScroll: false });
-  const commentFormRef = useRef<HTMLFormElement>(null);
-  const currentUserId = user?.id ?? '';
-  const isAdmin = user?.role === 'admin';
+  const { logId = '' } = useParams()
+  const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const user = useAuthStore((state) => state.user)
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  const [bundle, setBundle] = useState<PicLogBundle | null>(null)
+  const [comments, setComments] = useState<PicLogCommentRecord[]>([])
+  const [activeChapter, setActiveChapter] = useState('')
+  const [commentValue, setCommentValue] = useState('')
+  const [previewImage, setPreviewImage] = useState<PreviewImage | null>(null)
+  const [dateSheetOpen, setDateSheetOpen] = useState(false)
+  const [inviteOpen, setInviteOpen] = useState(false)
+  const [inviteUpdating, setInviteUpdating] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [emblaRef, emblaApi] = useEmblaCarousel({ align: 'start', containScroll: false })
+  const commentFormRef = useRef<HTMLFormElement>(null)
+  const currentUserId = user?.id ?? ''
+  const isAdmin = user?.role === 'admin'
 
   const loadDetail = useCallback(async () => {
     if (!logId) {
-      return;
+      return
     }
 
-    setLoading(true);
+    setLoading(true)
 
     try {
       const [log, entries, nextComments, orderRequests] = await Promise.all([
@@ -58,107 +88,112 @@ const PicLogDetail = () => {
         picLogApi.listEntries(logId),
         picLogApi.listComments(logId),
         picLogApi.listOrderRequests(logId),
-      ]);
+      ])
 
       setBundle({
         log,
         entries,
         participants: getParticipantsFromLog(log),
         orderRequests,
-      });
-      setComments(nextComments);
+      })
+      setComments(nextComments)
     } catch (error) {
-      toast(getUserMessage(error), { tone: 'danger' });
-      setBundle(null);
+      toast(getUserMessage(error), { tone: 'danger' })
+      setBundle(null)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  }, [logId]);
+  }, [logId])
 
   useEffect(() => {
-    void loadDetail();
-  }, [loadDetail]);
+    void loadDetail()
+  }, [loadDetail])
 
   const visibleDates = useMemo(
     () => (bundle ? getVisiblePicLogDates(bundle.entries, bundle.log.logDate) : []),
     [bundle],
-  );
-  const activeDate = searchParams.get('date') ?? visibleDates[0] ?? bundle?.log.logDate ?? '';
+  )
+  const activeDate = searchParams.get('date') ?? visibleDates[0] ?? bundle?.log.logDate ?? ''
   const visibleChapters = useMemo(
     () => (bundle && activeDate ? getVisibleChapters(bundle.entries, activeDate) : []),
     [activeDate, bundle],
-  );
+  )
 
   useEffect(() => {
     if (!visibleChapters.length) {
-      setActiveChapter('');
-      return;
+      setActiveChapter('')
+      return
     }
 
     setActiveChapter((currentChapter) =>
-      (visibleChapters as readonly string[]).includes(currentChapter) ? currentChapter : visibleChapters[0],
-    );
-  }, [visibleChapters]);
+      (visibleChapters as readonly string[]).includes(currentChapter)
+        ? currentChapter
+        : visibleChapters[0],
+    )
+  }, [visibleChapters])
 
   const handleSelect = useCallback(() => {
-    const selectedIndex = emblaApi?.selectedScrollSnap() ?? 0;
-    const nextChapter = visibleChapters[selectedIndex];
+    const selectedIndex = emblaApi?.selectedScrollSnap() ?? 0
+    const nextChapter = visibleChapters[selectedIndex]
 
     if (nextChapter) {
-      setActiveChapter(nextChapter);
+      setActiveChapter(nextChapter)
     }
-  }, [emblaApi, visibleChapters]);
+  }, [emblaApi, visibleChapters])
 
   useEffect(() => {
     if (!emblaApi) {
-      return undefined;
+      return undefined
     }
 
-    emblaApi.on('select', handleSelect);
-    emblaApi.on('reInit', handleSelect);
+    emblaApi.on('select', handleSelect)
+    emblaApi.on('reInit', handleSelect)
 
     return () => {
-      emblaApi.off('select', handleSelect);
-      emblaApi.off('reInit', handleSelect);
-    };
-  }, [emblaApi, handleSelect]);
+      emblaApi.off('select', handleSelect)
+      emblaApi.off('reInit', handleSelect)
+    }
+  }, [emblaApi, handleSelect])
 
   const handleDateClick = (dateKey: string) => {
-    const nextParams = new URLSearchParams(searchParams);
-    nextParams.set('date', dateKey);
-    setSearchParams(nextParams);
-  };
+    const nextParams = new URLSearchParams(searchParams)
+    nextParams.set('date', dateKey)
+    setSearchParams(nextParams)
+    setDateSheetOpen(false)
+  }
 
   const handleCommentIconClick = (authorId: string) => {
-    const author = bundle ? getPicLogParticipant(bundle.participants, authorId) : undefined;
-    const tagText = author ? `${formatMention(author.nickname)} ` : '';
-    setCommentValue((currentValue) => (currentValue.startsWith(tagText) ? currentValue : `${tagText}${currentValue}`));
-    commentFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  };
+    const author = bundle ? getPicLogParticipant(bundle.participants, authorId) : undefined
+    const tagText = author ? `${formatMention(author.nickname)} ` : ''
+    setCommentValue((currentValue) =>
+      currentValue.startsWith(tagText) ? currentValue : `${tagText}${currentValue}`,
+    )
+    commentFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
 
   const handleCommentSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+    event.preventDefault()
 
     if (!bundle || !activeChapter) {
-      return;
+      return
     }
 
     if (!isAuthenticated) {
-      toast('댓글 작성은 로그인 후 이용할 수 있습니다.', { tone: 'warning' });
-      return;
+      toast('댓글 작성은 로그인 후 이용할 수 있습니다.', { tone: 'warning' })
+      return
     }
 
-    const content = commentValue.trim();
+    const content = commentValue.trim()
 
     if (!content) {
-      toast('댓글 내용을 입력해주세요.', { tone: 'warning' });
-      return;
+      toast('댓글 내용을 입력해주세요.', { tone: 'warning' })
+      return
     }
 
     const taggedUser = bundle.participants.find((participant) => {
-      const mention = formatMention(normalizeNickname(participant.nickname));
-      return content === mention || content.startsWith(`${mention} `);
-    });
+      const mention = formatMention(normalizeNickname(participant.nickname))
+      return content === mention || content.startsWith(`${mention} `)
+    })
 
     try {
       await picLogApi.createComment({
@@ -166,18 +201,18 @@ const PicLogDetail = () => {
         chapter: activeChapter,
         content,
         taggedUserId: taggedUser?.id,
-      });
-      setCommentValue('');
-      toast('댓글을 남겼습니다.', { tone: 'success' });
-      setComments(await picLogApi.listComments(bundle.log.id));
+      })
+      setCommentValue('')
+      toast('댓글을 남겼습니다.', { tone: 'success' })
+      setComments(await picLogApi.listComments(bundle.log.id))
     } catch (error) {
-      toast(getUserMessage(error), { tone: 'danger' });
+      toast(getUserMessage(error), { tone: 'danger' })
     }
-  };
+  }
 
   const handleOrderRequest = async (targetUserId: string) => {
     if (!bundle || targetUserId === currentUserId) {
-      return;
+      return
     }
 
     const existingRequest = bundle.orderRequests.find(
@@ -185,40 +220,67 @@ const PicLogDetail = () => {
         request.status === 'pending' &&
         request.requester === currentUserId &&
         request.targetUser === targetUserId,
-    );
+    )
 
     if (existingRequest) {
-      toast('이미 순서 변경 요청을 보냈습니다.', { tone: 'info' });
-      return;
+      toast('이미 순서 변경 요청을 보냈습니다.', { tone: 'info' })
+      return
     }
 
     try {
-      await picLogApi.createOrderRequest({ logId: bundle.log.id, targetUserId });
-      toast('순서 변경 요청을 보냈습니다.', { tone: 'success' });
-      await loadDetail();
+      await picLogApi.createOrderRequest({ logId: bundle.log.id, targetUserId })
+      toast('순서 변경 요청을 보냈습니다.', { tone: 'success' })
+      await loadDetail()
     } catch (error) {
-      toast(getUserMessage(error), { tone: 'danger' });
+      toast(getUserMessage(error), { tone: 'danger' })
     }
-  };
+  }
 
   const handleOrderResponse = async (request: PicLogOrderRequestRecord, accepted: boolean) => {
     try {
-      await picLogApi.respondOrderRequest(request, accepted);
+      await picLogApi.respondOrderRequest(request, accepted)
       toast(accepted ? '순서를 변경했습니다.' : '순서 변경 요청을 거절했습니다.', {
         tone: accepted ? 'success' : 'info',
-      });
-      await loadDetail();
+      })
+      await loadDetail()
     } catch (error) {
-      toast(getUserMessage(error), { tone: 'danger' });
+      toast(getUserMessage(error), { tone: 'danger' })
     }
-  };
+  }
+
+  const handleCopy = async (value: string, message: string) => {
+    try {
+      await navigator.clipboard.writeText(value)
+      toast(message, { tone: 'success' })
+    } catch {
+      toast('복사하지 못했습니다. 직접 선택해서 복사해주세요.', { tone: 'warning' })
+    }
+  }
+
+  const handleRegenerateInvitePassword = async () => {
+    if (!bundle) {
+      return
+    }
+
+    setInviteUpdating(true)
+
+    try {
+      const log = await picLogApi.regenerateInvitePassword(bundle.log.id)
+      setBundle((current) => (current ? { ...current, log } : current))
+      toast('방 패스워드를 새로 만들었습니다.', { tone: 'success' })
+    } catch (error) {
+      toast(getUserMessage(error), { tone: 'danger' })
+    } finally {
+      setInviteUpdating(false)
+    }
+  }
 
   if (loading) {
     return (
       <section className="container pic-log-detail">
         <EmptyState title="picLog를 불러오는 중입니다." />
       </section>
-    );
+    )
   }
 
   if (!bundle) {
@@ -229,28 +291,35 @@ const PicLogDetail = () => {
           picLog 목록
         </Link>
       </section>
-    );
+    )
   }
 
-  const { log, entries, participants } = bundle;
-  const participantOrder = log.participantOrder.length > 0 ? log.participantOrder : log.participants;
+  const { log, entries, participants } = bundle
+  const participantOrder = log.participantOrder.length > 0 ? log.participantOrder : log.participants
+  const inviteLink = `${window.location.origin}${PIC_LOG_PATH}/${log.id}/join`
+  const invitePassword = log.invitePassword ?? ''
+  const canManageInvite = isAdmin || log.author === currentUserId
   const pendingRequests = bundle.orderRequests.filter(
     (request) => request.status === 'pending' && request.targetUser === currentUserId,
-  );
-  const visibleChapterSlides = visibleChapters.length > 0 ? visibleChapters : [''];
-  const getAddPath = () => `${PIC_LOG_PATH}/${log.id}/add`;
+  )
+  const visibleChapterSlides = visibleChapters.length > 0 ? visibleChapters : ['']
+  const getAddPath = () => `${PIC_LOG_PATH}/${log.id}/add`
   const renderSlot = (participantId: string, chapter?: string, entry?: PicLogEntryRecord) => {
-    const participant = getPicLogParticipant(participants, participantId);
+    const participant = getPicLogParticipant(participants, participantId)
 
     if (!participant) {
-      return null;
+      return null
     }
 
-    const canEdit = entry ? isAdmin || entry.author === currentUserId : false;
-    const imageUrl = entry ? getPicLogEntryImageUrl(entry) : '';
+    const canEdit = entry ? isAdmin || entry.author === currentUserId : false
+    const imageUrl = entry ? getPicLogEntryImageUrl(entry) : ''
 
     return (
-      <article key={`${chapter ?? 'empty'}-${participant.id}`} className="pic-log-entry" data-empty={!entry || undefined}>
+      <article
+        key={`${chapter ?? 'empty'}-${participant.id}`}
+        className="pic-log-entry"
+        data-empty={!entry || undefined}
+      >
         {entry ? (
           <>
             <button
@@ -274,7 +343,10 @@ const PicLogDetail = () => {
                 {entry.memo ? <span>{entry.memo}</span> : null}
               </span>
             </button>
-            <div className="pic-log-entry__quick-actions" aria-label={`${participant.name} 사진 액션`}>
+            <div
+              className="pic-log-entry__quick-actions"
+              aria-label={`${participant.name} 사진 액션`}
+            >
               <IconButton
                 label={`${participant.name}에게 댓글 쓰기`}
                 icon={<MessageCircle size={17} />}
@@ -306,13 +378,21 @@ const PicLogDetail = () => {
             </div>
           </>
         ) : (
-          <Link to={getAddPath()} className="pic-log-entry__empty-link" aria-label={`${participant.name} 사진 등록`}>
+          <Link
+            to={getAddPath()}
+            className="pic-log-entry__empty-link"
+            aria-label={`${participant.name} 사진 등록`}
+          >
+            <span className="pic-log-entry__avatar">
+              <Avatar src={participant.avatarUrl} name={participant.name} size="sm" />
+              <span>{participant.name}</span>
+            </span>
             <Plus size={30} />
           </Link>
         )}
       </article>
-    );
-  };
+    )
+  }
 
   return (
     <section className="container pic-log-detail">
@@ -320,26 +400,31 @@ const PicLogDetail = () => {
         <span className="board-page__eyebrow">picLog</span>
         <h2>{log.title}</h2>
         <p>사진이 있는 날짜와 시간 챕터만 표시됩니다.</p>
-      </header>
-
-      <div className="pic-log-date-tabs" aria-label="picLog 날짜 이동">
-        {visibleDates.map((dateKey) => (
-          <button
-            key={dateKey}
+        <div className="pic-log-detail__actions" aria-label="picLog 액션">
+          <Button
             type="button"
-            data-active={dateKey === activeDate}
-            onClick={() => handleDateClick(dateKey)}
+            variant="soft"
+            tone="neutral"
+            size="sm"
+            leftIcon={<CalendarDays size={16} />}
+            onClick={() => setDateSheetOpen(true)}
           >
-            <CalendarDays size={15} />
-            {formatPicLogDate(dateKey)}
-          </button>
-        ))}
-      </div>
+            {activeDate ? formatPicLogDate(activeDate) : '날짜 선택'}
+          </Button>
+          <IconButton
+            label="초대 링크와 패스워드 보기"
+            icon={<UserPlus size={18} />}
+            variant="soft"
+            tone="primary"
+            onClick={() => setInviteOpen(true)}
+          />
+        </div>
+      </header>
 
       {pendingRequests.length > 0 ? (
         <section className="pic-log-requests" aria-label="받은 순서 변경 요청">
           {pendingRequests.map((request) => {
-            const requester = getPicLogParticipant(participants, request.requester);
+            const requester = getPicLogParticipant(participants, request.requester)
 
             return (
               <div key={request.id} className="pic-log-request">
@@ -365,7 +450,7 @@ const PicLogDetail = () => {
                   />
                 </div>
               </div>
-            );
+            )
           })}
         </section>
       ) : null}
@@ -391,49 +476,66 @@ const PicLogDetail = () => {
             {visibleChapterSlides.map((chapter) => {
               const chapterEntries = chapter
                 ? sortEntriesByParticipantOrder(
-                    entries.filter((entry) => entry.logDate === activeDate && entry.chapter === chapter),
+                    entries.filter(
+                      (entry) => entry.logDate === activeDate && entry.chapter === chapter,
+                    ),
                     participantOrder,
                   )
-                : [];
-              const chapterComments = comments.filter((comment) => comment.chapter === chapter);
+                : []
+              const chapterComments = comments.filter((comment) => comment.chapter === chapter)
 
               return (
                 <article key={chapter || 'empty'} className="pic-log-chapter">
                   <header className="pic-log-chapter__header">
-                    <strong>{chapter ? getChapterLabel(chapter) : formatPicLogDate(log.logDate)}</strong>
-                    <span>{chapterEntries.length > 0 ? `${chapterEntries.length}장의 사진` : '첫 사진 대기 중'}</span>
+                    <strong>
+                      {chapter ? getChapterLabel(chapter) : formatPicLogDate(log.logDate)}
+                    </strong>
+                    <span>
+                      {chapterEntries.length > 0
+                        ? `${chapterEntries.length}장의 사진`
+                        : '첫 사진 대기 중'}
+                    </span>
                   </header>
 
                   <div className="pic-log-entry-list">
                     {participantOrder.map((participantId) => {
-                      const entry = chapterEntries.find((item) => item.author === participantId);
-                      return renderSlot(participantId, chapter || undefined, entry);
+                      const entry = chapterEntries.find((item) => item.author === participantId)
+                      return renderSlot(participantId, chapter || undefined, entry)
                     })}
                   </div>
 
                   {chapter ? (
-                    <section className="comment-box" aria-label={`${getChapterLabel(chapter)} 댓글`}>
+                    <section
+                      className="comment-box"
+                      aria-label={`${getChapterLabel(chapter)} 댓글`}
+                    >
                       <h3>
                         <MessageCircle size={18} /> 댓글 {chapterComments.length}
                       </h3>
                       {chapterComments.length > 0 ? (
                         <div className="comment-box__list">
                           {chapterComments.map((comment) => {
-                            const author = getPicLogParticipant(participants, comment.author);
+                            const author = getPicLogParticipant(participants, comment.author)
                             const taggedUser = comment.taggedUser
                               ? getPicLogParticipant(participants, comment.taggedUser)
-                              : undefined;
+                              : undefined
 
                             return (
                               <article key={comment.id} className="comment-item">
                                 <div className="comment-item__header">
                                   <div className="comment-item__author">
-                                    <Avatar src={author?.avatarUrl} name={author?.name ?? '참여자'} size="sm" />
+                                    <Avatar
+                                      src={author?.avatarUrl}
+                                      name={author?.name ?? '참여자'}
+                                      size="sm"
+                                    />
                                     <div className="comment-item__meta">
                                       <strong>{author?.name ?? '참여자'}</strong>
                                       <span>{formatRelativeTime(comment.created)}</span>
                                       {taggedUser ? (
-                                        <span className="comment-item__badge">{formatMention(taggedUser.nickname)}</span>
+                                        <span className="comment-item__badge">
+                                          {formatMention(taggedUser.nickname)}
+                                        </span>
                                       ) : null}
                                     </div>
                                   </div>
@@ -442,7 +544,7 @@ const PicLogDetail = () => {
                                   <p>{comment.content}</p>
                                 </div>
                               </article>
-                            );
+                            )
                           })}
                         </div>
                       ) : (
@@ -451,13 +553,17 @@ const PicLogDetail = () => {
                     </section>
                   ) : null}
                 </article>
-              );
+              )
             })}
           </div>
         </div>
       </div>
 
-      <form ref={commentFormRef} className="comment-box__form pic-log-comment-form" onSubmit={handleCommentSubmit}>
+      <form
+        ref={commentFormRef}
+        className="comment-box__form pic-log-comment-form"
+        onSubmit={handleCommentSubmit}
+      >
         <TextArea
           label={activeChapter ? `${getChapterLabel(activeChapter)} 댓글` : '댓글'}
           value={commentValue}
@@ -470,20 +576,95 @@ const PicLogDetail = () => {
         </Button>
       </form>
 
-      <Link to={`${PIC_LOG_PATH}/${log.id}/add`} className="pic-log-add-link">
+      {/* <Link to={`${PIC_LOG_PATH}/${log.id}/add`} className="pic-log-add-link">
         <Plus size={18} />
         사진 추가
-      </Link>
+      </Link> */}
 
-      <Dialog open={Boolean(previewImage)} title={previewImage?.title} onClose={() => setPreviewImage(null)}>
+      <Dialog
+        open={Boolean(previewImage)}
+        title={previewImage?.title}
+        onClose={() => setPreviewImage(null)}
+      >
         {previewImage ? (
           <figure className="pic-log-preview">
             <Img src={previewImage.src} alt={previewImage.alt} />
           </figure>
         ) : null}
       </Dialog>
-    </section>
-  );
-};
 
-export default PicLogDetail;
+      <BottomSheet
+        open={dateSheetOpen}
+        title="날짜 선택"
+        onClose={() => setDateSheetOpen(false)}
+      >
+        <div className="pic-log-date-sheet" aria-label="picLog 날짜 선택">
+          {visibleDates.length > 0 ? (
+            visibleDates.map((dateKey) => (
+              <button
+                key={dateKey}
+                type="button"
+                data-active={dateKey === activeDate}
+                onClick={() => handleDateClick(dateKey)}
+              >
+                <CalendarDays size={17} />
+                <span>{formatPicLogDate(dateKey)}</span>
+                {dateKey === activeDate ? <Check size={17} /> : null}
+              </button>
+            ))
+          ) : (
+            <p>선택할 수 있는 날짜가 없습니다.</p>
+          )}
+        </div>
+      </BottomSheet>
+
+      <Dialog
+        open={inviteOpen}
+        title="picLog 초대"
+        description="초대 링크와 방 패스워드를 함께 전달해주세요."
+        onClose={() => setInviteOpen(false)}
+        footer={
+          canManageInvite ? (
+            <Button
+              type="button"
+              variant="outline"
+              tone="neutral"
+              size="sm"
+              loading={inviteUpdating}
+              leftIcon={<RefreshCw size={16} />}
+              onClick={() => void handleRegenerateInvitePassword()}
+            >
+              패스워드 재생성
+            </Button>
+          ) : undefined
+        }
+      >
+        <div className="pic-log-invite-dialog">
+          <Input label="초대 링크" value={inviteLink} readOnly />
+          <Button
+            type="button"
+            variant="soft"
+            tone="neutral"
+            leftIcon={<Copy size={16} />}
+            onClick={() => void handleCopy(inviteLink, '초대 링크를 복사했습니다.')}
+          >
+            링크 복사
+          </Button>
+          <Input label="방 패스워드" value={invitePassword} readOnly />
+          <Button
+            type="button"
+            variant="soft"
+            tone="neutral"
+            leftIcon={<Copy size={16} />}
+            onClick={() => void handleCopy(invitePassword, '방 패스워드를 복사했습니다.')}
+            disabled={!invitePassword}
+          >
+            패스워드 복사
+          </Button>
+        </div>
+      </Dialog>
+    </section>
+  )
+}
+
+export default PicLogDetail

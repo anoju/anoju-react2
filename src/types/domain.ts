@@ -185,6 +185,7 @@ export interface PicLogRecord extends RecordModel {
   author: string;
   participants: string[];
   participantOrder: string[];
+  invitePassword?: string;
   visibility: PicLogVisibility;
   status: PicLogStatus;
   deleted: boolean;

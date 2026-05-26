@@ -16,11 +16,12 @@ interface AppHeaderProps {
 
 export const AppHeader = ({ config, visible }: AppHeaderProps) => {
   const navigate = useNavigate();
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const { status, user } = useAuthStore();
   const [unreadCount, setUnreadCount] = useState(0);
+  const canUseNotifications = status === 'authenticated' && Boolean(user?.id);
 
   const loadUnreadCount = useCallback(async () => {
-    if (!isAuthenticated) {
+    if (!canUseNotifications) {
       setUnreadCount(0);
       return;
     }
@@ -30,38 +31,32 @@ export const AppHeader = ({ config, visible }: AppHeaderProps) => {
     } catch {
       setUnreadCount(0);
     }
-  }, [isAuthenticated]);
+  }, [canUseNotifications]);
 
   useEffect(() => {
     void loadUnreadCount();
   }, [loadUnreadCount]);
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!canUseNotifications || !config.showNotificationButton) {
       return undefined;
     }
 
-    let unsubscribe: (() => void) | null = null;
-    let mounted = true;
-
-    void notificationApi.subscribeMine(() => {
+    const intervalId = window.setInterval(() => {
       void loadUnreadCount();
-    }).then((nextUnsubscribe) => {
-      if (!mounted) {
-        nextUnsubscribe?.();
-        return;
-      }
+    }, 30000);
 
-      unsubscribe = nextUnsubscribe;
-    }).catch(() => {
-      unsubscribe = null;
-    });
+    const handleFocus = () => {
+      void loadUnreadCount();
+    };
+
+    window.addEventListener('focus', handleFocus);
 
     return () => {
-      mounted = false;
-      unsubscribe?.();
+      window.clearInterval(intervalId);
+      window.removeEventListener('focus', handleFocus);
     };
-  }, [isAuthenticated, loadUnreadCount]);
+  }, [canUseNotifications, config.showNotificationButton, loadUnreadCount]);
 
   if (!config.enabled) {
     return null;
@@ -119,7 +114,7 @@ export const AppHeader = ({ config, visible }: AppHeaderProps) => {
 
         <div className="app-header__right">
           <div className="app-header__slot app-header__slot--right" data-slot={config.rightSlotKey} />
-          {isAuthenticated ? (
+          {config.showNotificationButton ? (
             <span className="app-header__notification">
               <IconButton
                 label={unreadCount > 0 ? `알림함, 읽지 않은 알림 ${unreadCount}개` : '알림함'}

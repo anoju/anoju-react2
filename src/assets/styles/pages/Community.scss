@@ -3,6 +3,7 @@
 .board-detail,
 .pic-log-page,
 .pic-log-detail,
+.pic-log-join,
 .pics-page,
 .pics-detail,
 .write-page {
@@ -19,6 +20,7 @@
 .hub-page,
 .board-page,
 .pic-log-page,
+.pic-log-join,
 .pics-page,
 .write-page {
   display: grid;
@@ -29,6 +31,7 @@
 .board-page__header,
 .pic-log-page__header,
 .pic-log-detail__header,
+.pic-log-join__header,
 .pics-page__header,
 .write-page__header {
   display: grid;
@@ -51,6 +54,19 @@
 .pic-log-detail {
   display: grid;
   gap: var(--spacing-lg);
+}
+
+.pic-log-detail__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  margin-top: var(--spacing-xs);
+  gap: var(--spacing-xs);
+
+  .button {
+    min-width: 0;
+  }
 }
 
 .pic-log-card {
@@ -415,6 +431,7 @@
   }
 
   &__empty-link {
+    position: relative;
     display: grid;
     place-items: center;
     min-height: 11rem;
@@ -499,6 +516,67 @@
 
 .pic-log-comment-form {
   scroll-margin-top: calc(var(--layout-header-height, 3.5rem) + var(--spacing-md));
+}
+
+.pic-log-date-sheet {
+  display: grid;
+  gap: var(--spacing-xs);
+
+  button {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    min-height: 3rem;
+    padding: 0 var(--spacing-sm);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    color: var(--color-text-primary);
+    background: var(--color-bg-surface);
+    cursor: pointer;
+    font-weight: 760;
+    gap: var(--spacing-xs);
+
+    &[data-active='true'] {
+      border-color: var(--color-border-focus);
+      color: var(--color-text-link);
+      background: var(--color-bg-primary-soft);
+    }
+  }
+
+  span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  p {
+    margin: 0;
+    color: var(--color-text-secondary);
+  }
+}
+
+.pic-log-invite-dialog,
+.pic-log-join__form {
+  display: grid;
+  gap: var(--spacing-sm);
+}
+
+.pic-log-invite-dialog {
+  .button {
+    justify-self: stretch;
+  }
+}
+
+.pic-log-join {
+  align-content: start;
+
+  &__form {
+    padding: var(--spacing-md);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-surface);
+    box-shadow: var(--shadow-sm);
+  }
 }
 
 .pic-log-add-link {

@@ -12,12 +12,14 @@ export type AppErrorCode =
 export class AppError extends Error {
   code: AppErrorCode;
   status?: number;
+  rawMessage?: string;
 
-  constructor(message: string, code: AppErrorCode = 'UNKNOWN', status?: number) {
+  constructor(message: string, code: AppErrorCode = 'UNKNOWN', status?: number, rawMessage?: string) {
     super(message);
     this.name = 'AppError';
     this.code = code;
     this.status = status;
+    this.rawMessage = rawMessage;
   }
 }
 
@@ -65,16 +67,20 @@ export const toAppError = (error: unknown): AppError => {
 
   if (error instanceof ClientResponseError) {
     const validationMessage = error.status === 400 ? getPocketBaseValidationMessage(error) : undefined;
+    const rawMessage = validationMessage || error.message || '요청을 처리하지 못했습니다.';
 
     return new AppError(
-      validationMessage || error.message || '요청을 처리하지 못했습니다.',
+      rawMessage,
       getErrorCode(error.status),
       error.status,
+      rawMessage,
     );
   }
 
   if (error instanceof Error) {
-    return new AppError(error.message || '알 수 없는 오류가 발생했습니다.');
+    const rawMessage = error.message || '알 수 없는 오류가 발생했습니다.';
+
+    return new AppError(rawMessage, 'UNKNOWN', undefined, rawMessage);
   }
 
   return new AppError('알 수 없는 오류가 발생했습니다.');
@@ -82,21 +88,38 @@ export const toAppError = (error: unknown): AppError => {
 
 export const getUserMessage = (error: unknown): string => {
   const appError = toAppError(error);
+  let userMessage = '요청을 처리하지 못했습니다. 잠시 후 다시 시도해주세요.';
 
   switch (appError.code) {
     case 'NETWORK':
-      return '네트워크 연결을 확인해주세요.';
+      userMessage = '네트워크 연결을 확인해주세요.';
+      break;
     case 'UNAUTHORIZED':
-      return '로그인이 필요합니다.';
+      userMessage = '로그인이 필요합니다.';
+      break;
     case 'FORBIDDEN':
-      return '접근 권한이 없습니다.';
+      userMessage = '접근 권한이 없습니다.';
+      break;
     case 'NOT_FOUND':
-      return '요청한 정보를 찾을 수 없습니다.';
+      userMessage = '요청한 정보를 찾을 수 없습니다.';
+      break;
     case 'VALIDATION':
-      return appError.message || '입력한 정보를 다시 확인해주세요.';
+      userMessage = '입력한 정보를 다시 확인해주세요.';
+      break;
     case 'SERVER':
-      return '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+      userMessage = '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+      break;
     default:
-      return appError.message || '알 수 없는 오류가 발생했습니다.';
+      userMessage = '요청을 처리하지 못했습니다. 잠시 후 다시 시도해주세요.';
   }
+
+  console.error('API 오류 안내 메시지 변환', {
+    userMessage,
+    originalMessage: appError.rawMessage ?? appError.message,
+    code: appError.code,
+    status: appError.status,
+    error,
+  });
+
+  return userMessage;
 };

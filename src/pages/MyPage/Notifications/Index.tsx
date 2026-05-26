@@ -68,23 +68,19 @@ const Notifications = () => {
   }, [loadNotifications]);
 
   useEffect(() => {
-    let unsubscribe: (() => void) | null = null;
-    let mounted = true;
-
-    void notificationApi.subscribeMine(() => {
+    const intervalId = window.setInterval(() => {
       void loadNotifications();
-    }).then((nextUnsubscribe) => {
-      if (!mounted) {
-        nextUnsubscribe?.();
-        return;
-      }
+    }, 30000);
 
-      unsubscribe = nextUnsubscribe;
-    });
+    const handleFocus = () => {
+      void loadNotifications();
+    };
+
+    window.addEventListener('focus', handleFocus);
 
     return () => {
-      mounted = false;
-      unsubscribe?.();
+      window.clearInterval(intervalId);
+      window.removeEventListener('focus', handleFocus);
     };
   }, [loadNotifications]);
 

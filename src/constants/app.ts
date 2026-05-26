@@ -50,6 +50,8 @@ export const PIC_LOG_ADD_PATH = '/snaps/pic-log/:logId/add';
 
 export const PIC_LOG_EDIT_PATH = '/snaps/pic-log/:logId/edit';
 
+export const PIC_LOG_JOIN_PATH = '/snaps/pic-log/:logId/join';
+
 export const STORAGE_KEYS = {
   theme: 'anoju-theme',
   fontMode: 'anoju-font-mode',

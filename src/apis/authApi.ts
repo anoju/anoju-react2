@@ -39,6 +39,7 @@ interface LoginParams {
   identity: string;
   password: string;
   autoLogin: boolean;
+  turnstileToken: string;
 }
 
 interface RegisterParams {
@@ -75,10 +76,16 @@ const getProviderFromRecord = (record: Record<string, unknown>) => {
 const escapeFilterValue = (value: string) => value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 
 export const authApi = {
-  login: ({ identity, password, autoLogin }: LoginParams) =>
+  login: ({ identity, password, autoLogin, turnstileToken }: LoginParams) =>
     runApi(async () => {
       setAutoLoginEnabled(autoLogin);
-      const result = await pb.collection(USERS_COLLECTION).authWithPassword(identity, password);
+      const result = await pb.collection(USERS_COLLECTION).authWithPassword(identity, password, {
+        body: {
+          identity,
+          password,
+          turnstileToken,
+        },
+      });
       await useAuthStore.getState().initialize();
       return result;
     }),

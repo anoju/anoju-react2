@@ -1,10 +1,21 @@
 import type React from 'react'
 import { useMemo, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { Button, Checkbox, Input, SocialLoginButtons, confirm, toast } from '@/components'
-import { authApi, getUserMessage } from '@/apis'
+import { Button, Checkbox, Input, SocialLoginButtons, TurnstileWidget, confirm, toast } from '@/components'
+import { authApi, toAppError } from '@/apis'
 import { DEFAULT_HOME_PATH, REGISTER_PATH } from '@/constants/app'
 import { useOAuthProviders } from '@/hooks/useOAuthProviders'
+
+const logAuthError = (label: string, error: unknown) => {
+  const appError = toAppError(error)
+
+  console.error(label, {
+    originalMessage: appError.rawMessage ?? appError.message,
+    code: appError.code,
+    status: appError.status,
+    error,
+  })
+}
 
 const Login = () => {
   const navigate = useNavigate()
@@ -12,6 +23,8 @@ const Login = () => {
   const [identity, setIdentity] = useState('')
   const [password, setPassword] = useState('')
   const [autoLogin, setAutoLogin] = useState(false)
+  const [turnstileToken, setTurnstileToken] = useState('')
+  const [turnstileKey, setTurnstileKey] = useState(0)
   const [submitting, setSubmitting] = useState(false)
   const { providers, loading: providersLoading } = useOAuthProviders()
 
@@ -28,14 +41,22 @@ const Login = () => {
       return
     }
 
+    if (!turnstileToken) {
+      toast('보안 확인을 완료해주세요.', { tone: 'warning' })
+      return
+    }
+
     setSubmitting(true)
 
     try {
-      await authApi.login({ identity: identity.trim(), password, autoLogin })
+      await authApi.login({ identity: identity.trim(), password, autoLogin, turnstileToken })
       toast('로그인되었습니다.', { tone: 'success' })
       navigate(redirectPath, { replace: true })
     } catch (error) {
-      toast(getUserMessage(error), { tone: 'danger' })
+      logAuthError('로그인 실패', error)
+      toast('이메일 또는 비밀번호가 올바르지 않습니다. 다시 확인해주세요.', { tone: 'danger' })
+      setTurnstileToken('')
+      setTurnstileKey((currentKey) => currentKey + 1)
     } finally {
       setSubmitting(false)
     }
@@ -60,7 +81,8 @@ const Login = () => {
       await authApi.requestPasswordReset(identity.trim())
       toast('비밀번호 재설정 메일을 발송했습니다.', { tone: 'success' })
     } catch (error) {
-      toast(getUserMessage(error), { tone: 'danger' })
+      logAuthError('비밀번호 재설정 요청 실패', error)
+      toast('비밀번호 재설정 요청을 처리하지 못했습니다. 잠시 후 다시 시도해주세요.', { tone: 'danger' })
     }
   }
 
@@ -94,6 +116,7 @@ const Login = () => {
           checked={autoLogin}
           onChange={(event) => setAutoLogin(event.target.checked)}
         />
+        <TurnstileWidget key={turnstileKey} value={turnstileToken} onChange={setTurnstileToken} />
         <Button type="submit" size="lg" fullWidth loading={submitting}>
           로그인
         </Button>
