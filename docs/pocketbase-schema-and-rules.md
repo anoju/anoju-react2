@@ -24,14 +24,14 @@ PocketBase auth collection입니다.
 
 추가 필드:
 
-| 필드 | 타입 | 필수 | 기본값 | 설명 |
-| --- | --- | --- | --- | --- |
-| `name` | text | no |  | 실명 또는 표시 이름 |
-| `nickname` | text | no |  | 서비스 표시 닉네임 |
-| `avatar` | file | no |  | 프로필 이미지 |
-| `bio` | text | no |  | 한 줄 소개 |
-| `role` | select | yes | `user` | `user`, `admin` |
-| `status` | select | yes | `active` | `active`, `suspended`, `withdrawn` |
+| 필드       | 타입   | 필수 | 기본값   | 설명                               |
+| ---------- | ------ | ---- | -------- | ---------------------------------- |
+| `name`     | text   | no   |          | 실명 또는 표시 이름                |
+| `nickname` | text   | no   |          | 서비스 표시 닉네임                 |
+| `avatar`   | file   | no   |          | 프로필 이미지                      |
+| `bio`      | text   | no   |          | 한 줄 소개                         |
+| `role`     | select | yes  | `user`   | `user`, `admin`                    |
+| `status`   | select | yes  | `active` | `active`, `suspended`, `withdrawn` |
 
 권장 인덱스:
 
@@ -62,21 +62,21 @@ Delete rule: @request.auth.role = "admin"
 
 필드:
 
-| 필드 | 타입 | 필수 | 기본값 | 설명 |
-| --- | --- | --- | --- | --- |
-| `title` | text | yes |  | 제목 |
-| `content` | editor/text | yes |  | 본문 |
-| `type` | select | yes | `board` | `board`, `gallery` |
-| `author` | relation users | yes |  | 작성자 |
-| `status` | select | yes | `published` | `draft`, `published`, `hidden`, `deleted` |
-| `tags` | json | no | `[]` | 태그 배열 |
-| `viewCount` | number | no | `0` | 조회수. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다. |
-| `commentCount` | number | no | `0` | 댓글 수. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다. |
-| `likeCount` | number | no | `0` | 좋아요 수. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다. |
-| `dislikeCount` | number | no | `0` | 싫어요 수. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다. |
-| `bookmarkCount` | number | no | `0` | 스크랩 수. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다. |
-| `deleted` | bool | no | `false` | soft delete 여부. false를 허용해야 하므로 Nonfalsey를 사용하지 않습니다. |
-| `deletedAt` | date | no |  | 삭제 시각 |
+| 필드            | 타입           | 필수 | 기본값      | 설명                                                                     |
+| --------------- | -------------- | ---- | ----------- | ------------------------------------------------------------------------ |
+| `title`         | text           | yes  |             | 제목                                                                     |
+| `content`       | editor/text    | yes  |             | 본문                                                                     |
+| `type`          | select         | yes  | `board`     | `board`, `gallery`                                                       |
+| `author`        | relation users | yes  |             | 작성자                                                                   |
+| `status`        | select         | yes  | `published` | `draft`, `published`, `hidden`, `deleted`                                |
+| `tags`          | json           | no   | `[]`        | 태그 배열                                                                |
+| `viewCount`     | number         | no   | `0`         | 조회수. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다.                 |
+| `commentCount`  | number         | no   | `0`         | 댓글 수. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다.                |
+| `likeCount`     | number         | no   | `0`         | 좋아요 수. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다.              |
+| `dislikeCount`  | number         | no   | `0`         | 싫어요 수. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다.              |
+| `bookmarkCount` | number         | no   | `0`         | 스크랩 수. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다.              |
+| `deleted`       | bool           | no   | `false`     | soft delete 여부. false를 허용해야 하므로 Nonfalsey를 사용하지 않습니다. |
+| `deletedAt`     | date           | no   |             | 삭제 시각                                                                |
 
 권장 인덱스:
 
@@ -109,17 +109,17 @@ Delete rule: @request.auth.role = "admin"
 
 필드:
 
-| 필드 | 타입 | 필수 | 기본값 | 설명 |
-| --- | --- | --- | --- | --- |
-| `post` | relation posts | yes |  | 게시글 |
-| `author` | relation users | yes |  | 작성자 |
-| `content` | text | yes |  | 댓글 내용 |
-| `parentComment` | relation comments | no |  | 대댓글 부모 |
-| `status` | select | yes | `published` | `published`, `hidden`, `deleted` |
-| `likeCount` | number | no | `0` | 좋아요 수. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다. |
-| `dislikeCount` | number | no | `0` | 싫어요 수. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다. |
-| `deleted` | bool | no | `false` | soft delete 여부. `false` 값을 허용해야 하므로 Nonempty를 사용하지 않습니다. |
-| `deletedAt` | date | no |  | 삭제 시각 |
+| 필드            | 타입              | 필수 | 기본값      | 설명                                                                         |
+| --------------- | ----------------- | ---- | ----------- | ---------------------------------------------------------------------------- |
+| `post`          | relation posts    | yes  |             | 게시글                                                                       |
+| `author`        | relation users    | yes  |             | 작성자                                                                       |
+| `content`       | text              | yes  |             | 댓글 내용                                                                    |
+| `parentComment` | relation comments | no   |             | 대댓글 부모                                                                  |
+| `status`        | select            | yes  | `published` | `published`, `hidden`, `deleted`                                             |
+| `likeCount`     | number            | no   | `0`         | 좋아요 수. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다.                  |
+| `dislikeCount`  | number            | no   | `0`         | 싫어요 수. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다.                  |
+| `deleted`       | bool              | no   | `false`     | soft delete 여부. `false` 값을 허용해야 하므로 Nonempty를 사용하지 않습니다. |
+| `deletedAt`     | date              | no   |             | 삭제 시각                                                                    |
 
 현재 import 적용 인덱스: 없음
 
@@ -146,13 +146,13 @@ Delete rule: @request.auth.role = "admin"
 
 필드:
 
-| 필드 | 타입 | 필수 | 기본값 | 설명 |
-| --- | --- | --- | --- | --- |
-| `post` | relation posts | yes |  | 게시글 |
-| `image` | file | yes |  | 이미지 파일 |
-| `alt` | text | no |  | 대체 텍스트 |
-| `sortOrder` | number | no | `0` | 정렬 순서. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다. |
-| `isCover` | bool | no | `false` | 대표 이미지. false를 허용해야 하므로 Nonfalsey를 사용하지 않습니다. |
+| 필드        | 타입           | 필수 | 기본값  | 설명                                                                |
+| ----------- | -------------- | ---- | ------- | ------------------------------------------------------------------- |
+| `post`      | relation posts | yes  |         | 게시글                                                              |
+| `image`     | file           | yes  |         | 이미지 파일                                                         |
+| `alt`       | text           | no   |         | 대체 텍스트                                                         |
+| `sortOrder` | number         | no   | `0`     | 정렬 순서. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다.         |
+| `isCover`   | bool           | no   | `false` | 대표 이미지. false를 허용해야 하므로 Nonfalsey를 사용하지 않습니다. |
 
 API Rules:
 
@@ -170,12 +170,12 @@ Delete rule: post.author = @request.auth.id || @request.auth.role = "admin"
 
 필드:
 
-| 필드 | 타입 | 필수 | 기본값 | 설명 |
-| --- | --- | --- | --- | --- |
-| `targetType` | select | yes |  | `post`, `comment` |
-| `targetId` | text | yes |  | 대상 record id |
-| `user` | relation users | yes |  | 사용자 |
-| `type` | select | yes | `like` | `like`, `dislike` |
+| 필드         | 타입           | 필수 | 기본값 | 설명              |
+| ------------ | -------------- | ---- | ------ | ----------------- |
+| `targetType` | select         | yes  |        | `post`, `comment` |
+| `targetId`   | text           | yes  |        | 대상 record id    |
+| `user`       | relation users | yes  |        | 사용자            |
+| `type`       | select         | yes  | `like` | `like`, `dislike` |
 
 권장 인덱스:
 
@@ -200,10 +200,10 @@ Delete rule: user = @request.auth.id || @request.auth.role = "admin"
 
 필드:
 
-| 필드 | 타입 | 필수 | 기본값 | 설명 |
-| --- | --- | --- | --- | --- |
-| `post` | relation posts | yes |  | 게시글 |
-| `user` | relation users | yes |  | 사용자 |
+| 필드   | 타입           | 필수 | 기본값 | 설명   |
+| ------ | -------------- | ---- | ------ | ------ |
+| `post` | relation posts | yes  |        | 게시글 |
+| `user` | relation users | yes  |        | 사용자 |
 
 권장 인덱스:
 
@@ -233,14 +233,14 @@ Delete rule: user = @request.auth.id || @request.auth.role = "admin"
 
 필드:
 
-| 필드 | 타입 | 필수 | 기본값 | 설명 |
-| --- | --- | --- | --- | --- |
-| `targetType` | select | yes |  | `post`, `comment`, `user` |
-| `targetId` | text | yes |  | 대상 record id |
-| `reporter` | relation users | yes |  | 신고자 |
-| `reason` | select | yes |  | 신고 사유 |
-| `detail` | text | no |  | 상세 설명 |
-| `status` | select | yes | `pending` | `pending`, `reviewed`, `rejected`, `resolved` |
+| 필드         | 타입           | 필수 | 기본값    | 설명                                          |
+| ------------ | -------------- | ---- | --------- | --------------------------------------------- |
+| `targetType` | select         | yes  |           | `post`, `comment`, `user`                     |
+| `targetId`   | text           | yes  |           | 대상 record id                                |
+| `reporter`   | relation users | yes  |           | 신고자                                        |
+| `reason`     | select         | yes  |           | 신고 사유                                     |
+| `detail`     | text           | no   |           | 상세 설명                                     |
+| `status`     | select         | yes  | `pending` | `pending`, `reviewed`, `rejected`, `resolved` |
 
 API Rules:
 
@@ -258,25 +258,25 @@ Delete rule: @request.auth.role = "admin"
 
 필드:
 
-| 필드 | 타입 | 필수 | 기본값 | 설명 |
-| --- | --- | --- | --- | --- |
-| `manufacturer` | text | yes |  | 제조사 |
-| `model` | text | yes |  | 모델 |
-| `screenWidth` | number | yes |  | `window.screen.width` |
-| `screenHeight` | number | yes |  | `window.screen.height` |
-| `windowWidthMin` | number | yes |  | 작성 중 관측된 최소 `window.innerWidth` |
-| `windowWidthMax` | number | yes |  | 작성 중 관측된 최대 `window.innerWidth` |
-| `windowHeightMin` | number | yes |  | 작성 중 관측된 최소 `window.innerHeight` |
-| `windowHeightMax` | number | yes |  | 작성 중 관측된 최대 `window.innerHeight` |
-| `devicePixelRatio` | number | yes |  | `window.devicePixelRatio` |
-| `orientation` | select | yes | `portrait` | `portrait`, `landscape` |
-| `userAgent` | text | yes |  | 브라우저 userAgent |
-| `displaySetting` | number | yes | `0` | Android 표시 크기 단계. iOS는 0으로 고정 |
-| `description` | text | no |  | 추가 설명 |
-| `author` | relation users | yes |  | 작성자 |
-| `status` | select | yes | `published` | `published`, `hidden`, `deleted` |
-| `deleted` | bool | no | `false` | soft delete 여부. false를 허용해야 하므로 required로 설정하지 않습니다. |
-| `deletedAt` | date | no |  | 삭제 시각 |
+| 필드               | 타입           | 필수 | 기본값      | 설명                                                                    |
+| ------------------ | -------------- | ---- | ----------- | ----------------------------------------------------------------------- |
+| `manufacturer`     | text           | yes  |             | 제조사                                                                  |
+| `model`            | text           | yes  |             | 모델                                                                    |
+| `screenWidth`      | number         | yes  |             | `window.screen.width`                                                   |
+| `screenHeight`     | number         | yes  |             | `window.screen.height`                                                  |
+| `windowWidthMin`   | number         | yes  |             | 작성 중 관측된 최소 `window.innerWidth`                                 |
+| `windowWidthMax`   | number         | yes  |             | 작성 중 관측된 최대 `window.innerWidth`                                 |
+| `windowHeightMin`  | number         | yes  |             | 작성 중 관측된 최소 `window.innerHeight`                                |
+| `windowHeightMax`  | number         | yes  |             | 작성 중 관측된 최대 `window.innerHeight`                                |
+| `devicePixelRatio` | number         | yes  |             | `window.devicePixelRatio`                                               |
+| `orientation`      | select         | yes  | `portrait`  | `portrait`, `landscape`                                                 |
+| `userAgent`        | text           | yes  |             | 브라우저 userAgent                                                      |
+| `displaySetting`   | number         | yes  | `0`         | Android 표시 크기 단계. iOS는 0으로 고정                                |
+| `description`      | text           | no   |             | 추가 설명                                                               |
+| `author`           | relation users | yes  |             | 작성자                                                                  |
+| `status`           | select         | yes  | `published` | `published`, `hidden`, `deleted`                                        |
+| `deleted`          | bool           | no   | `false`     | soft delete 여부. false를 허용해야 하므로 required로 설정하지 않습니다. |
+| `deletedAt`        | date           | no   |             | 삭제 시각                                                               |
 
 API Rules:
 
@@ -294,14 +294,14 @@ Delete rule: @request.auth.role = "admin"
 
 필드:
 
-| 필드 | 타입 | 필수 | 기본값 | 설명 |
-| --- | --- | --- | --- | --- |
-| `title` | text | yes |  | 제목 |
-| `content` | editor/text | yes |  | 내용 |
-| `placement` | select | yes | `global` | `global`, `board`, `gallery` |
-| `active` | bool | yes | `true` | 활성 여부 |
-| `startsAt` | date | no |  | 시작일 |
-| `endsAt` | date | no |  | 종료일 |
+| 필드        | 타입        | 필수 | 기본값   | 설명                         |
+| ----------- | ----------- | ---- | -------- | ---------------------------- |
+| `title`     | text        | yes  |          | 제목                         |
+| `content`   | editor/text | yes  |          | 내용                         |
+| `placement` | select      | yes  | `global` | `global`, `board`, `gallery` |
+| `active`    | bool        | yes  | `true`   | 활성 여부                    |
+| `startsAt`  | date        | no   |          | 시작일                       |
+| `endsAt`    | date        | no   |          | 종료일                       |
 
 API Rules:
 
@@ -319,19 +319,19 @@ Delete rule: @request.auth.role = "admin"
 
 필드:
 
-| 필드 | 타입 | 필수 | 기본값 | 설명 |
-| --- | --- | --- | --- | --- |
-| `recipient` | text | yes |  | 알림을 받을 사용자 id |
-| `actor` | text | no |  | 알림을 발생시킨 사용자 id |
-| `type` | text | yes |  | `post_comment`, `comment_reply`, `mention`, `pic_log_invite`, `pic_log_order_request`, `system` |
-| `title` | text | yes |  | 알림 제목 |
-| `message` | text | yes |  | 알림 설명 |
-| `targetUrl` | text | yes |  | 클릭 시 이동할 프론트 경로 |
-| `targetType` | text | yes |  | `post`, `comment`, `picLog`, `picLogOrderRequest`, `system` |
-| `targetId` | text | no |  | 연결 대상 record id |
-| `isRead` | bool | no | `false` | 읽음 여부. false를 허용해야 하므로 required로 설정하지 않습니다. |
-| `readAt` | date | no |  | 읽은 시각 |
-| `hidden` | bool | no | `false` | 사용자 숨김 여부. false를 허용해야 하므로 required로 설정하지 않습니다. |
+| 필드         | 타입 | 필수 | 기본값  | 설명                                                                                            |
+| ------------ | ---- | ---- | ------- | ----------------------------------------------------------------------------------------------- |
+| `recipient`  | text | yes  |         | 알림을 받을 사용자 id                                                                           |
+| `actor`      | text | no   |         | 알림을 발생시킨 사용자 id                                                                       |
+| `type`       | text | yes  |         | `post_comment`, `comment_reply`, `mention`, `pic_log_invite`, `pic_log_order_request`, `system` |
+| `title`      | text | yes  |         | 알림 제목                                                                                       |
+| `message`    | text | yes  |         | 알림 설명                                                                                       |
+| `targetUrl`  | text | yes  |         | 클릭 시 이동할 프론트 경로                                                                      |
+| `targetType` | text | yes  |         | `post`, `comment`, `picLog`, `picLogOrderRequest`, `system`                                     |
+| `targetId`   | text | no   |         | 연결 대상 record id                                                                             |
+| `isRead`     | bool | no   | `false` | 읽음 여부. false를 허용해야 하므로 required로 설정하지 않습니다.                                |
+| `readAt`     | date | no   |         | 읽은 시각                                                                                       |
+| `hidden`     | bool | no   | `false` | 사용자 숨김 여부. false를 허용해야 하므로 required로 설정하지 않습니다.                         |
 
 권장 인덱스:
 
@@ -366,4 +366,4 @@ Delete rule: @request.auth.role = "admin"
 - 일반화된 오류 메시지 반환
 - `turnstileToken`은 DB에 저장하지 않음
 
-자세한 설정은 [turnstile-setup.md](/Users/anoju/git-workspace/anoju-react2/docs/turnstile-setup.md)를 따릅니다.
+자세한 설정은 [turnstile-setup.md](/Users/anoju/git-workspace/anoju-react/docs/turnstile-setup.md)를 따릅니다.

@@ -1,6 +1,6 @@
 # Synology NAS React 컨테이너 배포 가이드
 
-이 문서는 `anoju-react2` React/Vite 프론트엔드를 **Windows PC에서 Docker 이미지로 빌드**한 뒤, **Synology NAS Container Manager**에 올려서 실행하는 절차를 정리합니다.
+이 문서는 `anoju-react` React/Vite 프론트엔드를 **Windows PC에서 Docker 이미지로 빌드**한 뒤, **Synology NAS Container Manager**에 올려서 실행하는 절차를 정리합니다.
 
 현재 기준 배포 흐름은 다음과 같습니다.
 

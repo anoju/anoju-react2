@@ -1,11 +1,13 @@
-# anoju-react2
+# anoju-react
 
-모바일 최우선(Mobile-First) 반응형 웹 애플리케이션 프로젝트인 **anoju-react2**입니다.
+모바일 최우선(Mobile-First) 반응형 웹 애플리케이션 프로젝트인 **anoju-react**입니다.
 
 ## 🚀 프로젝트 개요
+
 이 프로젝트는 React와 Vite를 기반으로 하며, 사용성 높은 SNS/이메일 인증 및 자유게시판/갤러리 기능을 제공합니다. 모든 디자인과 로직은 모바일 기기에서의 최적화된 경험을 최우선으로 합니다.
 
 ## 🛠 기술 스택
+
 - **프레임워크:** React (v19)
 - **빌드 도구:** Vite
 - **언어:** TypeScript
@@ -15,6 +17,7 @@
 - **SEO/메타:** React Helmet Async
 
 ## 📁 주요 폴더 구조
+
 - `/src/assets/images`: 이미지 관리 (icons, logos, contents 등으로 세분화)
 - `/src/components`: 아토믹 디자인(Atoms, Molecules, Organisms, Templates) 적용 및 각 컴포넌트 전용 폴더화
 - `/src/styles`: SCSS 관리 (base, layout, components 계층 구조)
@@ -22,6 +25,7 @@
 - `/src/hooks`: 재사용 가능한 비즈니스 로직 및 이벤트 해제 관리
 
 ## 📝 개발 원칙 및 규칙
+
 1. **언어 정책:** 코드 내 주석, 설명, README 등은 반드시 **한글**로 작성합니다.
 2. **스타일 네이밍:** CSS 클래스명은 **BEM(kebab-case)** 방식을 따릅니다.
 3. **방어적 코딩:** Optional Chaining(`?.`), Nullish Coalescing(`??`)을 생활화합니다.
@@ -29,6 +33,7 @@
 5. **체계적 관리:** 모든 파일은 용도별 폴더로 분류하여 관리 효율성을 높입니다.
 
 ## 💻 실행 방법
+
 ```bash
 # 의존성 설치
 pnpm install
@@ -41,6 +46,7 @@ pnpm build
 ```
 
 ## 🛠 VS Code 권장 설정
+
 일관된 코드 스타일과 린트 자동 수정을 위해 아래 설정을 `.vscode/settings.json`에 적용하여 사용하시길 권장합니다.
 
 ```json
@@ -50,12 +56,7 @@ pnpm build
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "always"
   },
-  "eslint.validate": [
-    "javascript",
-    "javascriptreact",
-    "typescript",
-    "typescriptreact"
-  ],
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
   "typescript.tsdk": "node_modules/typescript/lib",
   "files.associations": {
     "*.scss": "scss"
