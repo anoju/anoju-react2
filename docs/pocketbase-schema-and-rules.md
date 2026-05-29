@@ -271,7 +271,7 @@ Delete rule: @request.auth.role = "admin"
 | `devicePixelRatio` | number         | yes  |             | `window.devicePixelRatio`                                               |
 | `orientation`      | select         | yes  | `portrait`  | `portrait`, `landscape`                                                 |
 | `userAgent`        | text           | yes  |             | 브라우저 userAgent                                                      |
-| `displaySetting`   | number         | yes  | `0`         | Android 표시 크기 단계. iOS는 0으로 고정                                |
+| `displaySetting`   | number         | no   | `0`         | Android 표시 크기 단계. iOS는 0으로 고정. PocketBase number 필드는 `0`을 required 값으로 안정적으로 통과시키기 어려우므로 필수값을 끄고 프론트 검증으로 보완합니다. |
 | `description`      | text           | no   |             | 추가 설명                                                               |
 | `author`           | relation users | yes  |             | 작성자                                                                  |
 | `status`           | select         | yes  | `published` | `published`, `hidden`, `deleted`                                        |
@@ -285,6 +285,66 @@ List rule: status = "published" && deleted = false || @request.auth.role = "admi
 View rule: status = "published" && deleted = false || author = @request.auth.id || @request.auth.role = "admin"
 Create rule: @request.auth.id != "" && @request.auth.verified = true
 Update rule: (author = @request.auth.id && status != "hidden") || @request.auth.role = "admin"
+Delete rule: @request.auth.role = "admin"
+```
+
+## pic_logs
+
+하루 사진 로그 방 컬렉션입니다.
+
+API Rules:
+
+```text
+List rule: status = "published" && deleted = false && (visibility = "public" || visibility = "link" || participants ?= @request.auth.id || author = @request.auth.id || @request.auth.role = "admin")
+View rule: status = "published" && deleted = false && (visibility = "public" || visibility = "link" || participants ?= @request.auth.id || author = @request.auth.id || @request.auth.role = "admin" || (@request.auth.id != "" && @request.auth.verified = true && visibility != "private"))
+Create rule: @request.auth.id != "" && @request.auth.verified = true
+Update rule: (author = @request.auth.id && status != "hidden") || @request.auth.role = "admin" || (@request.auth.id != "" && @request.auth.verified = true && visibility != "private" && invitePassword = @request.body.invitePassword && @request.body.participants ?= @request.auth.id)
+Delete rule: @request.auth.role = "admin"
+```
+
+## pic_log_entries
+
+picLog 사진 항목 컬렉션입니다.
+
+API Rules:
+
+```text
+List rule: deleted = false && log.status = "published" && log.deleted = false && (log.visibility = "public" || log.visibility = "link" || log.participants ?= @request.auth.id || log.author = @request.auth.id || @request.auth.role = "admin")
+View rule: deleted = false && log.status = "published" && log.deleted = false && (log.visibility = "public" || log.visibility = "link" || log.participants ?= @request.auth.id || log.author = @request.auth.id || @request.auth.role = "admin")
+Create rule: @request.auth.id != "" && @request.auth.verified = true && author = @request.auth.id
+Update rule: author = @request.auth.id || log.author = @request.auth.id || @request.auth.role = "admin"
+Delete rule: @request.auth.role = "admin"
+```
+
+주의:
+
+- PocketBase create rule에서 새로 생성되는 relation record의 `log.participants ?= @request.auth.id`처럼 연쇄 relation 조건을 평가하면 생성 요청이 400으로 막힐 수 있습니다. 생성 시에는 `author = @request.auth.id`를 API rule로 보장하고, 참여자 여부 검증은 프론트와 추후 hook에서 보완합니다.
+
+## pic_log_comments
+
+picLog 시간 챕터 댓글 컬렉션입니다.
+
+API Rules:
+
+```text
+List rule: status = "published" && deleted = false && log.status = "published" && log.deleted = false && (log.visibility = "public" || log.visibility = "link" || log.participants ?= @request.auth.id || log.author = @request.auth.id || @request.auth.role = "admin")
+View rule: status = "published" && deleted = false && log.status = "published" && log.deleted = false && (log.visibility = "public" || log.visibility = "link" || log.participants ?= @request.auth.id || log.author = @request.auth.id || @request.auth.role = "admin")
+Create rule: @request.auth.id != "" && @request.auth.verified = true && author = @request.auth.id
+Update rule: author = @request.auth.id || @request.auth.role = "admin"
+Delete rule: @request.auth.role = "admin"
+```
+
+## pic_log_order_requests
+
+picLog 참여자 순서 변경 요청 컬렉션입니다.
+
+API Rules:
+
+```text
+List rule: log.participants ?= @request.auth.id || @request.auth.role = "admin"
+View rule: log.participants ?= @request.auth.id || @request.auth.role = "admin"
+Create rule: @request.auth.id != "" && @request.auth.verified = true && requester = @request.auth.id && requester != targetUser
+Update rule: targetUser = @request.auth.id || @request.auth.role = "admin"
 Delete rule: @request.auth.role = "admin"
 ```
 

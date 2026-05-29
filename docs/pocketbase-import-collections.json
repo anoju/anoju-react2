@@ -845,7 +845,7 @@
         "name": "displaySetting",
         "type": "number",
         "system": false,
-        "required": true,
+        "required": false,
         "presentable": false,
         "hidden": false,
         "min": 0,

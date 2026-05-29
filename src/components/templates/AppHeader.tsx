@@ -19,10 +19,10 @@ export const AppHeader = ({ config, visible }: AppHeaderProps) => {
   const { status, user } = useAuthStore();
   const [unreadCount, setUnreadCount] = useState(0);
   const canUseNotifications = status === 'authenticated' && Boolean(user?.id);
+  const visibleUnreadCount = canUseNotifications ? unreadCount : 0;
 
   const loadUnreadCount = useCallback(async () => {
     if (!canUseNotifications) {
-      setUnreadCount(0);
       return;
     }
 
@@ -34,7 +34,13 @@ export const AppHeader = ({ config, visible }: AppHeaderProps) => {
   }, [canUseNotifications]);
 
   useEffect(() => {
-    void loadUnreadCount();
+    const timeoutId = window.setTimeout(() => {
+      void loadUnreadCount();
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
   }, [loadUnreadCount]);
 
   useEffect(() => {
@@ -117,13 +123,13 @@ export const AppHeader = ({ config, visible }: AppHeaderProps) => {
           {config.showNotificationButton ? (
             <span className="app-header__notification">
               <IconButton
-                label={unreadCount > 0 ? `알림함, 읽지 않은 알림 ${unreadCount}개` : '알림함'}
+                label={visibleUnreadCount > 0 ? `알림함, 읽지 않은 알림 ${visibleUnreadCount}개` : '알림함'}
                 icon={<Bell size={20} />}
                 onClick={() => navigate(MY_PAGE_NOTIFICATIONS_PATH)}
               />
-              {unreadCount > 0 ? (
+              {visibleUnreadCount > 0 ? (
                 <span className="app-header__notification-badge" aria-hidden="true">
-                  {unreadCount > 99 ? '99+' : unreadCount}
+                  {visibleUnreadCount > 99 ? '99+' : visibleUnreadCount}
                 </span>
               ) : null}
             </span>

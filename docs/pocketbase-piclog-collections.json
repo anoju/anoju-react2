@@ -94,7 +94,12 @@
         "presentable": false,
         "hidden": false,
         "maxSelect": 1,
-        "values": ["private", "invited", "link", "public"]
+        "values": [
+          "private",
+          "invited",
+          "link",
+          "public"
+        ]
       },
       {
         "id": "sel_pl_stat",
@@ -105,7 +110,11 @@
         "presentable": false,
         "hidden": false,
         "maxSelect": 1,
-        "values": ["published", "hidden", "deleted"]
+        "values": [
+          "published",
+          "hidden",
+          "deleted"
+        ]
       },
       {
         "id": "bool_pl_del",
@@ -140,7 +149,7 @@
     "system": false,
     "listRule": "deleted = false && log.status = \"published\" && log.deleted = false && (log.visibility = \"public\" || log.visibility = \"link\" || log.participants ?= @request.auth.id || log.author = @request.auth.id || @request.auth.role = \"admin\")",
     "viewRule": "deleted = false && log.status = \"published\" && log.deleted = false && (log.visibility = \"public\" || log.visibility = \"link\" || log.participants ?= @request.auth.id || log.author = @request.auth.id || @request.auth.role = \"admin\")",
-    "createRule": "@request.auth.id != \"\" && @request.auth.verified = true && log.participants ?= @request.auth.id && log.status = \"published\" && log.deleted = false",
+    "createRule": "@request.auth.id != \"\" && @request.auth.verified = true && author = @request.auth.id",
     "updateRule": "author = @request.auth.id || log.author = @request.auth.id || @request.auth.role = \"admin\"",
     "deleteRule": "@request.auth.role = \"admin\"",
     "fields": [
@@ -220,7 +229,11 @@
         "hidden": false,
         "maxSelect": 1,
         "maxSize": 5242880,
-        "mimeTypes": ["image/jpeg", "image/png", "image/webp"],
+        "mimeTypes": [
+          "image/jpeg",
+          "image/png",
+          "image/webp"
+        ],
         "thumbs": [],
         "protected": false
       },
@@ -283,7 +296,7 @@
     "system": false,
     "listRule": "status = \"published\" && deleted = false && log.status = \"published\" && log.deleted = false && (log.visibility = \"public\" || log.visibility = \"link\" || log.participants ?= @request.auth.id || log.author = @request.auth.id || @request.auth.role = \"admin\")",
     "viewRule": "status = \"published\" && deleted = false && log.status = \"published\" && log.deleted = false && (log.visibility = \"public\" || log.visibility = \"link\" || log.participants ?= @request.auth.id || log.author = @request.auth.id || @request.auth.role = \"admin\")",
-    "createRule": "@request.auth.id != \"\" && @request.auth.verified = true && log.participants ?= @request.auth.id",
+    "createRule": "@request.auth.id != \"\" && @request.auth.verified = true && author = @request.auth.id",
     "updateRule": "author = @request.auth.id || @request.auth.role = \"admin\"",
     "deleteRule": "@request.auth.role = \"admin\"",
     "fields": [
@@ -388,7 +401,11 @@
         "presentable": false,
         "hidden": false,
         "maxSelect": 1,
-        "values": ["published", "hidden", "deleted"]
+        "values": [
+          "published",
+          "hidden",
+          "deleted"
+        ]
       },
       {
         "id": "bool_plc_del",
@@ -422,7 +439,7 @@
     "system": false,
     "listRule": "log.participants ?= @request.auth.id || @request.auth.role = \"admin\"",
     "viewRule": "log.participants ?= @request.auth.id || @request.auth.role = \"admin\"",
-    "createRule": "@request.auth.id != \"\" && @request.auth.verified = true && log.participants ?= @request.auth.id",
+    "createRule": "@request.auth.id != \"\" && @request.auth.verified = true && requester = @request.auth.id && requester != targetUser",
     "updateRule": "targetUser = @request.auth.id || @request.auth.role = \"admin\"",
     "deleteRule": "@request.auth.role = \"admin\"",
     "fields": [
@@ -474,7 +491,12 @@
         "presentable": true,
         "hidden": false,
         "maxSelect": 1,
-        "values": ["pending", "accepted", "rejected", "expired"]
+        "values": [
+          "pending",
+          "accepted",
+          "rejected",
+          "expired"
+        ]
       }
     ],
     "indexes": [

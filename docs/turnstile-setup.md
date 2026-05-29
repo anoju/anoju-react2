@@ -22,7 +22,7 @@ VITE_TURNSTILE_SITE_KEY=Cloudflare에서_발급받은_Sitekey
 
 - `VITE_TURNSTILE_SITE_KEY`는 브라우저에 노출되는 값입니다.
 - Secret key는 절대 `VITE_` 환경 변수에 넣지 않습니다.
-- 개발 환경에서 Sitekey가 없으면 Cloudflare 테스트 Sitekey를 사용하도록 구현되어 있습니다.
+- 개발 환경에서는 `.env`의 실제 Sitekey보다 Cloudflare 테스트 Sitekey를 우선 사용하도록 구현되어 있습니다. 실제 운영 Sitekey 검증은 `pnpm build`로 만든 배포 빌드에서 확인합니다.
 
 ## PocketBase 서버 환경 변수
 
