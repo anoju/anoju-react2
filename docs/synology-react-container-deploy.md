@@ -63,6 +63,7 @@ NAS에서 직접 `pnpm i`를 할 필요는 없습니다. 이 방식은 **PC에�
 ```env
 VITE_APP_URL=https://anoju.synology.me
 VITE_PB_URL=https://pocketbase.anoju.synology.me
+VITE_TURNSTILE_SITE_KEY=Cloudflare에서_발급받은_Sitekey
 ```
 
 주의할 점:
@@ -70,6 +71,8 @@ VITE_PB_URL=https://pocketbase.anoju.synology.me
 - Vite의 `VITE_` 환경 변수는 빌드 시점에 결과물에 포함됩니다.
 - `.env`를 바꾸면 반드시 다시 `pnpm build`와 `docker build`를 해야 합니다.
 - PocketBase 주소를 코드에 직접 하드코딩하지 않습니다.
+- `VITE_TURNSTILE_SITE_KEY`가 비어 있으면 운영 화면에서 `Turnstile Sitekey 설정이 필요합니다.` 메시지가 노출됩니다.
+- Turnstile Secret key는 프론트 `.env`에 넣지 않고 PocketBase 서버 환경 변수 `TURNSTILE_SECRET_KEY`로만 등록합니다.
 
 ## 4. Docker Desktop 상태 확인
 

@@ -26,11 +26,14 @@ services:
       - serve
       - --http=0.0.0.0:9080 # 내부 포트를 9080으로 지정
       - --dir=/pb_data      # 데이터 저장 위치 강제 지정
+    environment:
+      - TURNSTILE_SECRET_KEY=Cloudflare에서_발급받은_Turnstile_Secret_key
     ports:
       - "9090:9080" # 외부포트 9090 (NAS 접속용) : 내부포트 9080
     volumes:
       # 볼륨 권한 문제를 피하기 위해 전체(절대) 경로 사용을 권장합니다.
       - "/volume1/docker/pocketbase/pb_data:/pb_data"
+      - "/volume1/docker/pocketbase/pb_hooks:/pb_hooks"
     healthcheck:
       test: wget --no-verbose --tries=1 --spider http://localhost:9080/api/health || exit 1
       interval: 10s
@@ -46,6 +49,33 @@ services:
     - 로그 파일 하단에 `http://0.0.0.0:9080/_/#/pbinstal/...` 주소를 찾습니다.
     - `0.0.0.0` 부분을 본인의 NAS 주소로 바꿔서 브라우저에 입력하고 접속합니다. (예: `https://[NAS_IP]/_/#/pbinstal/...`)
 3.  첫 접속 시 사용할 **관리자 이메일과 비밀번호**를 생성합니다.
+
+## 3.1 Turnstile 환경 변수와 hook 적용
+
+Cloudflare Turnstile Secret key는 PocketBase 관리자 화면이 아니라 PocketBase 컨테이너 실행 환경 변수에 등록합니다.
+
+Container Manager에서 `pocketbase` 프로젝트를 사용하는 경우:
+
+1. **Container Manager** → **프로젝트** → `pocketbase` 선택
+2. 프로젝트를 중지합니다.
+3. **편집** 또는 **설정**에서 compose YAML을 엽니다.
+4. `pocketbase` 서비스 아래에 아래 값을 추가합니다.
+
+```yaml
+environment:
+  - TURNSTILE_SECRET_KEY=Cloudflare에서_발급받은_Turnstile_Secret_key
+```
+
+5. `pb_hooks`를 사용하려면 볼륨도 함께 연결합니다.
+
+```yaml
+volumes:
+  - "/volume1/docker/pocketbase/pb_data:/pb_data"
+  - "/volume1/docker/pocketbase/pb_hooks:/pb_hooks"
+```
+
+6. `/volume1/docker/pocketbase/pb_hooks` 폴더에 프로젝트의 `pb_hooks/turnstile.pb.js` 파일을 복사합니다.
+7. 프로젝트를 다시 시작합니다.
 
 ## 4. 특징 및 외부 접속 (역방향 프록시)
 
