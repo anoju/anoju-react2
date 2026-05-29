@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom'
 import {
   DEFAULT_HOME_PATH,
   DEVICE_INFO_PATH,
+  CLIPS_PATH,
   FREE_BOARD_PATH,
   IT_LOGS_PATH,
   LOGIN_PATH,
@@ -61,6 +62,7 @@ const Menu = () => {
       items: [
         { label: 'Snaps Home', path: SNAPS_PATH },
         { label: 'Pics', path: PICS_PATH },
+        { label: 'Clips', path: CLIPS_PATH },
       ],
     },
     {

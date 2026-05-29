@@ -22,6 +22,10 @@ import ITLogsDetail from "@/pages/Playground/ITLogs/Detail/Index";
 import ITLogsEdit from "@/pages/Playground/ITLogs/Edit/Index";
 import ITLogsWrite from "@/pages/Playground/ITLogs/Write/Index";
 import Snaps from "@/pages/Snaps/Index";
+import Clips from "@/pages/Snaps/Clips/Index";
+import ClipsDetail from "@/pages/Snaps/Clips/Detail/Index";
+import ClipsEdit from "@/pages/Snaps/Clips/Edit/Index";
+import ClipsWrite from "@/pages/Snaps/Clips/Write/Index";
 import Pics from "@/pages/Snaps/Pics/Index";
 import PicsDetail from "@/pages/Snaps/Pics/Detail/Index";
 import PicsEdit from "@/pages/Snaps/Pics/Edit/Index";
@@ -35,6 +39,9 @@ import PicLogNew from "@/pages/Snaps/PicLog/New/Index";
 import About from "@/pages/Static/About/Index";
 import NotFound from "@/pages/System/NotFound/Index";
 import {
+  CLIPS_PATH,
+  CLIPS_EDIT_PATH,
+  CLIPS_WRITE_PATH,
   DEFAULT_HOME_PATH,
   DEVICE_INFO_PATH,
   DEVICE_INFO_EDIT_PATH,
@@ -472,6 +479,64 @@ export const routeConfig = [
       header: defaultHeader("Pics"),
       floatingMenu: defaultFloatingMenu,
     },
+  },
+  {
+    id: "clips",
+    path: CLIPS_PATH,
+    element: <Clips />,
+    meta: {
+      title: "Clips",
+      description: "동영상 Clips 목록 화면입니다.",
+    },
+    layout: {
+      header: defaultHeader("Clips"),
+      floatingMenu: defaultFloatingMenu,
+    },
+  },
+  {
+    id: "clips-detail",
+    path: `${CLIPS_PATH}/:clipId`,
+    element: <ClipsDetail />,
+    meta: {
+      title: "Clips 상세",
+      description: "Clips 동영상 상세 화면입니다.",
+    },
+    layout: {
+      header: defaultHeader("Clips"),
+      floatingMenu: defaultFloatingMenu,
+    },
+  },
+  {
+    id: "clips-write",
+    path: CLIPS_WRITE_PATH,
+    element: <ClipsWrite />,
+    meta: {
+      title: "Clips 작성",
+      description: "Clips 동영상 작성 화면입니다.",
+      robots: "noindex",
+    },
+    layout: {
+      header: defaultHeader("Clips 작성"),
+      floatingMenu: defaultFloatingMenu,
+    },
+    requiresAuth: true,
+    roles: ["user", "admin"],
+  },
+  {
+    id: "clips-edit",
+    path: CLIPS_EDIT_PATH,
+    element: <ClipsEdit />,
+    meta: {
+      title: "Clips 수정",
+      description: "Clips 동영상 수정 화면입니다.",
+      robots: "noindex",
+    },
+    layout: {
+      header: defaultHeader("Clips 수정"),
+      floatingMenu: defaultFloatingMenu,
+    },
+    requiresAuth: true,
+    roles: ["user", "admin"],
   },
   {
     id: "pics-write",

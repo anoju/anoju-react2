@@ -938,5 +938,213 @@
       }
     ],
     "indexes": []
+  },
+  {
+    "id": "anoju_clips",
+    "name": "clips",
+    "type": "base",
+    "system": false,
+    "listRule": "status = \"published\" && deleted = false || @request.auth.role = \"admin\"",
+    "viewRule": "status = \"published\" && deleted = false || author = @request.auth.id || @request.auth.role = \"admin\"",
+    "createRule": "@request.auth.id != \"\" && @request.auth.verified = true",
+    "updateRule": "(author = @request.auth.id && status != \"hidden\") || @request.auth.role = \"admin\"",
+    "deleteRule": "@request.auth.role = \"admin\"",
+    "fields": [
+      {
+        "id": "text3208210256",
+        "name": "id",
+        "type": "text",
+        "system": true,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "primaryKey": true,
+        "min": 15,
+        "max": 15,
+        "pattern": "^[a-z0-9]+$",
+        "autogeneratePattern": "[a-z0-9]{15}"
+      },
+      {
+        "id": "txt_clip_title",
+        "name": "title",
+        "type": "text",
+        "system": false,
+        "required": true,
+        "presentable": true,
+        "hidden": false,
+        "min": 1,
+        "max": 120,
+        "pattern": "",
+        "autogeneratePattern": ""
+      },
+      {
+        "id": "txt_clip_desc",
+        "name": "description",
+        "type": "text",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "min": 1,
+        "max": 0,
+        "pattern": "",
+        "autogeneratePattern": ""
+      },
+      {
+        "id": "file_clip_video",
+        "name": "video",
+        "type": "file",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "mimeTypes": [
+          "video/mp4",
+          "video/webm",
+          "video/quicktime"
+        ],
+        "thumbs": [],
+        "maxSelect": 1,
+        "maxSize": 104857600,
+        "protected": false
+      },
+      {
+        "id": "file_clip_poster",
+        "name": "poster",
+        "type": "file",
+        "system": false,
+        "required": false,
+        "presentable": false,
+        "hidden": false,
+        "mimeTypes": [
+          "image/jpeg",
+          "image/png",
+          "image/webp"
+        ],
+        "thumbs": [
+          "640x360"
+        ],
+        "maxSelect": 1,
+        "maxSize": 5242880,
+        "protected": false
+      },
+      {
+        "id": "rel_clip_author",
+        "name": "author",
+        "type": "relation",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "collectionId": "_pb_users_auth_",
+        "cascadeDelete": false,
+        "minSelect": 1,
+        "maxSelect": 1
+      },
+      {
+        "id": "sel_clip_status",
+        "name": "status",
+        "type": "select",
+        "system": false,
+        "required": true,
+        "presentable": false,
+        "hidden": false,
+        "maxSelect": 1,
+        "values": [
+          "published",
+          "hidden",
+          "deleted"
+        ]
+      },
+      {
+        "id": "json_clip_tags",
+        "name": "tags",
+        "type": "json",
+        "system": false,
+        "required": false,
+        "presentable": false,
+        "hidden": false,
+        "maxSize": 2000000
+      },
+      {
+        "id": "num_clip_view",
+        "name": "viewCount",
+        "type": "number",
+        "system": false,
+        "required": false,
+        "presentable": false,
+        "hidden": false,
+        "min": 0,
+        "max": null,
+        "onlyInt": true
+      },
+      {
+        "id": "num_clip_like",
+        "name": "likeCount",
+        "type": "number",
+        "system": false,
+        "required": false,
+        "presentable": false,
+        "hidden": false,
+        "min": 0,
+        "max": null,
+        "onlyInt": true
+      },
+      {
+        "id": "num_clip_dislike",
+        "name": "dislikeCount",
+        "type": "number",
+        "system": false,
+        "required": false,
+        "presentable": false,
+        "hidden": false,
+        "min": 0,
+        "max": null,
+        "onlyInt": true
+      },
+      {
+        "id": "bool_clip_deleted",
+        "name": "deleted",
+        "type": "bool",
+        "system": false,
+        "required": false,
+        "presentable": false,
+        "hidden": false
+      },
+      {
+        "id": "date_clip_deleted",
+        "name": "deletedAt",
+        "type": "date",
+        "system": false,
+        "required": false,
+        "presentable": false,
+        "hidden": false,
+        "min": "",
+        "max": ""
+      },
+      {
+        "id": "adate_clip_cr",
+        "name": "created",
+        "type": "autodate",
+        "system": false,
+        "required": false,
+        "presentable": false,
+        "hidden": false,
+        "onCreate": true,
+        "onUpdate": false
+      },
+      {
+        "id": "adate_clip_up",
+        "name": "updated",
+        "type": "autodate",
+        "system": false,
+        "required": false,
+        "presentable": false,
+        "hidden": false,
+        "onCreate": true,
+        "onUpdate": true
+      }
+    ],
+    "indexes": []
   }
 ]

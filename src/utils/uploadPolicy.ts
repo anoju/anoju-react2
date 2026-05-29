@@ -2,6 +2,7 @@ import { toast } from '@/components/feedback';
 import { createClientId } from '@/utils/id';
 
 const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/quicktime'];
 const BOARD_ATTACHMENT_TYPES = [
   'application/pdf',
   'text/plain',
@@ -35,6 +36,8 @@ const MB = 1024 * 1024;
 export const UPLOAD_LIMITS = {
   profileImage: 2 * MB,
   postImage: 5 * MB,
+  clipVideo: 100 * MB,
+  clipPoster: 5 * MB,
   boardAttachment: 10 * MB,
 } as const;
 
@@ -53,6 +56,14 @@ export interface FileAttachmentPreview {
   name: string;
   size: number;
   extension: string;
+}
+
+export interface VideoUploadPreview {
+  id: string;
+  file: File;
+  url: string;
+  name: string;
+  size: number;
 }
 
 export const validateImageFile = (file: File, maxSize: number) => {
@@ -91,8 +102,43 @@ export const createUploadPreviews = (files: File[], maxSize = UPLOAD_LIMITS.post
   return previews;
 };
 
+export const validateVideoFile = (file: File, maxSize = UPLOAD_LIMITS.clipVideo) => {
+  if (!VIDEO_TYPES.includes(file.type)) {
+    return 'mp4, webm, mov 형식의 동영상만 업로드할 수 있습니다.';
+  }
+
+  if (file.size > maxSize) {
+    return `동영상은 ${Math.floor(maxSize / MB)}MB 이하로 업로드해주세요.`;
+  }
+
+  return null;
+};
+
+export const createVideoUploadPreview = (file: File, maxSize = UPLOAD_LIMITS.clipVideo): VideoUploadPreview | null => {
+  const error = validateVideoFile(file, maxSize);
+
+  if (error) {
+    toast(error, { tone: 'danger' });
+    return null;
+  }
+
+  return {
+    id: createClientId('clip-video'),
+    file,
+    url: URL.createObjectURL(file),
+    name: file.name,
+    size: file.size,
+  };
+};
+
 export const revokeUploadPreviews = (previews: UploadPreview[]) => {
   previews.forEach((preview) => URL.revokeObjectURL(preview.url));
+};
+
+export const revokeVideoUploadPreview = (preview: VideoUploadPreview | null) => {
+  if (preview) {
+    URL.revokeObjectURL(preview.url);
+  }
 };
 
 export const formatFileSize = (size: number) => {

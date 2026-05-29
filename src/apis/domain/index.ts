@@ -1,4 +1,5 @@
 export { bookmarkApi } from './bookmarkApi';
+export { clipApi, getClipPosterUrl, getClipVideoUrl } from './clipApi';
 export { commentApi } from './commentApi';
 export { communityApi } from './communityApi';
 export { createCrudApi } from './createCrudApi';

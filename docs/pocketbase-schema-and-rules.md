@@ -288,6 +288,39 @@ Update rule: (author = @request.auth.id && status != "hidden") || @request.auth.
 Delete rule: @request.auth.role = "admin"
 ```
 
+## clips
+
+Snaps 하위 동영상 게시판 컬렉션입니다. 일반 회원은 로그인 및 이메일 인증 완료 후 작성할 수 있고, 수정/삭제는 작성자 본인과 관리자만 가능합니다.
+
+필드:
+
+| 필드           | 타입           | 필수 | 기본값      | 설명                                                                    |
+| -------------- | -------------- | ---- | ----------- | ----------------------------------------------------------------------- |
+| `title`        | text           | yes  |             | 동영상 제목                                                             |
+| `description`  | text           | yes  |             | 동영상 설명                                                             |
+| `video`        | file           | yes  |             | `mp4`, `webm`, `mov`, 최대 100MB                                        |
+| `poster`       | file           | no   |             | 썸네일 이미지. `jpg`, `png`, `webp`, 최대 5MB                           |
+| `author`       | relation users | yes  |             | 작성자                                                                  |
+| `status`       | select         | yes  | `published` | `published`, `hidden`, `deleted`                                        |
+| `tags`         | json           | no   | `[]`        | 태그 배열                                                               |
+| `viewCount`    | number         | no   | `0`         | 조회수. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다.                |
+| `likeCount`    | number         | no   | `0`         | 좋아요 수. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다.             |
+| `dislikeCount` | number         | no   | `0`         | 싫어요 수. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다.             |
+| `deleted`      | bool           | no   | `false`     | soft delete 여부. false를 허용해야 하므로 required로 설정하지 않습니다. |
+| `deletedAt`    | date           | no   |             | 삭제 시각                                                               |
+| `created`      | autodate       | no   |             | 생성 시각                                                               |
+| `updated`      | autodate       | no   |             | 수정 시각                                                               |
+
+API Rules:
+
+```text
+List rule: status = "published" && deleted = false || @request.auth.role = "admin"
+View rule: status = "published" && deleted = false || author = @request.auth.id || @request.auth.role = "admin"
+Create rule: @request.auth.id != "" && @request.auth.verified = true
+Update rule: (author = @request.auth.id && status != "hidden") || @request.auth.role = "admin"
+Delete rule: @request.auth.role = "admin"
+```
+
 ## pic_logs
 
 하루 사진 로그 방 컬렉션입니다.

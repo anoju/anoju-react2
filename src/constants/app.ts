@@ -42,6 +42,12 @@ export const DEVICE_INFO_EDIT_PATH = '/playground/device/:deviceReportId/edit';
 
 export const SNAPS_PATH = '/snaps';
 
+export const CLIPS_PATH = '/snaps/clips';
+
+export const CLIPS_WRITE_PATH = '/snaps/clips/write';
+
+export const CLIPS_EDIT_PATH = '/snaps/clips/:clipId/edit';
+
 export const PICS_PATH = '/snaps/pics';
 
 export const PICS_WRITE_PATH = '/snaps/pics/write';

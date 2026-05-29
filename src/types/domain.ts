@@ -179,6 +179,21 @@ export interface DeviceReportRecord extends RecordModel {
   deletedAt?: string;
 }
 
+export interface ClipRecord extends RecordModel {
+  title: string;
+  description: string;
+  video: string;
+  poster?: string;
+  author: string;
+  status: PostStatus;
+  tags?: string[];
+  viewCount: number;
+  likeCount: number;
+  dislikeCount?: number;
+  deleted: boolean;
+  deletedAt?: string;
+}
+
 export interface PicLogRecord extends RecordModel {
   title: string;
   logDate: string;

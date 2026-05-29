@@ -1,6 +1,6 @@
-import { Camera, Images } from 'lucide-react';
+import { Camera, Images, PlaySquare } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
-import { PICS_PATH, PIC_LOG_PATH } from '@/constants/app';
+import { CLIPS_PATH, PICS_PATH, PIC_LOG_PATH } from '@/constants/app';
 
 const Snaps = () => (
   <section className="container hub-page">
@@ -18,6 +18,15 @@ const Snaps = () => (
         <span className="hub-card__content">
           <strong>Pics</strong>
           <span>이미지와 캡션을 중심으로 보는 소셜 피드입니다.</span>
+        </span>
+      </NavLink>
+      <NavLink to={CLIPS_PATH} className="hub-card">
+        <span className="hub-card__icon" aria-hidden="true">
+          <PlaySquare size={22} />
+        </span>
+        <span className="hub-card__content">
+          <strong>Clips</strong>
+          <span>유튜브처럼 목록에서 고르고 플레이어로 집중해서 봅니다.</span>
         </span>
       </NavLink>
       <NavLink to={PIC_LOG_PATH} className="hub-card">
