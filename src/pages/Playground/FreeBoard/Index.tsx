@@ -4,15 +4,20 @@ import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-do
 import { MessageCircle, Plus, Search } from 'lucide-react';
 import { Avatar, Checkbox, DataList, FloatingActionButton, FloatingActions, Input, toast } from '@/components';
 import { communityApi, getUserMessage } from '@/apis';
-import { FREE_BOARD_PATH, FREE_BOARD_WRITE_PATH, LOGIN_PATH } from '@/constants/app';
+import { LOGIN_PATH } from '@/constants/app';
 import type { PostRecord } from '@/types/domain';
 import { createTextFilter } from '@/utils/queryString';
 import { compareByCreatedDesc, formatRelativeTime, getRecordAuthorAvatarUrl, getRecordAuthorName } from '@/utils/community';
 import { useAuthStore } from '@/stores/authStore';
+import { canWriteBoardContent, FREE_BOARD_CONFIG, type PlaygroundBoardConfig } from '../boardConfig';
 
 const PER_PAGE = 20;
 
-const FreeBoard = () => {
+interface FreeBoardProps {
+  config?: PlaygroundBoardConfig;
+}
+
+const FreeBoard = ({ config = FREE_BOARD_CONFIG }: FreeBoardProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -27,6 +32,7 @@ const FreeBoard = () => {
   const authStatus = useAuthStore((state) => state.status);
   const user = useAuthStore((state) => state.user);
   const showMyPosts = searchParams.get('mine') === '1';
+  const canWrite = canWriteBoardContent(config, user);
 
   const filter = useMemo(() => createTextFilter(keyword, ['title', 'content']), [keyword]);
 
@@ -53,7 +59,7 @@ const FreeBoard = () => {
 
       try {
         const result = await communityApi.listPosts({
-          type: 'board',
+          type: config.type,
           page: nextPage,
           perPage: PER_PAGE,
           filter,
@@ -71,7 +77,7 @@ const FreeBoard = () => {
         setLoadingMore(false);
       }
     },
-    [filter, showMyPosts, user?.id],
+    [config.type, filter, showMyPosts, user?.id],
   );
 
   useEffect(() => {
@@ -96,8 +102,8 @@ const FreeBoard = () => {
   };
 
   const handleWriteClick = () => {
-    if (!isAuthenticated) {
-      toast('글 작성은 이메일 인증을 완료한 회원만 가능합니다.', { tone: 'warning' });
+    if (!canWrite) {
+      toast(config.writeDeniedMessage, { tone: 'warning' });
     }
   };
 
@@ -127,9 +133,9 @@ const FreeBoard = () => {
     <section className="container board-page">
       <header className="board-page__header">
         <div>
-          <span className="board-page__eyebrow">playground</span>
-          <h2>자유게시판</h2>
-          <p>편하게 쓰고 천천히 이어가는 모바일 커뮤니티 게시판입니다.</p>
+          <span className="board-page__eyebrow">{config.eyebrow}</span>
+          <h2>{config.title}</h2>
+          <p>{config.description}</p>
         </div>
       </header>
 
@@ -155,12 +161,12 @@ const FreeBoard = () => {
         loadingMore={loadingMore}
         hasMore={page < totalPages}
         error={error}
-        emptyTitle="아직 게시글이 없습니다."
-        emptyDescription="첫 이야기를 남겨보세요."
+        emptyTitle={config.emptyTitle}
+        emptyDescription={config.emptyDescription}
         onLoadMore={() => void loadPosts(page + 1)}
         onRetry={() => void loadPosts(1)}
         renderItem={(post) => (
-          <Link to={`${FREE_BOARD_PATH}/${post.id}`} className="board-list-item">
+          <Link to={config.getDetailPath(post.id)} className="board-list-item">
             <span className="board-list-item__title">{post.title}</span>
             <span className="board-list-item__meta board-list-item__meta--author">
               <Avatar src={getRecordAuthorAvatarUrl(post)} name={getRecordAuthorName(post)} size="sm" />
@@ -176,9 +182,9 @@ const FreeBoard = () => {
         )}
       />
 
-      <FloatingActions label="자유게시판 주요 액션">
-        {isAuthenticated ? (
-          <FloatingActionButton label="글쓰기" to={FREE_BOARD_WRITE_PATH} icon={<Plus size={24} />} />
+      <FloatingActions label={config.floatingActionLabel}>
+        {canWrite ? (
+          <FloatingActionButton label="글쓰기" to={config.writePath} icon={<Plus size={24} />} />
         ) : (
           <FloatingActionButton label="글쓰기" icon={<Plus size={24} />} onClick={handleWriteClick} />
         )}

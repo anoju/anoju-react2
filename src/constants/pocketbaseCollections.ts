@@ -17,7 +17,7 @@ export const PB_COLLECTIONS = {
 
 export type PocketBaseCollectionName = (typeof PB_COLLECTIONS)[keyof typeof PB_COLLECTIONS];
 
-export const POST_TYPES = ['board', 'gallery'] as const;
+export const POST_TYPES = ['board', 'gallery', 'it_logs'] as const;
 
 export const POST_STATUSES = ['draft', 'published', 'hidden', 'deleted'] as const;
 

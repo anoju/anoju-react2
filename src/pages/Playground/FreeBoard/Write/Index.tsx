@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import { Paperclip, X } from 'lucide-react';
 import { Button, FixedBottomActions, Input, RichTextEditor, toast } from '@/components';
 import { communityApi, getUserMessage } from '@/apis';
-import { FREE_BOARD_PATH } from '@/constants/app';
 import {
   BOARD_ATTACHMENT_ACCEPT,
   createFileAttachmentPreviews,
@@ -15,6 +14,7 @@ import {
   type UploadPreview,
 } from '@/utils/uploadPolicy';
 import { useUnsavedChanges } from '@/hooks/useUnsavedChanges';
+import { FREE_BOARD_CONFIG, type PlaygroundBoardConfig } from '../../boardConfig';
 
 const getPlainText = (html: string) =>
   html
@@ -22,7 +22,11 @@ const getPlainText = (html: string) =>
     .replace(/&nbsp;/g, ' ')
     .trim();
 
-const FreeBoardWrite = () => {
+interface FreeBoardWriteProps {
+  config?: PlaygroundBoardConfig;
+}
+
+const FreeBoardWrite = ({ config = FREE_BOARD_CONFIG }: FreeBoardWriteProps) => {
   const navigate = useNavigate();
   const attachmentInputRef = useRef<HTMLInputElement>(null);
   const [title, setTitle] = useState('');
@@ -42,7 +46,7 @@ const FreeBoardWrite = () => {
 
   const handleCancel = async () => {
     if (await confirmLeave()) {
-      navigate(FREE_BOARD_PATH);
+      navigate(config.listPath);
     }
   };
 
@@ -80,12 +84,12 @@ const FreeBoardWrite = () => {
       const post = await communityApi.createPost({
         title: title.trim(),
         content,
-        type: 'board',
+        type: config.type,
         imageFiles: previews,
       });
 
       toast('게시글을 등록했습니다.', { tone: 'success' });
-      navigate(`${FREE_BOARD_PATH}/${post.id}`, { replace: true });
+      navigate(config.getDetailPath(post.id), { replace: true });
     } catch (error) {
       toast(getUserMessage(error), { tone: 'danger' });
     } finally {
@@ -96,7 +100,7 @@ const FreeBoardWrite = () => {
   return (
     <section className="container write-page">
       <header className="write-page__header">
-        <span className="board-page__eyebrow">자유게시판</span>
+        <span className="board-page__eyebrow">{config.title}</span>
         <h2>글쓰기</h2>
         <p>에디터에서 본문을 작성하고 원하는 위치에 이미지를 넣을 수 있습니다.</p>
       </header>

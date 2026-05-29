@@ -6,8 +6,8 @@
     "system": false,
     "listRule": "status = \"published\" && deleted = false || @request.auth.role = \"admin\"",
     "viewRule": "status = \"published\" && deleted = false || author = @request.auth.id || @request.auth.role = \"admin\"",
-    "createRule": "@request.auth.id != \"\" && @request.auth.verified = true",
-    "updateRule": "(author = @request.auth.id && status != \"hidden\") || @request.auth.role = \"admin\"",
+    "createRule": "@request.auth.id != \"\" && @request.auth.verified = true && (type != \"it_logs\" || @request.auth.role = \"admin\")",
+    "updateRule": "(author = @request.auth.id && status != \"hidden\" && type != \"it_logs\") || @request.auth.role = \"admin\"",
     "deleteRule": "@request.auth.role = \"admin\"",
     "fields": [
       {
@@ -47,7 +47,8 @@
         "maxSelect": 1,
         "values": [
           "board",
-          "gallery"
+          "gallery",
+          "it_logs"
         ]
       },
       {
@@ -181,8 +182,8 @@
     "system": false,
     "listRule": "status = \"published\" && deleted = false || @request.auth.role = \"admin\"",
     "viewRule": "status = \"published\" && deleted = false || author = @request.auth.id || @request.auth.role = \"admin\"",
-    "createRule": "@request.auth.id != \"\" && @request.auth.verified = true",
-    "updateRule": "author = @request.auth.id || @request.auth.role = \"admin\"",
+    "createRule": "@request.auth.id != \"\" && @request.auth.verified = true && (post.type != \"it_logs\" || @request.auth.role = \"admin\")",
+    "updateRule": "(author = @request.auth.id && post.type != \"it_logs\") || @request.auth.role = \"admin\"",
     "deleteRule": "@request.auth.role = \"admin\"",
     "fields": [
       {

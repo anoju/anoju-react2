@@ -13,7 +13,7 @@ import {
   toast,
 } from '@/components'
 import { communityApi, getUserMessage, reactionApi, type ReactionType } from '@/apis'
-import { FREE_BOARD_PATH, LOGIN_PATH } from '@/constants/app'
+import { LOGIN_PATH } from '@/constants/app'
 import type { CommentRecord, PostImageRecord, PostRecord } from '@/types/domain'
 import {
   compareByCreatedAsc,
@@ -28,8 +28,13 @@ import { applyReactionCount, getReactionKey } from '@/utils/reactionState'
 import { useAuthStore } from '@/stores/authStore'
 import { canEditAuthoredRecord } from '@/utils/recordPermission'
 import { createCommentThreads, type CommentThreadNode } from '@/utils/commentThread'
+import { canWriteBoardContent, FREE_BOARD_CONFIG, type PlaygroundBoardConfig } from '../../boardConfig'
 
-const FreeBoardDetail = () => {
+interface FreeBoardDetailProps {
+  config?: PlaygroundBoardConfig
+}
+
+const FreeBoardDetail = ({ config = FREE_BOARD_CONFIG }: FreeBoardDetailProps) => {
   const { postId = '' } = useParams()
   const location = useLocation()
   const navigate = useNavigate()
@@ -52,6 +57,7 @@ const FreeBoardDetail = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
   const user = useAuthStore((state) => state.user)
   const isAdmin = user?.role === 'admin'
+  const canWriteInteraction = canWriteBoardContent(config, user)
 
   const loadDetail = useCallback(async () => {
     if (!postId) {
@@ -67,6 +73,12 @@ const FreeBoardDetail = () => {
         communityApi.listImages(postId),
         communityApi.listComments(postId),
       ])
+
+      if (nextPost.type !== config.type) {
+        setError('게시글을 찾을 수 없습니다.')
+        return
+      }
+
       const sortedComments = [...nextComments].sort(compareByCreatedAsc)
       const reactions = isAuthenticated
         ? await reactionApi
@@ -96,7 +108,7 @@ const FreeBoardDetail = () => {
     } finally {
       setLoading(false)
     }
-  }, [isAuthenticated, postId])
+  }, [config.type, isAuthenticated, postId])
 
   useEffect(() => {
     void loadDetail()
@@ -156,8 +168,10 @@ const FreeBoardDetail = () => {
     targetId: string,
     type: ReactionType,
   ) => {
-    if (!isAuthenticated) {
-      toast('로그인 후 반응을 남길 수 있습니다.', { tone: 'warning' })
+    if (!canWriteInteraction) {
+      toast(config.adminOnlyWrite ? 'ITLogs 반응은 관리자만 남길 수 있습니다.' : '로그인 후 반응을 남길 수 있습니다.', {
+        tone: 'warning',
+      })
       return
     }
 
@@ -353,7 +367,7 @@ const FreeBoardDetail = () => {
     try {
       await communityApi.deletePostPermanently(postId)
       toast('게시글을 완전히 삭제했습니다.', { tone: 'success' })
-      navigate(FREE_BOARD_PATH, { replace: true })
+      navigate(config.listPath, { replace: true })
     } catch (deleteError) {
       toast(getUserMessage(deleteError), { tone: 'danger' })
     } finally {
@@ -369,7 +383,7 @@ const FreeBoardDetail = () => {
     return (
       <section className="container board-page">
         <p className="board-page__message">{error ?? '게시글을 찾을 수 없습니다.'}</p>
-        <Link className="button-link" to={FREE_BOARD_PATH}>
+        <Link className="button-link" to={config.listPath}>
           목록으로
         </Link>
       </section>
@@ -379,8 +393,8 @@ const FreeBoardDetail = () => {
   const hasLegacyImageToken = post.content.includes('[[image:')
   const contentParts = hasLegacyImageToken ? createContentParts(post.content, images) : []
   const sanitizedContent = sanitizeRichTextHtml(post.content)
-  const shareUrl = new URL(`${FREE_BOARD_PATH}/${post.id}`, window.location.origin).toString()
-  const canEditPost = canEditAuthoredRecord(post, user)
+  const shareUrl = new URL(config.getDetailPath(post.id), window.location.origin).toString()
+  const canEditPost = config.adminOnlyWrite ? isAdmin : canEditAuthoredRecord(post, user)
   const commentThreads = createCommentThreads(comments)
   const getCommentShareUrl = (commentId: string) => {
     const url = new URL(shareUrl)
@@ -389,7 +403,7 @@ const FreeBoardDetail = () => {
   }
   const renderComment = (node: CommentThreadNode, depth = 0): React.ReactNode => {
     const item = node.comment
-    const canEditComment = canEditAuthoredRecord(item, user)
+    const canEditComment = config.adminOnlyWrite ? isAdmin : canEditAuthoredRecord(item, user)
     const isPostAuthorComment = item.author === post.author
 
     return (
@@ -496,7 +510,7 @@ const FreeBoardDetail = () => {
         {editingCommentId !== item.id ? (
           <div className="comment-item__manage-actions" aria-label="댓글 관리">
             <div className="comment-item__reply-actions">
-              {isAuthenticated ? (
+              {canWriteInteraction ? (
                 <Button
                   type="button"
                   variant="ghost"
@@ -551,8 +565,8 @@ const FreeBoardDetail = () => {
   return (
     <article className="container board-detail">
       <header className="board-detail__header">
-        <Link to={FREE_BOARD_PATH} className="board-detail__back">
-          자유게시판
+        <Link to={config.listPath} className="board-detail__back">
+          {config.title}
         </Link>
         <h2>{post.title}</h2>
         <div className="board-detail__author">
@@ -603,7 +617,7 @@ const FreeBoardDetail = () => {
               tone="neutral"
               size="lg"
               leftIcon={<Pencil size={18} />}
-              onClick={() => navigate(`${FREE_BOARD_PATH}/${post.id}/edit`)}
+              onClick={() => navigate(config.getEditPath(post.id))}
             >
               수정
             </Button>
@@ -650,7 +664,7 @@ const FreeBoardDetail = () => {
           )}
         </div>
 
-        {isAuthenticated ? (
+        {canWriteInteraction ? (
           <form className="comment-box__form" onSubmit={handleCommentSubmit}>
             <TextArea
               label="댓글 작성"
@@ -662,6 +676,8 @@ const FreeBoardDetail = () => {
               댓글 등록
             </Button>
           </form>
+        ) : config.adminOnlyWrite ? (
+          <p className="board-page__message">관리자만 댓글을 작성할 수 있습니다.</p>
         ) : (
           <Link
             className="button-link"

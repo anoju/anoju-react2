@@ -66,7 +66,7 @@ Delete rule: @request.auth.role = "admin"
 | --------------- | -------------- | ---- | ----------- | ------------------------------------------------------------------------ |
 | `title`         | text           | yes  |             | 제목                                                                     |
 | `content`       | editor/text    | yes  |             | 본문                                                                     |
-| `type`          | select         | yes  | `board`     | `board`, `gallery`                                                       |
+| `type`          | select         | yes  | `board`     | `board`, `gallery`, `it_logs`                                            |
 | `author`        | relation users | yes  |             | 작성자                                                                   |
 | `status`        | select         | yes  | `published` | `draft`, `published`, `hidden`, `deleted`                                |
 | `tags`          | json           | no   | `[]`        | 태그 배열                                                                |
@@ -98,8 +98,8 @@ API Rules:
 ```text
 List rule: status = "published" && deleted = false || @request.auth.role = "admin"
 View rule: status = "published" && deleted = false || author = @request.auth.id || @request.auth.role = "admin"
-Create rule: @request.auth.id != "" && @request.auth.verified = true
-Update rule: (author = @request.auth.id && status != "hidden") || @request.auth.role = "admin"
+Create rule: @request.auth.id != "" && @request.auth.verified = true && (type != "it_logs" || @request.auth.role = "admin")
+Update rule: (author = @request.auth.id && status != "hidden" && type != "it_logs") || @request.auth.role = "admin"
 Delete rule: @request.auth.role = "admin"
 ```
 
@@ -135,8 +135,8 @@ API Rules:
 ```text
 List rule: status = "published" && deleted = false || @request.auth.role = "admin"
 View rule: status = "published" && deleted = false || author = @request.auth.id || @request.auth.role = "admin"
-Create rule: @request.auth.id != "" && @request.auth.verified = true
-Update rule: author = @request.auth.id || @request.auth.role = "admin"
+Create rule: @request.auth.id != "" && @request.auth.verified = true && (post.type != "it_logs" || @request.auth.role = "admin")
+Update rule: (author = @request.auth.id && post.type != "it_logs") || @request.auth.role = "admin"
 Delete rule: @request.auth.role = "admin"
 ```
 

@@ -3,11 +3,11 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button, FixedBottomActions, Input, RichTextEditor, toast } from '@/components';
 import { communityApi, getUserMessage } from '@/apis';
-import { FREE_BOARD_PATH } from '@/constants/app';
 import type { PostRecord } from '@/types/domain';
 import { useUnsavedChanges } from '@/hooks/useUnsavedChanges';
 import { useAuthStore } from '@/stores/authStore';
 import { canEditAuthoredRecord } from '@/utils/recordPermission';
+import { FREE_BOARD_CONFIG, type PlaygroundBoardConfig } from '../../boardConfig';
 
 const getPlainText = (html: string) =>
   html
@@ -15,10 +15,15 @@ const getPlainText = (html: string) =>
     .replace(/&nbsp;/g, ' ')
     .trim();
 
-const FreeBoardEdit = () => {
+interface FreeBoardEditProps {
+  config?: PlaygroundBoardConfig;
+}
+
+const FreeBoardEdit = ({ config = FREE_BOARD_CONFIG }: FreeBoardEditProps) => {
   const { postId = '' } = useParams();
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
+  const isAdmin = user?.role === 'admin';
   const [post, setPost] = useState<PostRecord | null>(null);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -40,17 +45,22 @@ const FreeBoardEdit = () => {
 
     void communityApi.getPost(postId)
       .then((nextPost) => {
+        if (nextPost.type !== config.type) {
+          setError('게시글을 찾을 수 없습니다.');
+          return;
+        }
+
         setPost(nextPost);
         setTitle(nextPost.title);
         setContent(nextPost.content);
       })
       .catch((loadError) => setError(getUserMessage(loadError)))
       .finally(() => setLoading(false));
-  }, [postId]);
+  }, [config.type, postId]);
 
   const handleCancel = async () => {
     if (await confirmLeave()) {
-      navigate(`${FREE_BOARD_PATH}/${postId}`);
+      navigate(config.getDetailPath(postId));
     }
   };
 
@@ -72,7 +82,7 @@ const FreeBoardEdit = () => {
       });
 
       toast('게시글을 수정했습니다.', { tone: 'success' });
-      navigate(`${FREE_BOARD_PATH}/${nextPost.id}`, { replace: true });
+      navigate(config.getDetailPath(nextPost.id), { replace: true });
     } catch (submitError) {
       toast(getUserMessage(submitError), { tone: 'danger' });
     } finally {
@@ -88,18 +98,18 @@ const FreeBoardEdit = () => {
     return (
       <section className="container write-page">
         <p className="board-page__message">{error ?? '게시글을 찾을 수 없습니다.'}</p>
-        <Link className="button-link" to={FREE_BOARD_PATH}>
+        <Link className="button-link" to={config.listPath}>
           목록으로
         </Link>
       </section>
     );
   }
 
-  if (!canEditAuthoredRecord(post, user)) {
+  if (!(config.adminOnlyWrite ? isAdmin : canEditAuthoredRecord(post, user))) {
     return (
       <section className="container write-page">
         <p className="board-page__message">수정 권한이 없습니다.</p>
-        <Link className="button-link" to={`${FREE_BOARD_PATH}/${post.id}`}>
+        <Link className="button-link" to={config.getDetailPath(post.id)}>
           상세로
         </Link>
       </section>
@@ -109,7 +119,7 @@ const FreeBoardEdit = () => {
   return (
     <section className="container write-page">
       <header className="write-page__header">
-        <span className="board-page__eyebrow">자유게시판</span>
+        <span className="board-page__eyebrow">{config.title}</span>
         <h2>게시글 수정</h2>
         <p>제목과 본문을 수정합니다. 기존 본문 이미지는 유지됩니다.</p>
       </header>

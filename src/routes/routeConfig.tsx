@@ -17,6 +17,10 @@ import FreeBoard from "@/pages/Playground/FreeBoard/Index";
 import FreeBoardDetail from "@/pages/Playground/FreeBoard/Detail/Index";
 import FreeBoardEdit from "@/pages/Playground/FreeBoard/Edit/Index";
 import FreeBoardWrite from "@/pages/Playground/FreeBoard/Write/Index";
+import ITLogs from "@/pages/Playground/ITLogs/Index";
+import ITLogsDetail from "@/pages/Playground/ITLogs/Detail/Index";
+import ITLogsEdit from "@/pages/Playground/ITLogs/Edit/Index";
+import ITLogsWrite from "@/pages/Playground/ITLogs/Write/Index";
 import Snaps from "@/pages/Snaps/Index";
 import Pics from "@/pages/Snaps/Pics/Index";
 import PicsDetail from "@/pages/Snaps/Pics/Detail/Index";
@@ -38,6 +42,9 @@ import {
   FREE_BOARD_EDIT_PATH,
   FREE_BOARD_PATH,
   FREE_BOARD_WRITE_PATH,
+  IT_LOGS_EDIT_PATH,
+  IT_LOGS_PATH,
+  IT_LOGS_WRITE_PATH,
   LOGIN_PATH,
   MENU_PATH,
   MY_PAGE_PATH,
@@ -320,6 +327,64 @@ export const routeConfig = [
     },
     requiresAuth: true,
     roles: ["user", "admin"],
+  },
+  {
+    id: "it-logs",
+    path: IT_LOGS_PATH,
+    element: <ITLogs />,
+    meta: {
+      title: "ITLogs",
+      description: "ITLogs 목록 화면입니다.",
+    },
+    layout: {
+      header: defaultHeader("ITLogs"),
+      floatingMenu: defaultFloatingMenu,
+    },
+  },
+  {
+    id: "it-logs-write",
+    path: IT_LOGS_WRITE_PATH,
+    element: <ITLogsWrite />,
+    meta: {
+      title: "ITLogs 글쓰기",
+      description: "ITLogs 글 작성 화면입니다.",
+      robots: "noindex",
+    },
+    layout: {
+      header: defaultHeader("ITLogs 글쓰기"),
+      floatingMenu: defaultFloatingMenu,
+    },
+    requiresAuth: true,
+    adminOnly: true,
+  },
+  {
+    id: "it-logs-detail",
+    path: `${IT_LOGS_PATH}/:postId`,
+    element: <ITLogsDetail />,
+    meta: {
+      title: "ITLogs 상세",
+      description: "ITLogs 게시글 상세 화면입니다.",
+    },
+    layout: {
+      header: defaultHeader("ITLogs"),
+      floatingMenu: defaultFloatingMenu,
+    },
+  },
+  {
+    id: "it-logs-edit",
+    path: IT_LOGS_EDIT_PATH,
+    element: <ITLogsEdit />,
+    meta: {
+      title: "ITLogs 수정",
+      description: "ITLogs 게시글 수정 화면입니다.",
+      robots: "noindex",
+    },
+    layout: {
+      header: defaultHeader("ITLogs 수정"),
+      floatingMenu: defaultFloatingMenu,
+    },
+    requiresAuth: true,
+    adminOnly: true,
   },
   {
     id: "device-info",

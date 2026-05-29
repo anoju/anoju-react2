@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { DataList } from '@/components';
 import { communityApi, getUserMessage } from '@/apis';
-import { FREE_BOARD_PATH, PICS_PATH } from '@/constants/app';
+import { FREE_BOARD_PATH, IT_LOGS_PATH, PICS_PATH } from '@/constants/app';
 import type { CommentRecord, PostRecord } from '@/types/domain';
 import { compareByCreatedDesc, formatRelativeTime } from '@/utils/community';
 
@@ -10,6 +10,30 @@ interface MyCommentItem {
   comment: CommentRecord;
   post?: PostRecord;
 }
+
+const getPostPath = (post?: PostRecord) => {
+  if (post?.type === 'gallery') {
+    return PICS_PATH;
+  }
+
+  if (post?.type === 'it_logs') {
+    return IT_LOGS_PATH;
+  }
+
+  return FREE_BOARD_PATH;
+};
+
+const getPostTypeLabel = (post?: PostRecord) => {
+  if (post?.type === 'gallery') {
+    return 'Pics';
+  }
+
+  if (post?.type === 'it_logs') {
+    return 'ITLogs';
+  }
+
+  return '자유게시판';
+};
 
 const MyComments = () => {
   const [comments, setComments] = useState<MyCommentItem[]>([]);
@@ -64,8 +88,8 @@ const MyComments = () => {
         emptyDescription="댓글을 남기면 이곳에 모입니다."
         onRetry={() => void loadComments()}
         renderItem={({ comment, post }) => (
-          <Link className="activity-item" to={`${post?.type === 'gallery' ? PICS_PATH : FREE_BOARD_PATH}/${comment.post}`}>
-            <span className="activity-item__type">{post?.type === 'gallery' ? 'Pics' : '자유게시판'} · {formatRelativeTime(comment.created)}</span>
+          <Link className="activity-item" to={`${getPostPath(post)}/${comment.post}`}>
+            <span className="activity-item__type">{getPostTypeLabel(post)} · {formatRelativeTime(comment.created)}</span>
             <strong>{comment.content}</strong>
             <span>{post?.title ?? '연결된 글'}로 이동</span>
           </Link>

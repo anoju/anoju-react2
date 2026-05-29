@@ -2,12 +2,33 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { DataList } from '@/components';
 import { communityApi, getUserMessage } from '@/apis';
-import { FREE_BOARD_PATH, PICS_PATH } from '@/constants/app';
+import { FREE_BOARD_PATH, IT_LOGS_PATH, PICS_PATH } from '@/constants/app';
 import type { PostRecord } from '@/types/domain';
 import { compareByCreatedDesc, formatRelativeTime } from '@/utils/community';
 
-const getPostPath = (post: PostRecord) => `${post.type === 'gallery' ? PICS_PATH : FREE_BOARD_PATH}/${post.id}`;
-const getPostTypeLabel = (post: PostRecord) => (post.type === 'gallery' ? 'Pics' : '자유게시판');
+const getPostPath = (post: PostRecord) => {
+  if (post.type === 'gallery') {
+    return `${PICS_PATH}/${post.id}`;
+  }
+
+  if (post.type === 'it_logs') {
+    return `${IT_LOGS_PATH}/${post.id}`;
+  }
+
+  return `${FREE_BOARD_PATH}/${post.id}`;
+};
+
+const getPostTypeLabel = (post: PostRecord) => {
+  if (post.type === 'gallery') {
+    return 'Pics';
+  }
+
+  if (post.type === 'it_logs') {
+    return 'ITLogs';
+  }
+
+  return '자유게시판';
+};
 
 const MyPosts = () => {
   const [posts, setPosts] = useState<PostRecord[]>([]);

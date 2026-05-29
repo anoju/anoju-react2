@@ -1,6 +1,6 @@
-import { MonitorSmartphone, MessageCircle } from 'lucide-react';
+import { FileText, MonitorSmartphone, MessageCircle } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
-import { DEVICE_INFO_PATH, FREE_BOARD_PATH } from '@/constants/app';
+import { DEVICE_INFO_PATH, FREE_BOARD_PATH, IT_LOGS_PATH } from '@/constants/app';
 
 const Playground = () => (
   <section className="container hub-page">
@@ -18,6 +18,15 @@ const Playground = () => (
         <span className="hub-card__content">
           <strong>자유게시판</strong>
           <span>일상, 질문, 잡담을 모바일 리스트로 빠르게 둘러봅니다.</span>
+        </span>
+      </NavLink>
+      <NavLink to={IT_LOGS_PATH} className="hub-card">
+        <span className="hub-card__icon" aria-hidden="true">
+          <FileText size={22} />
+        </span>
+        <span className="hub-card__content">
+          <strong>ITLogs</strong>
+          <span>관리자가 IT 기록과 안내를 정리합니다.</span>
         </span>
       </NavLink>
       <NavLink to={DEVICE_INFO_PATH} className="hub-card">
