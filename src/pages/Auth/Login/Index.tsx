@@ -1,10 +1,12 @@
 import type React from 'react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { Button, Checkbox, Input, SocialLoginButtons, TurnstileWidget, confirm, toast } from '@/components'
+import { Button, Checkbox, Input, PageLoading, SocialLoginButtons, TurnstileWidget, confirm, toast } from '@/components'
 import { authApi, toAppError } from '@/apis'
 import { DEFAULT_HOME_PATH, REGISTER_PATH } from '@/constants/app'
 import { useOAuthProviders } from '@/hooks/useOAuthProviders'
+import { resolveLoginRedirectPath } from '@/routes/redirects'
+import { useAuthStore } from '@/stores/authStore'
 
 const logAuthError = (label: string, error: unknown) => {
   const appError = toAppError(error)
@@ -26,12 +28,25 @@ const Login = () => {
   const [turnstileToken, setTurnstileToken] = useState('')
   const [turnstileKey, setTurnstileKey] = useState(0)
   const [submitting, setSubmitting] = useState(false)
+  const authStatus = useAuthStore((state) => state.status)
   const { providers, loading: providersLoading } = useOAuthProviders()
 
   const redirectPath = useMemo(() => {
     const params = new URLSearchParams(location.search)
-    return params.get('redirect') ?? DEFAULT_HOME_PATH
+    return resolveLoginRedirectPath(params.get('redirect') ?? DEFAULT_HOME_PATH)
   }, [location.search])
+
+  useEffect(() => {
+    if (authStatus !== 'authenticated') {
+      return
+    }
+
+    navigate(redirectPath, { replace: true })
+  }, [authStatus, navigate, redirectPath])
+
+  if (authStatus === 'initializing' || authStatus === 'authenticated') {
+    return <PageLoading label="인증 상태를 확인하고 있습니다." />
+  }
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault()

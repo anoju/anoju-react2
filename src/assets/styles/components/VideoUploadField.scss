@@ -62,4 +62,100 @@
     color: var(--color-text-muted);
     font-size: var(--font-size-xs);
   }
+
+  &__trim {
+    display: grid;
+    padding: var(--spacing-sm);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-surface);
+    gap: var(--spacing-sm);
+  }
+
+  &__trim-preview {
+    width: 100%;
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+    background: #000;
+    aspect-ratio: 16 / 9;
+    object-fit: contain;
+  }
+
+  &__trim-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+
+    strong {
+      font-size: var(--font-size-sm);
+    }
+
+    span {
+      color: var(--color-text-muted);
+      font-size: var(--font-size-xs);
+      font-weight: 720;
+      text-align: right;
+    }
+  }
+
+  &__timeline {
+    position: relative;
+    min-height: 3rem;
+    padding: 1.25rem 0;
+    touch-action: none;
+    user-select: none;
+  }
+
+  &__timeline-track,
+  &__timeline-range {
+    position: absolute;
+    top: 50%;
+    height: 0.5rem;
+    border-radius: var(--radius-full);
+    transform: translateY(-50%);
+  }
+
+  &__timeline-track {
+    right: 0;
+    left: 0;
+    background: var(--color-bg-surface-soft);
+  }
+
+  &__timeline-range {
+    background: var(--color-action-primary);
+    cursor: grab;
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
+
+  &__timeline-handle {
+    position: absolute;
+    top: 50%;
+    width: 1.75rem;
+    height: 1.75rem;
+    padding: 0;
+    border: 0.1875rem solid var(--color-action-primary);
+    border-radius: var(--radius-full);
+    background: var(--color-bg-surface);
+    box-shadow: var(--shadow-sm);
+    cursor: ew-resize;
+    transform: translate(-50%, -50%);
+
+    &:first-child {
+      left: 0;
+    }
+
+    &:last-child {
+      right: 0;
+      transform: translate(50%, -50%);
+    }
+
+    &:focus-visible {
+      outline: 0.1875rem solid var(--color-border-focus);
+      outline-offset: 0.125rem;
+    }
+  }
 }

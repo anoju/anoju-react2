@@ -298,7 +298,7 @@ Snaps 하위 동영상 게시판 컬렉션입니다. 일반 회원은 로그인 
 | -------------- | -------------- | ---- | ----------- | ----------------------------------------------------------------------- |
 | `title`        | text           | yes  |             | 동영상 제목                                                             |
 | `description`  | text           | yes  |             | 동영상 설명                                                             |
-| `video`        | file           | yes  |             | `mp4`, `webm`, `mov`, 최대 100MB                                        |
+| `video`        | file           | yes  |             | `mp4`, `webm`, `mov`, 원본 입력 최대 300MB                              |
 | `poster`       | file           | no   |             | 썸네일 이미지. `jpg`, `png`, `webp`, 최대 5MB                           |
 | `author`       | relation users | yes  |             | 작성자                                                                  |
 | `status`       | select         | yes  | `published` | `published`, `hidden`, `deleted`                                        |

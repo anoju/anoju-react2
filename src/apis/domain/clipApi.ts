@@ -17,6 +17,8 @@ export interface CreateClipParams {
   title: string;
   description: string;
   videoFile: File;
+  videoTrimStart?: number;
+  videoTrimEnd?: number;
   posterFile?: File;
 }
 
@@ -65,7 +67,7 @@ export const clipApi = {
       }),
     ),
 
-  createClip: ({ title, description, videoFile, posterFile }: CreateClipParams) =>
+  createClip: ({ title, description, videoFile, videoTrimStart, videoTrimEnd, posterFile }: CreateClipParams) =>
     runApi(() => {
       const author = pb.authStore.model?.id;
 
@@ -84,6 +86,14 @@ export const clipApi = {
       formData.append('dislikeCount', '0');
       formData.append('deleted', 'false');
       formData.append('video', videoFile);
+
+      if (videoTrimStart !== undefined) {
+        formData.append('videoTrimStart', String(videoTrimStart));
+      }
+
+      if (videoTrimEnd !== undefined) {
+        formData.append('videoTrimEnd', String(videoTrimEnd));
+      }
 
       if (posterFile) {
         formData.append('poster', posterFile);

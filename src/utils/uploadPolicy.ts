@@ -36,7 +36,7 @@ const MB = 1024 * 1024;
 export const UPLOAD_LIMITS = {
   profileImage: 2 * MB,
   postImage: 5 * MB,
-  clipVideo: 100 * MB,
+  clipVideo: 300 * MB,
   clipPoster: 5 * MB,
   boardAttachment: 10 * MB,
 } as const;
@@ -75,6 +75,7 @@ export interface VideoUploadOptions {
   maxLongSide?: number;
   maxShortSide?: number;
   resolutionLabel?: string;
+  transformToFit?: boolean;
 }
 
 export const VIDEO_UPLOAD_PROFILES = {
@@ -84,6 +85,7 @@ export const VIDEO_UPLOAD_PROFILES = {
     maxLongSide: 1280,
     maxShortSide: 720,
     resolutionLabel: '720p',
+    transformToFit: true,
   },
 } as const satisfies Record<string, VideoUploadOptions>;
 
@@ -155,14 +157,22 @@ const loadVideoMetadata = (url: string) =>
 
 const validateVideoMetadata = (
   metadata: { duration: number; width: number; height: number },
-  { maxDurationSeconds, maxLongSide, maxShortSide, resolutionLabel }: VideoUploadOptions,
+  { maxDurationSeconds, maxLongSide, maxShortSide, resolutionLabel, transformToFit }: VideoUploadOptions,
 ) => {
   if (maxDurationSeconds && metadata.duration > maxDurationSeconds) {
+    if (transformToFit) {
+      return null;
+    }
+
     return `동영상은 ${maxDurationSeconds}초 이하로 업로드해주세요.`;
   }
 
   const longSide = Math.max(metadata.width, metadata.height);
   const shortSide = Math.min(metadata.width, metadata.height);
+
+  if (transformToFit) {
+    return null;
+  }
 
   if (maxLongSide && longSide > maxLongSide) {
     return `동영상 해상도는 최대 ${resolutionLabel ?? `${maxLongSide}px`}까지 업로드할 수 있습니다.`;
@@ -227,7 +237,16 @@ export const createVideoUploadPreview = async (
   }
 };
 
-export const getVideoUploadPolicyText = ({ maxDurationSeconds, resolutionLabel }: VideoUploadOptions) => {
+export const getVideoUploadPolicyText = ({ maxDurationSeconds, resolutionLabel, transformToFit }: VideoUploadOptions) => {
+  if (transformToFit) {
+    return [
+      maxDurationSeconds ? `${maxDurationSeconds}초 구간 선택` : '',
+      resolutionLabel ? `${resolutionLabel}로 자동 변환` : '',
+    ]
+      .filter(Boolean)
+      .join(' · ');
+  }
+
   const parts = [
     maxDurationSeconds ? `${maxDurationSeconds}초 이하` : '',
     resolutionLabel ? `${resolutionLabel} 이하` : '',

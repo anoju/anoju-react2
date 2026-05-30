@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Camera, ImagePlus, X } from 'lucide-react';
 import { Button, FixedBottomActions, Img, Input, TextArea, VideoUploadField, toast } from '@/components';
@@ -17,7 +17,19 @@ import {
 } from '@/utils/uploadPolicy';
 import { createClientId } from '@/utils/id';
 
-const captureVideoFrame = async (videoUrl: string, timeRatio: number) => {
+const getThumbnailTimes = ({ start, end }: { start: number; end: number }) => {
+  const duration = Math.max(0, end - start);
+  const count = duration >= 24 ? 4 : duration >= 12 ? 3 : 2;
+
+  return Array.from({ length: count }, (_, index) => {
+    const ratio = index / (count - 1);
+    const insetRatio = 0.08 + ratio * 0.84;
+
+    return start + duration * insetRatio;
+  });
+};
+
+const captureVideoFrame = async (videoUrl: string, captureTime: number, index: number) => {
   const video = document.createElement('video');
   video.src = videoUrl;
   video.muted = true;
@@ -30,8 +42,8 @@ const captureVideoFrame = async (videoUrl: string, timeRatio: number) => {
     video.onerror = () => reject(new Error('동영상을 불러오지 못했습니다.'));
   });
 
-  const captureTime = Math.max(0, Math.min(video.duration * timeRatio, Math.max(video.duration - 0.1, 0)));
-  video.currentTime = captureTime;
+  const nextCaptureTime = Math.max(0, Math.min(captureTime, Math.max(video.duration - 0.1, 0)));
+  video.currentTime = nextCaptureTime;
 
   await new Promise<void>((resolve, reject) => {
     video.onseeked = () => resolve();
@@ -49,7 +61,7 @@ const captureVideoFrame = async (videoUrl: string, timeRatio: number) => {
     throw new Error('썸네일 이미지를 만들지 못했습니다.');
   }
 
-  const file = new File([blob], `clip-thumbnail-${Math.round(timeRatio * 100)}.jpg`, {
+  const file = new File([blob], `clip-thumbnail-${index + 1}.jpg`, {
     type: 'image/jpeg',
   });
 
@@ -59,7 +71,7 @@ const captureVideoFrame = async (videoUrl: string, timeRatio: number) => {
     url: URL.createObjectURL(file),
     sortOrder: 0,
     isCover: true,
-    alt: file.name,
+    alt: `${Math.round(nextCaptureTime * 10) / 10}초 썸네일`,
   } satisfies UploadPreview;
 };
 
@@ -68,23 +80,75 @@ const ClipsWrite = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [videoPreview, setVideoPreview] = useState<VideoUploadPreview | null>(null);
+  const [videoTrimRange, setVideoTrimRange] = useState<{ start: number; end: number }>({
+    start: 0,
+    end: VIDEO_UPLOAD_PROFILES.clips.maxDurationSeconds ?? 30,
+  });
   const [posterPreview, setPosterPreview] = useState<UploadPreview | null>(null);
+  const [posterCandidates, setPosterCandidates] = useState<UploadPreview[]>([]);
   const [extractingPoster, setExtractingPoster] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const videoPreviewRef = useRef<VideoUploadPreview | null>(null);
+  const posterPreviewRef = useRef<UploadPreview | null>(null);
+  const posterCandidatesRef = useRef<UploadPreview[]>([]);
   const dirty = Boolean(title.trim() || description.trim() || videoPreview || posterPreview);
   const { confirmLeave } = useUnsavedChanges(dirty && !submitting);
 
+  useEffect(() => {
+    videoPreviewRef.current = videoPreview;
+    posterPreviewRef.current = posterPreview;
+    posterCandidatesRef.current = posterCandidates;
+  }, [posterCandidates, posterPreview, videoPreview]);
+
   useEffect(
     () => () => {
-      revokeVideoUploadPreview(videoPreview);
-      revokeUploadPreviews(posterPreview ? [posterPreview] : []);
+      revokeVideoUploadPreview(videoPreviewRef.current);
+      revokeUploadPreviews(posterCandidatesRef.current);
+
+      if (!posterCandidatesRef.current.some((candidate) => candidate.id === posterPreviewRef.current?.id)) {
+        revokeUploadPreviews(posterPreviewRef.current ? [posterPreviewRef.current] : []);
+      }
     },
-    [posterPreview, videoPreview],
+    [],
   );
 
-  const handleVideoChange = (nextPreview: VideoUploadPreview) => {
+  const revokeStandalonePosterPreview = (preview: UploadPreview | null) => {
+    if (!preview || posterCandidates.some((candidate) => candidate.id === preview.id)) {
+      return;
+    }
+
+    revokeUploadPreviews([preview]);
+  };
+
+  const createPosterCandidates = async (preview: VideoUploadPreview, range: { start: number; end: number }) => {
+    setExtractingPoster(true);
+
+    try {
+      const nextCandidates = await Promise.all(
+        getThumbnailTimes(range).map((time, index) => captureVideoFrame(preview.url, time, index)),
+      );
+      revokeStandalonePosterPreview(posterPreview);
+      revokeUploadPreviews(posterCandidates);
+      setPosterCandidates(nextCandidates);
+      setPosterPreview(nextCandidates[0] ?? null);
+      toast('썸네일 후보를 만들었습니다.', { tone: 'success' });
+    } catch (error) {
+      toast(error instanceof Error ? error.message : '썸네일 후보를 만들지 못했습니다.', { tone: 'danger' });
+    } finally {
+      setExtractingPoster(false);
+    }
+  };
+
+  const handleVideoChange = async (nextPreview: VideoUploadPreview) => {
     revokeVideoUploadPreview(videoPreview);
     setVideoPreview(nextPreview);
+    const nextTrimRange = {
+      start: 0,
+      end: Math.min(nextPreview.duration, VIDEO_UPLOAD_PROFILES.clips.maxDurationSeconds ?? nextPreview.duration),
+    };
+
+    setVideoTrimRange(nextTrimRange);
+    await createPosterCandidates(nextPreview, nextTrimRange);
   };
 
   const handlePosterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -97,7 +161,7 @@ const ClipsWrite = () => {
     const nextPreview = createUploadPreviews([file], UPLOAD_LIMITS.clipPoster)[0] ?? null;
 
     if (nextPreview) {
-      revokeUploadPreviews(posterPreview ? [posterPreview] : []);
+      revokeStandalonePosterPreview(posterPreview);
       setPosterPreview(nextPreview);
     }
 
@@ -113,31 +177,29 @@ const ClipsWrite = () => {
   const handleVideoRemove = () => {
     revokeVideoUploadPreview(videoPreview);
     setVideoPreview(null);
+    setVideoTrimRange({ start: 0, end: VIDEO_UPLOAD_PROFILES.clips.maxDurationSeconds ?? 30 });
+    revokeStandalonePosterPreview(posterPreview);
+    setPosterPreview(null);
+    revokeUploadPreviews(posterCandidates);
+    setPosterCandidates([]);
   };
 
   const handlePosterRemove = () => {
-    revokeUploadPreviews(posterPreview ? [posterPreview] : []);
+    revokeStandalonePosterPreview(posterPreview);
     setPosterPreview(null);
   };
 
-  const handlePosterExtract = async (timeRatio: number) => {
+  const handlePosterCandidatesCreate = async () => {
     if (!videoPreview) {
       toast('먼저 동영상을 선택해주세요.', { tone: 'warning' });
       return;
     }
 
-    setExtractingPoster(true);
+    await createPosterCandidates(videoPreview, videoTrimRange);
+  };
 
-    try {
-      const nextPreview = await captureVideoFrame(videoPreview.url, timeRatio);
-      revokeUploadPreviews(posterPreview ? [posterPreview] : []);
-      setPosterPreview(nextPreview);
-      toast('영상에서 썸네일을 추출했습니다.', { tone: 'success' });
-    } catch (error) {
-      toast(error instanceof Error ? error.message : '썸네일을 추출하지 못했습니다.', { tone: 'danger' });
-    } finally {
-      setExtractingPoster(false);
-    }
+  const handlePosterCandidateSelect = (candidate: UploadPreview) => {
+    setPosterPreview(candidate);
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -165,6 +227,8 @@ const ClipsWrite = () => {
         title,
         description,
         videoFile: videoPreview.file,
+        videoTrimStart: videoTrimRange.start,
+        videoTrimEnd: videoTrimRange.end,
         posterFile: posterPreview?.file,
       });
 
@@ -191,9 +255,12 @@ const ClipsWrite = () => {
           title={title}
           poster={posterPreview?.url}
           options={VIDEO_UPLOAD_PROFILES.clips}
+          trimStart={videoTrimRange.start}
+          trimEnd={videoTrimRange.end}
           uploading={submitting}
           onChange={handleVideoChange}
           onRemove={handleVideoRemove}
+          onTrimChange={setVideoTrimRange}
         />
 
         {posterPreview ? (
@@ -219,18 +286,31 @@ const ClipsWrite = () => {
 
         {videoPreview ? (
           <div className="clip-thumbnail-extractor" aria-label="영상 썸네일 추출">
-            <span>영상에서 썸네일 추출</span>
-            <div>
-              <Button type="button" variant="outline" tone="neutral" size="sm" loading={extractingPoster} leftIcon={<Camera size={16} />} onClick={() => void handlePosterExtract(0.1)}>
-                초반
-              </Button>
-              <Button type="button" variant="outline" tone="neutral" size="sm" loading={extractingPoster} leftIcon={<Camera size={16} />} onClick={() => void handlePosterExtract(0.5)}>
-                중간
-              </Button>
-              <Button type="button" variant="outline" tone="neutral" size="sm" loading={extractingPoster} leftIcon={<Camera size={16} />} onClick={() => void handlePosterExtract(0.9)}>
-                후반
+            <div className="clip-thumbnail-extractor__header">
+              <span>썸네일 후보</span>
+              <Button type="button" variant="outline" tone="neutral" size="sm" loading={extractingPoster} leftIcon={<Camera size={16} />} onClick={() => void handlePosterCandidatesCreate()}>
+                썸네일 다시 만들기
               </Button>
             </div>
+            {posterCandidates.length > 0 ? (
+              <div className="clip-thumbnail-extractor__grid">
+                {posterCandidates.map((candidate) => (
+                  <button
+                    className="clip-thumbnail-extractor__candidate"
+                    type="button"
+                    key={candidate.id}
+                    aria-pressed={posterPreview?.id === candidate.id}
+                    data-selected={posterPreview?.id === candidate.id || undefined}
+                    onClick={() => handlePosterCandidateSelect(candidate)}
+                  >
+                    <Img src={candidate.url} alt={candidate.alt} />
+                    <span>{candidate.alt}</span>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <p>선택 구간에서 썸네일 후보를 만들 수 있습니다.</p>
+            )}
           </div>
         ) : null}
 
