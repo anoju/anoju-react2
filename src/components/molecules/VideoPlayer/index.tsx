@@ -3,19 +3,20 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Captions,
   Check,
+  Expand,
   FastForward,
   Gauge,
   Loader2,
   Maximize,
   Minimize,
-  MonitorUp,
   MoreVertical,
   Pause,
-  PictureInPicture2,
+  PictureInPicture,
   Play,
   RotateCcw,
   RotateCw,
   Settings,
+  Shrink,
   Subtitles,
   Volume2,
   VolumeX,
@@ -57,6 +58,16 @@ const getBufferedPercent = (video: HTMLVideoElement | null) => {
   return Math.min(100, (end / video.duration) * 100);
 };
 
+type PictureInPictureDocument = Document & {
+  pictureInPictureElement?: Element | null;
+  pictureInPictureEnabled?: boolean;
+  exitPictureInPicture?: () => Promise<void>;
+};
+
+type PictureInPictureVideo = HTMLVideoElement & {
+  requestPictureInPicture?: () => Promise<unknown>;
+};
+
 export const VideoPlayer = ({ src, title, poster, className = '' }: VideoPlayerProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -68,6 +79,7 @@ export const VideoPlayer = ({ src, title, poster, className = '' }: VideoPlayerP
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isTheater, setIsTheater] = useState(false);
   const [isMini, setIsMini] = useState(false);
+  const [isPictureInPicture, setIsPictureInPicture] = useState(false);
   const [isLooping, setIsLooping] = useState(false);
   const [isAutoplayNext, setIsAutoplayNext] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(true);
@@ -143,25 +155,28 @@ export const VideoPlayer = ({ src, title, poster, className = '' }: VideoPlayerP
   }, []);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const root = rootRef.current;
+    const video = videoRef.current;
 
-      if (!root || !isPlaying || isFullscreen || isTheater) {
-        setIsMini(false);
-        return;
-      }
+    if (!video) {
+      return undefined;
+    }
 
-      const rect = root.getBoundingClientRect();
-      setIsMini(rect.bottom < 80);
+    const handleEnterPictureInPicture = () => {
+      setIsPictureInPicture(true);
+      setIsMini(false);
+    };
+    const handleLeavePictureInPicture = () => {
+      setIsPictureInPicture(false);
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
+    video.addEventListener('enterpictureinpicture', handleEnterPictureInPicture);
+    video.addEventListener('leavepictureinpicture', handleLeavePictureInPicture);
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      video.removeEventListener('enterpictureinpicture', handleEnterPictureInPicture);
+      video.removeEventListener('leavepictureinpicture', handleLeavePictureInPicture);
     };
-  }, [isFullscreen, isPlaying, isTheater]);
+  }, []);
 
   const syncPlaybackState = useCallback(() => {
     const video = videoRef.current;
@@ -251,6 +266,37 @@ export const VideoPlayer = ({ src, title, poster, className = '' }: VideoPlayerP
     await root.requestFullscreen().catch(() => undefined);
   }, []);
 
+  const togglePictureInPicture = useCallback(async () => {
+    const video = videoRef.current as PictureInPictureVideo | null;
+    const pictureInPictureDocument = document as PictureInPictureDocument;
+
+    if (!video) {
+      return;
+    }
+
+    if (pictureInPictureDocument.pictureInPictureElement === video) {
+      await pictureInPictureDocument.exitPictureInPicture?.().catch(() => undefined);
+      return;
+    }
+
+    if (pictureInPictureDocument.pictureInPictureEnabled && video.requestPictureInPicture) {
+      if (video.paused) {
+        await video.play().catch(() => undefined);
+      }
+
+      await video.requestPictureInPicture().catch(() => {
+        setIsMini((current) => !current);
+      });
+      showFeedback(<PictureInPicture size={42} />);
+      revealControls();
+      return;
+    }
+
+    setIsMini((current) => !current);
+    showFeedback(<PictureInPicture size={42} />);
+    revealControls();
+  }, [revealControls, showFeedback]);
+
   useEffect(() => {
     const handleDocumentKeyDown = (event: KeyboardEvent) => {
       if (!isPointerInside && !rootRef.current?.contains(document.activeElement)) {
@@ -294,6 +340,12 @@ export const VideoPlayer = ({ src, title, poster, className = '' }: VideoPlayerP
       if (event.key.toLowerCase() === 't') {
         event.preventDefault();
         setIsTheater((current) => !current);
+        return;
+      }
+
+      if (event.key.toLowerCase() === 'i') {
+        event.preventDefault();
+        void togglePictureInPicture();
       }
     };
 
@@ -302,7 +354,7 @@ export const VideoPlayer = ({ src, title, poster, className = '' }: VideoPlayerP
     return () => {
       document.removeEventListener('keydown', handleDocumentKeyDown);
     };
-  }, [isPointerInside, seekBy, toggleFullscreen, toggleMute, togglePlay]);
+  }, [isPointerInside, seekBy, toggleFullscreen, toggleMute, togglePictureInPicture, togglePlay]);
 
   const handleTapSeek = useCallback((clientX: number, rect: DOMRect) => {
     const now = Date.now();
@@ -342,26 +394,28 @@ export const VideoPlayer = ({ src, title, poster, className = '' }: VideoPlayerP
     handleTapSeek(event.clientX, event.currentTarget.getBoundingClientRect());
   };
 
-  const rootClassName = ['video-player', className].filter(Boolean).join(' ');
+  const shellClassName = ['video-player-shell', className].filter(Boolean).join(' ');
 
   return (
-    <div
-      ref={rootRef}
-      className={rootClassName}
-      data-playing={isPlaying || undefined}
-      data-controls-visible={controlsVisible || undefined}
-      data-fullscreen={isFullscreen || undefined}
-      data-theater={isTheater || undefined}
-      data-mini={isMini || undefined}
-      data-loading={loading || undefined}
-      onPointerEnter={() => {
-        setIsPointerInside(true);
-        revealControls();
-      }}
-      onPointerLeave={() => setIsPointerInside(false)}
-      onPointerMove={revealControls}
-      tabIndex={0}
-    >
+    <div className={shellClassName} data-theater={isTheater || undefined} data-mini={isMini || undefined}>
+      <div
+        ref={rootRef}
+        className="video-player"
+        data-playing={isPlaying || undefined}
+        data-controls-visible={controlsVisible || undefined}
+        data-fullscreen={isFullscreen || undefined}
+        data-theater={isTheater || undefined}
+        data-mini={isMini || undefined}
+        data-pip={isPictureInPicture || undefined}
+        data-loading={loading || undefined}
+        onPointerEnter={() => {
+          setIsPointerInside(true);
+          revealControls();
+        }}
+        onPointerLeave={() => setIsPointerInside(false)}
+        onPointerMove={revealControls}
+        tabIndex={0}
+      >
       <video
         ref={videoRef}
         className="video-player__media"
@@ -512,19 +566,19 @@ export const VideoPlayer = ({ src, title, poster, className = '' }: VideoPlayerP
             />
             <IconButton
               label={isTheater ? '기본 모드' : '극장 모드'}
-              icon={<MonitorUp size={18} />}
+              icon={isTheater ? <Shrink size={18} /> : <Expand size={18} />}
               size="sm"
               variant="plain"
               tone="neutral"
               onClick={() => setIsTheater((current) => !current)}
             />
             <IconButton
-              label={isMini ? '미니 플레이어 해제' : '미니 플레이어'}
-              icon={<PictureInPicture2 size={18} />}
+              label={isPictureInPicture || isMini ? 'PIP 종료' : 'PIP 모드'}
+              icon={<PictureInPicture size={18} />}
               size="sm"
               variant="plain"
               tone="neutral"
-              onClick={() => setIsMini((current) => !current)}
+              onClick={() => void togglePictureInPicture()}
             />
             <IconButton
               label={isFullscreen ? '전체화면 종료' : '전체화면'}
@@ -588,8 +642,9 @@ export const VideoPlayer = ({ src, title, poster, className = '' }: VideoPlayerP
       ) : null}
 
       <span className="video-player__shortcut" aria-hidden="true">
-        K 재생 · J/L 탐색 · M 음소거 · T 극장 · F 전체화면
+        K 재생 · J/L 탐색 · M 음소거 · I PIP · T 극장 · F 전체화면
       </span>
+      </div>
     </div>
   );
 };
