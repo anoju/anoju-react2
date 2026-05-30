@@ -148,6 +148,10 @@
 - **계정 병합 제한:** 동일 이메일의 인증 완료 계정은 같은 사용자로 연결하는 흐름을 우선 검토하되, 미인증 계정은 이메일 인증 후 연결합니다. 서로 다른 이메일 계정끼리는 자동 병합하지 않습니다. 마지막 로그인 수단은 해제할 수 없습니다.
 - **계정 존재 여부 보호:** 로그인 밸리데이션 단계에서 공개 API로 이메일 존재 여부를 사전 확인하지 않습니다. 로그인 실패, 비밀번호 재설정, 소셜 로그인 실패 메시지는 계정 존재 여부를 직접 노출하지 않는 일반화된 한글 메시지를 사용합니다.
 - **회원가입 봇 방지:** 일반 이메일 회원가입에는 Cloudflare Turnstile을 적용합니다. 클라이언트는 Sitekey로 token을 발급받고, 서버/PocketBase 훅은 Secret key로 Siteverify 검증을 완료한 뒤에만 회원 생성을 허용해야 합니다. Secret key는 클라이언트 코드와 `VITE_` 환경 변수에 절대 노출하지 않습니다.
+- **PocketBase hook 작성 원칙:** `pb_hooks/*.pb.js`는 PocketBase JSVM에서 여러 파일이 같은 런타임 컨텍스트로 로드되거나 callback 실행 시 전역 스코프 참조가 끊기는 문제가 발생할 수 있으므로, hook callback 밖에 공통 helper 함수와 mutable 상태를 두지 않는 것을 원칙으로 합니다. 각 hook callback 안에서 필요한 helper를 정의하거나, 중복이 있더라도 callback 내부에서 자기완결적으로 처리합니다.
+- **PocketBase hook 전역 충돌 방지:** 여러 hook 파일에서 `isBlank`, `DEFAULT_*`, `sync*`처럼 흔한 이름을 전역으로 반복 선언하지 않습니다. 꼭 전역 상수가 필요하면 파일 목적이 드러나는 고유 접두사를 사용하고, 함수는 가급적 callback 내부에 둡니다.
+- **PocketBase hook 실패 정책:** 권한/검증/업로드 제한처럼 요청을 막아야 하는 작업은 `e.next()` 전에 검증하고 명확한 `BadRequestError` 또는 `e.badRequestError()`로 중단합니다. 카운트 동기화, 파생 필드 갱신, 로그 기록처럼 보조 작업은 `try-catch`로 감싸고 실패 시 `$app.logger()` 또는 `e.app.logger()`에 남겨 원 요청이 400으로 롤백되지 않게 설계합니다.
+- **PocketBase hook 배포 검증:** NAS의 `/volume1/docker/pocketbase/pb_hooks`에 hook 파일을 올린 뒤 PocketBase 컨테이너를 반드시 재시작하고, Admin UI Logs에서 `ReferenceError`, `TypeError`, hook 로딩 오류가 없는지 확인합니다. hook 변경 후에는 관련 API의 create/update/delete 실제 요청을 최소 1회씩 테스트합니다.
 - **권한 관리:** 기본 역할은 `guest`, `user`, `admin`이며, 프론트 노출 제어와 PocketBase API Rules를 함께 사용합니다. 이메일 미인증, 정지, 탈퇴 상태는 역할과 별개로 쓰기 액션을 제한할 수 있습니다.
 - **테스트 계정 관리:** 게시물/댓글/갤러리 작성 검증용 테스트 계정은 `test1@test.com`, `test2@test.com`, `test3@test.com`을 사용할 수 있습니다. 테스트 계정 비밀번호는 문서, 코드, 저장소에 기록하지 않습니다.
 - **에러 핸들링:** API 호출 시 반드시 `try-catch` 및 방어적 코딩 규칙을 적용하여 네트워크 장애에 대비합니다.

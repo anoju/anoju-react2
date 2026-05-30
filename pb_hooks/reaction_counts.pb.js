@@ -40,7 +40,11 @@ onRecordAfterCreateSuccess(function (e) {
   }
 
   e.next();
-  syncReactionCounts(e.record);
+  try {
+    syncReactionCounts(e.record);
+  } catch (error) {
+    $app.logger().error('반응 카운트 동기화 실패', 'hook', 'create', 'reactionId', e.record.id, 'error', error);
+  }
 }, 'reactions');
 
 onRecordAfterDeleteSuccess(function (e) {
@@ -85,5 +89,9 @@ onRecordAfterDeleteSuccess(function (e) {
   }
 
   e.next();
-  syncReactionCounts(e.record);
+  try {
+    syncReactionCounts(e.record);
+  } catch (error) {
+    $app.logger().error('반응 카운트 동기화 실패', 'hook', 'delete', 'reactionId', e.record.id, 'error', error);
+  }
 }, 'reactions');
