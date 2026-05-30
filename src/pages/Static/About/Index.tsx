@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { Images, MessageCircle, SlidersHorizontal } from 'lucide-react'
 import { useState } from 'react'
+import { TimedVideoCapture } from '@/components'
 
 const aboutHighlights = [
   {
@@ -113,6 +114,12 @@ const About = () => {
             </motion.article>
           </AnimatePresence>
         </motion.div>
+      </div>
+
+      <div className="about-page__section about-page__capture-test">
+        <h3>picLog 5초 영상 테스트</h3>
+        <p>박스의 +를 누르면 모바일 카메라 촬영 흐름을 확인할 수 있습니다.</p>
+        <TimedVideoCapture />
       </div>
     </section>
   )

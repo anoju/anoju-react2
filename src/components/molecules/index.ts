@@ -4,6 +4,7 @@ export { ContentActions } from './ContentActions';
 export { RecordFormShell } from './RecordFormShell';
 export { SocialLoginButtons } from './SocialLoginButtons';
 export { TurnstileWidget } from './TurnstileWidget';
+export { TimedVideoCapture } from './TimedVideoCapture';
 export { PageLoading } from './PageLoading';
 export { EmptyState } from './EmptyState';
 export { ErrorState } from './ErrorState';

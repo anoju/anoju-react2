@@ -15,7 +15,6 @@ import {
   Play,
   RotateCcw,
   RotateCw,
-  Settings,
   Shrink,
   Subtitles,
   Volume2,
@@ -551,6 +550,20 @@ export const VideoPlayer = ({ src, title, poster, className = '' }: VideoPlayerP
         </button>
       ) : null}
 
+      <div className="video-player__top-actions" aria-label="동영상 상단 액션">
+        <IconButton
+          label="더보기"
+          icon={<MoreVertical size={18} />}
+          size="sm"
+          variant="plain"
+          tone="neutral"
+          onClick={() => {
+            setSettingsOpen((current) => !current);
+            revealControls();
+          }}
+        />
+      </div>
+
       <div className="video-player__controls">
         <div className="video-player__progress-wrap">
           <span className="video-player__hover-time">{hoverTime ?? formatTime(currentTime)}</span>
@@ -622,17 +635,6 @@ export const VideoPlayer = ({ src, title, poster, className = '' }: VideoPlayerP
               />
             </div>
             <IconButton
-              label="설정"
-              icon={<Settings size={18} />}
-              size="sm"
-              variant="plain"
-              tone="neutral"
-              onClick={() => {
-                setSettingsOpen((current) => !current);
-                revealControls();
-              }}
-            />
-            <IconButton
               label={isTheater ? '기본 모드' : '극장 모드'}
               icon={isTheater ? <Shrink size={18} /> : <Expand size={18} />}
               size="sm"
@@ -655,14 +657,6 @@ export const VideoPlayer = ({ src, title, poster, className = '' }: VideoPlayerP
               variant="plain"
               tone="neutral"
               onClick={() => void toggleFullscreen()}
-            />
-            <IconButton
-              label="더보기"
-              icon={<MoreVertical size={18} />}
-              size="sm"
-              variant="plain"
-              tone="neutral"
-              onClick={() => setSettingsOpen((current) => !current)}
             />
           </div>
         </div>

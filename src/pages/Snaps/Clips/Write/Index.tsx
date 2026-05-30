@@ -263,6 +263,16 @@ const ClipsWrite = () => {
           onTrimChange={setVideoTrimRange}
         />
 
+        <Input label="제목" value={title} onChange={(event) => setTitle(event.target.value)} maxLength={120} required />
+        <TextArea
+          label="설명"
+          value={description}
+          onChange={(event) => setDescription(event.target.value)}
+          rows={6}
+          placeholder="영상에 대한 설명을 입력해주세요."
+          required
+        />
+
         {posterPreview ? (
           <figure className="clip-poster-preview">
             <Img src={posterPreview.url} alt={posterPreview.alt} />
@@ -313,16 +323,6 @@ const ClipsWrite = () => {
             )}
           </div>
         ) : null}
-
-        <Input label="제목" value={title} onChange={(event) => setTitle(event.target.value)} maxLength={120} required />
-        <TextArea
-          label="설명"
-          value={description}
-          onChange={(event) => setDescription(event.target.value)}
-          rows={6}
-          placeholder="영상에 대한 설명을 입력해주세요."
-          required
-        />
 
         <FixedBottomActions>
           <Button type="button" variant="outline" tone="neutral" onClick={handleCancel}>

@@ -167,12 +167,15 @@ Delete rule: post.author = @request.auth.id || @request.auth.role = "admin"
 ## reactions
 
 좋아요/싫어요 컬렉션입니다.
+같은 사용자는 같은 대상에 좋아요와 싫어요 중 하나만 가질 수 있으며, 같은 반응을 다시 누르면 해당 반응 레코드를 삭제해 취소합니다. 좋아요에서 싫어요로 전환하거나 반대로 전환할 때도 기존 반응 레코드를 삭제한 뒤 새 반응 레코드를 생성합니다.
+
+`reactions`는 토글 상태를 나타내는 휘발성 데이터이므로 다른 컬렉션에서 필수 relation으로 참조하지 않습니다. 알림, 활동 로그, 감사 로그처럼 반응 사실을 남겨야 하는 컬렉션은 `reaction` relation 대신 `actor`, `targetType`, `targetId`, `type` 같은 스냅샷 값을 저장합니다. 운영 PocketBase에서 `reactions`를 required relation으로 참조하는 필드가 있으면 반응 취소 DELETE가 400 오류로 막히므로 해당 필드를 optional로 바꾸거나 스냅샷 필드로 분리해야 합니다.
 
 필드:
 
 | 필드         | 타입           | 필수 | 기본값 | 설명              |
 | ------------ | -------------- | ---- | ------ | ----------------- |
-| `targetType` | select         | yes  |        | `post`, `comment` |
+| `targetType` | select         | yes  |        | `post`, `comment`, `clip`, `clip_comment` |
 | `targetId`   | text           | yes  |        | 대상 record id    |
 | `user`       | relation users | yes  |        | 사용자            |
 | `type`       | select         | yes  | `like` | `like`, `dislike` |

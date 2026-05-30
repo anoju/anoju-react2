@@ -184,6 +184,26 @@
     transform: translateY(0);
   }
 
+  &__top-actions {
+    position: absolute;
+    top: var(--spacing-sm);
+    right: var(--spacing-sm);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--spacing-2xs);
+    opacity: 0;
+    transform: translateY(-0.25rem);
+    transition: var(--transition-base);
+  }
+
+  &[data-controls-visible="true"] &__top-actions,
+  &:focus-within &__top-actions,
+  &:hover &__top-actions {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
   &__progress-wrap {
     position: relative;
     display: grid;
@@ -292,7 +312,7 @@
   &__settings {
     position: absolute;
     right: var(--spacing-sm);
-    bottom: 4.25rem;
+    top: calc(var(--spacing-sm) + 2.5rem);
     display: grid;
     width: min(18rem, calc(100% - (var(--spacing-sm) * 2)));
     padding: var(--spacing-xs);
@@ -348,10 +368,10 @@
   &__shortcut {
     position: absolute;
     top: var(--spacing-sm);
-    right: var(--spacing-sm);
+    left: var(--spacing-sm);
     display: inline-flex;
     align-items: center;
-    max-width: calc(100% - (var(--spacing-sm) * 2));
+    max-width: calc(100% - (var(--spacing-sm) * 2) - 3rem);
     padding: var(--spacing-2xs) var(--spacing-xs);
     border-radius: var(--radius-full);
     color: rgb(255 255 255 / 84%);

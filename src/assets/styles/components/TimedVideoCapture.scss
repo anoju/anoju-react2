@@ -1,0 +1,187 @@
+.timed-video-capture {
+  display: grid;
+  gap: var(--spacing-sm);
+
+  &__box {
+    position: relative;
+    display: grid;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    background:
+      linear-gradient(135deg, var(--color-bg-primary-soft), transparent 62%),
+      var(--color-bg-surface);
+  }
+
+  &__add {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    place-items: center;
+    align-content: center;
+    border: 0;
+    color: var(--color-action-primary);
+    background: transparent;
+    cursor: pointer;
+    gap: var(--spacing-xs);
+
+    span {
+      display: grid;
+      width: 4rem;
+      height: 4rem;
+      place-items: center;
+      border: 1px solid var(--color-border-focus);
+      border-radius: var(--radius-full);
+      background: var(--color-bg-surface);
+      box-shadow: var(--shadow-sm);
+      font-size: var(--font-size-3xl);
+      font-weight: 500;
+      line-height: 1;
+    }
+
+    strong {
+      color: var(--color-text-primary);
+      font-size: var(--font-size-sm);
+      line-height: var(--line-height-tight);
+    }
+
+    &:hover,
+    &:focus-visible {
+      background: var(--color-bg-primary-soft);
+    }
+  }
+
+  &__camera {
+    position: relative;
+    min-width: 0;
+    min-height: 0;
+  }
+
+  &__video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: var(--color-bg-elevated);
+    object-fit: cover;
+  }
+
+  &__close,
+  &__reset {
+    position: absolute;
+    top: var(--spacing-sm);
+    right: var(--spacing-sm);
+    z-index: 2;
+  }
+
+  &__controls {
+    position: absolute;
+    right: var(--spacing-sm);
+    bottom: var(--spacing-sm);
+    left: var(--spacing-sm);
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+  }
+
+  &__meta {
+    display: grid;
+    gap: var(--spacing-xs);
+
+    p {
+      margin: 0;
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-sm);
+      line-height: var(--line-height-base);
+    }
+
+    [role="alert"] {
+      color: var(--color-text-danger);
+    }
+  }
+
+  &__guide {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-surface);
+
+    strong {
+      color: var(--color-text-primary);
+      font-size: var(--font-size-md);
+      line-height: var(--line-height-tight);
+    }
+  }
+
+  &__guide-icon {
+    display: inline-grid;
+    width: 2.5rem;
+    height: 2.5rem;
+    place-items: center;
+    border-radius: var(--radius-full);
+    color: var(--color-icon-primary);
+    background: var(--color-bg-primary-soft);
+  }
+
+  &__file {
+    display: none;
+  }
+
+  &__sheet {
+    display: grid;
+    gap: var(--spacing-sm);
+  }
+
+  &__sheet-action {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    width: 100%;
+    padding: var(--spacing-md);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    color: var(--color-text-primary);
+    background: var(--color-bg-surface);
+    cursor: pointer;
+    gap: var(--spacing-sm);
+    text-align: left;
+
+    svg {
+      color: var(--color-icon-primary);
+    }
+
+    span {
+      display: grid;
+      min-width: 0;
+      gap: var(--spacing-2xs);
+    }
+
+    strong {
+      font-size: var(--font-size-md);
+      line-height: var(--line-height-tight);
+    }
+
+    small {
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-sm);
+      line-height: var(--line-height-base);
+    }
+
+    &:hover,
+    &:focus-visible {
+      border-color: var(--color-border-focus);
+      background: var(--color-bg-primary-soft);
+    }
+  }
+
+  &__sheet-note {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-base);
+  }
+}
