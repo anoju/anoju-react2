@@ -10,6 +10,7 @@ export const PB_COLLECTIONS = {
   notifications: 'notifications',
   deviceReports: 'device_reports',
   clips: 'clips',
+  clipComments: 'clip_comments',
   picLogs: 'pic_logs',
   picLogEntries: 'pic_log_entries',
   picLogComments: 'pic_log_comments',

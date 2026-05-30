@@ -5,7 +5,8 @@ interface ReactionCountState {
   dislikeCount?: number;
 }
 
-export const getReactionKey = (targetType: 'post' | 'comment', targetId: string) => `${targetType}:${targetId}`;
+export const getReactionKey = (targetType: 'post' | 'comment' | 'clip' | 'clip_comment', targetId: string) =>
+  `${targetType}:${targetId}`;
 
 export const applyReactionCount = <T extends ReactionCountState>(
   item: T,

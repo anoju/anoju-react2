@@ -1,7 +1,7 @@
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileVideo, ImagePlus, X } from 'lucide-react';
+import { Camera, FileVideo, ImagePlus, X } from 'lucide-react';
 import { Button, FixedBottomActions, Img, Input, TextArea, VideoPlayer, toast } from '@/components';
 import { clipApi, getUserMessage } from '@/apis';
 import { CLIPS_PATH } from '@/constants/app';
@@ -16,6 +16,53 @@ import {
   type UploadPreview,
   type VideoUploadPreview,
 } from '@/utils/uploadPolicy';
+import { createClientId } from '@/utils/id';
+
+const captureVideoFrame = async (videoUrl: string, timeRatio: number) => {
+  const video = document.createElement('video');
+  video.src = videoUrl;
+  video.muted = true;
+  video.playsInline = true;
+  video.crossOrigin = 'anonymous';
+  video.preload = 'metadata';
+
+  await new Promise<void>((resolve, reject) => {
+    video.onloadedmetadata = () => resolve();
+    video.onerror = () => reject(new Error('동영상을 불러오지 못했습니다.'));
+  });
+
+  const captureTime = Math.max(0, Math.min(video.duration * timeRatio, Math.max(video.duration - 0.1, 0)));
+  video.currentTime = captureTime;
+
+  await new Promise<void>((resolve, reject) => {
+    video.onseeked = () => resolve();
+    video.onerror = () => reject(new Error('썸네일을 추출하지 못했습니다.'));
+  });
+
+  const canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d')?.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.88));
+
+  if (!blob) {
+    throw new Error('썸네일 이미지를 만들지 못했습니다.');
+  }
+
+  const file = new File([blob], `clip-thumbnail-${Math.round(timeRatio * 100)}.jpg`, {
+    type: 'image/jpeg',
+  });
+
+  return {
+    id: createClientId('clip-poster'),
+    file,
+    url: URL.createObjectURL(file),
+    sortOrder: 0,
+    isCover: true,
+    alt: file.name,
+  } satisfies UploadPreview;
+};
 
 const ClipsWrite = () => {
   const navigate = useNavigate();
@@ -23,6 +70,7 @@ const ClipsWrite = () => {
   const [description, setDescription] = useState('');
   const [videoPreview, setVideoPreview] = useState<VideoUploadPreview | null>(null);
   const [posterPreview, setPosterPreview] = useState<UploadPreview | null>(null);
+  const [extractingPoster, setExtractingPoster] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const dirty = Boolean(title.trim() || description.trim() || videoPreview || posterPreview);
   const { confirmLeave } = useUnsavedChanges(dirty && !submitting);
@@ -83,6 +131,26 @@ const ClipsWrite = () => {
   const handlePosterRemove = () => {
     revokeUploadPreviews(posterPreview ? [posterPreview] : []);
     setPosterPreview(null);
+  };
+
+  const handlePosterExtract = async (timeRatio: number) => {
+    if (!videoPreview) {
+      toast('먼저 동영상을 선택해주세요.', { tone: 'warning' });
+      return;
+    }
+
+    setExtractingPoster(true);
+
+    try {
+      const nextPreview = await captureVideoFrame(videoPreview.url, timeRatio);
+      revokeUploadPreviews(posterPreview ? [posterPreview] : []);
+      setPosterPreview(nextPreview);
+      toast('영상에서 썸네일을 추출했습니다.', { tone: 'success' });
+    } catch (error) {
+      toast(error instanceof Error ? error.message : '썸네일을 추출하지 못했습니다.', { tone: 'danger' });
+    } finally {
+      setExtractingPoster(false);
+    }
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -171,6 +239,23 @@ const ClipsWrite = () => {
             </span>
           </label>
         </div>
+
+        {videoPreview ? (
+          <div className="clip-thumbnail-extractor" aria-label="영상 썸네일 추출">
+            <span>영상에서 썸네일 추출</span>
+            <div>
+              <Button type="button" variant="outline" tone="neutral" size="sm" loading={extractingPoster} leftIcon={<Camera size={16} />} onClick={() => void handlePosterExtract(0.1)}>
+                초반
+              </Button>
+              <Button type="button" variant="outline" tone="neutral" size="sm" loading={extractingPoster} leftIcon={<Camera size={16} />} onClick={() => void handlePosterExtract(0.5)}>
+                중간
+              </Button>
+              <Button type="button" variant="outline" tone="neutral" size="sm" loading={extractingPoster} leftIcon={<Camera size={16} />} onClick={() => void handlePosterExtract(0.9)}>
+                후반
+              </Button>
+            </div>
+          </div>
+        ) : null}
 
         <Input label="제목" value={title} onChange={(event) => setTitle(event.target.value)} maxLength={120} required />
         <TextArea

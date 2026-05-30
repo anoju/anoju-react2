@@ -321,6 +321,35 @@ Update rule: (author = @request.auth.id && status != "hidden") || @request.auth.
 Delete rule: @request.auth.role = "admin"
 ```
 
+## clip_comments
+
+Clips 상세 댓글 컬렉션입니다. 로그인 및 이메일 인증 완료 회원만 작성할 수 있고, 댓글 수정/삭제는 작성자 본인과 관리자만 가능합니다. 삭제는 soft delete로 숨김 처리합니다.
+
+필드:
+
+| 필드        | 타입           | 필수 | 기본값      | 설명                                                                    |
+| ----------- | -------------- | ---- | ----------- | ----------------------------------------------------------------------- |
+| `clip`      | relation clips | yes  |             | 댓글이 달린 Clips                                                       |
+| `author`    | relation users | yes  |             | 작성자                                                                  |
+| `content`   | text           | yes  |             | 댓글 내용, 최대 1000자                                                  |
+| `status`    | select         | yes  | `published` | `published`, `hidden`, `deleted`                                        |
+| `likeCount` | number         | no   | `0`         | 좋아요 수. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다.             |
+| `dislikeCount` | number      | no   | `0`         | 싫어요 수. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다.             |
+| `deleted`   | bool           | no   | `false`     | soft delete 여부. false를 허용해야 하므로 required로 설정하지 않습니다. |
+| `deletedAt` | date           | no   |             | 삭제 시각                                                               |
+| `created`   | autodate       | no   |             | 생성 시각                                                               |
+| `updated`   | autodate       | no   |             | 수정 시각                                                               |
+
+API Rules:
+
+```text
+List rule: status = "published" && deleted = false && clip.status = "published" && clip.deleted = false || @request.auth.role = "admin"
+View rule: status = "published" && deleted = false && clip.status = "published" && clip.deleted = false || author = @request.auth.id || @request.auth.role = "admin"
+Create rule: @request.auth.id != "" && @request.auth.verified = true && clip.status = "published" && clip.deleted = false
+Update rule: (author = @request.auth.id && status != "hidden") || @request.auth.role = "admin"
+Delete rule: @request.auth.role = "admin"
+```
+
 ## pic_logs
 
 하루 사진 로그 방 컬렉션입니다.

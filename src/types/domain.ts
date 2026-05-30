@@ -116,7 +116,7 @@ export interface PostImageRecord extends RecordModel {
 }
 
 export interface ReactionRecord extends RecordModel {
-  targetType: 'post' | 'comment';
+  targetType: 'post' | 'comment' | 'clip' | 'clip_comment';
   targetId: string;
   user: string;
   type: 'like' | 'dislike';
@@ -188,6 +188,17 @@ export interface ClipRecord extends RecordModel {
   status: PostStatus;
   tags?: string[];
   viewCount: number;
+  likeCount: number;
+  dislikeCount?: number;
+  deleted: boolean;
+  deletedAt?: string;
+}
+
+export interface ClipCommentRecord extends RecordModel {
+  clip: string;
+  author: string;
+  content: string;
+  status: CommentStatus;
   likeCount: number;
   dislikeCount?: number;
   deleted: boolean;

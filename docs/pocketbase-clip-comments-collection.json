@@ -1,0 +1,147 @@
+{
+  "id": "anoju_clipcomments",
+  "name": "clip_comments",
+  "type": "base",
+  "system": false,
+  "listRule": "status = \"published\" && deleted = false && clip.status = \"published\" && clip.deleted = false || @request.auth.role = \"admin\"",
+  "viewRule": "status = \"published\" && deleted = false && clip.status = \"published\" && clip.deleted = false || author = @request.auth.id || @request.auth.role = \"admin\"",
+  "createRule": "@request.auth.id != \"\" && @request.auth.verified = true && clip.status = \"published\" && clip.deleted = false",
+  "updateRule": "(author = @request.auth.id && status != \"hidden\") || @request.auth.role = \"admin\"",
+  "deleteRule": "@request.auth.role = \"admin\"",
+  "fields": [
+    {
+      "id": "text3208210256",
+      "name": "id",
+      "type": "text",
+      "system": true,
+      "required": true,
+      "presentable": false,
+      "hidden": false,
+      "primaryKey": true,
+      "min": 15,
+      "max": 15,
+      "pattern": "^[a-z0-9]+$",
+      "autogeneratePattern": "[a-z0-9]{15}"
+    },
+    {
+      "id": "rel_clip_comment_clip",
+      "name": "clip",
+      "type": "relation",
+      "system": false,
+      "required": true,
+      "presentable": false,
+      "hidden": false,
+      "collectionId": "anoju_clips",
+      "cascadeDelete": true,
+      "minSelect": 1,
+      "maxSelect": 1
+    },
+    {
+      "id": "rel_clip_comment_author",
+      "name": "author",
+      "type": "relation",
+      "system": false,
+      "required": true,
+      "presentable": false,
+      "hidden": false,
+      "collectionId": "_pb_users_auth_",
+      "cascadeDelete": false,
+      "minSelect": 1,
+      "maxSelect": 1
+    },
+    {
+      "id": "txt_clip_comment_content",
+      "name": "content",
+      "type": "text",
+      "system": false,
+      "required": true,
+      "presentable": true,
+      "hidden": false,
+      "min": 1,
+      "max": 1000,
+      "pattern": "",
+      "autogeneratePattern": ""
+    },
+    {
+      "id": "sel_clip_comment_status",
+      "name": "status",
+      "type": "select",
+      "system": false,
+      "required": true,
+      "presentable": false,
+      "hidden": false,
+      "maxSelect": 1,
+      "values": ["published", "hidden", "deleted"]
+    },
+    {
+      "id": "num_clip_comment_like",
+      "name": "likeCount",
+      "type": "number",
+      "system": false,
+      "required": false,
+      "presentable": false,
+      "hidden": false,
+      "min": 0,
+      "max": null,
+      "onlyInt": true
+    },
+    {
+      "id": "num_clip_comment_dislike",
+      "name": "dislikeCount",
+      "type": "number",
+      "system": false,
+      "required": false,
+      "presentable": false,
+      "hidden": false,
+      "min": 0,
+      "max": null,
+      "onlyInt": true
+    },
+    {
+      "id": "bool_clip_comment_deleted",
+      "name": "deleted",
+      "type": "bool",
+      "system": false,
+      "required": false,
+      "presentable": false,
+      "hidden": false
+    },
+    {
+      "id": "date_clip_comment_deleted",
+      "name": "deletedAt",
+      "type": "date",
+      "system": false,
+      "required": false,
+      "presentable": false,
+      "hidden": false,
+      "min": "",
+      "max": ""
+    },
+    {
+      "id": "adate_clip_comment_cr",
+      "name": "created",
+      "type": "autodate",
+      "system": false,
+      "required": false,
+      "presentable": false,
+      "hidden": false,
+      "onCreate": true,
+      "onUpdate": false
+    },
+    {
+      "id": "adate_clip_comment_up",
+      "name": "updated",
+      "type": "autodate",
+      "system": false,
+      "required": false,
+      "presentable": false,
+      "hidden": false,
+      "onCreate": true,
+      "onUpdate": true
+    }
+  ],
+  "indexes": [
+    "CREATE INDEX `idx_clip_comments_clip_created` ON `clip_comments` (`clip`, `created`)",
+    "CREATE INDEX `idx_clip_comments_author_created` ON `clip_comments` (`author`, `created`)"
+  ]
+}
