@@ -1,4 +1,6 @@
 export { DataList } from './DataList';
+export { CommentSection, type CommentSectionItem } from './CommentSection';
+export { ContentActions } from './ContentActions';
 export { RecordFormShell } from './RecordFormShell';
 export { SocialLoginButtons } from './SocialLoginButtons';
 export { TurnstileWidget } from './TurnstileWidget';

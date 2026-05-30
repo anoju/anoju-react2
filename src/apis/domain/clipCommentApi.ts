@@ -6,6 +6,7 @@ import { runApi } from '../apiClient';
 export interface CreateClipCommentParams {
   clipId: string;
   content: string;
+  parentCommentId?: string;
 }
 
 export interface UpdateClipCommentParams {
@@ -24,7 +25,7 @@ export const clipCommentApi = {
       }),
     ),
 
-  createComment: ({ clipId, content }: CreateClipCommentParams) =>
+  createComment: ({ clipId, content, parentCommentId }: CreateClipCommentParams) =>
     runApi(() => {
       const author = pb.authStore.model?.id;
 
@@ -37,6 +38,7 @@ export const clipCommentApi = {
           clip: clipId,
           author,
           content: content.trim(),
+          ...(parentCommentId ? { parentComment: parentCommentId } : {}),
           status: 'published',
           likeCount: 0,
           dislikeCount: 0,

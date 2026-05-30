@@ -1,19 +1,17 @@
-import type React from 'react'
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { MessageCircle, Pencil, Reply, Trash2 } from 'lucide-react'
+import { Pencil, Trash2 } from 'lucide-react'
 import {
   Avatar,
   Button,
+  CommentSection,
+  ContentActions,
   ImageSwipe,
-  ReactionActions,
-  ShareButton,
-  TextArea,
   confirm,
   toast,
   type ImageSwipeItem,
 } from '@/components'
-import { communityApi, getUserMessage, reactionApi, type ReactionType } from '@/apis'
+import { communityApi, getUserMessage, reactionApi, type ReactionTargetType, type ReactionType } from '@/apis'
 import { LOGIN_PATH, PICS_PATH } from '@/constants/app'
 import type { CommentRecord, PostImageRecord, PostRecord } from '@/types/domain'
 import {
@@ -26,7 +24,6 @@ import {
 import { applyReactionCount, getReactionKey } from '@/utils/reactionState'
 import { useAuthStore } from '@/stores/authStore'
 import { canEditAuthoredRecord } from '@/utils/recordPermission'
-import { createCommentThreads, type CommentThreadNode } from '@/utils/commentThread'
 
 const PicsDetail = () => {
   const { postId = '' } = useParams()
@@ -35,15 +32,9 @@ const PicsDetail = () => {
   const [post, setPost] = useState<PostRecord | null>(null)
   const [images, setImages] = useState<PostImageRecord[]>([])
   const [comments, setComments] = useState<CommentRecord[]>([])
-  const [comment, setComment] = useState('')
   const [loading, setLoading] = useState(true)
-  const [submitting, setSubmitting] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [commentActionSubmittingId, setCommentActionSubmittingId] = useState<string | null>(null)
-  const [editingCommentId, setEditingCommentId] = useState<string | null>(null)
-  const [editingCommentContent, setEditingCommentContent] = useState('')
-  const [replyingCommentId, setReplyingCommentId] = useState<string | null>(null)
-  const [replyContent, setReplyContent] = useState('')
   const [reactionSubmittingKey, setReactionSubmittingKey] = useState<string | null>(null)
   const [userReactions, setUserReactions] = useState<Record<string, ReactionType>>({})
   const [highlightedCommentId, setHighlightedCommentId] = useState<string | null>(null)
@@ -128,30 +119,18 @@ const PicsDetail = () => {
     }
   }, [comments, loading, location.search])
 
-  const handleCommentSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-
-    if (!comment.trim()) {
-      toast('댓글 내용을 입력해주세요.', { tone: 'warning' })
-      return
-    }
-
-    setSubmitting(true)
-
+  const handleCommentCreate = async (content: string, parentCommentId?: string) => {
     try {
-      await communityApi.createComment({ postId, content: comment.trim() })
-      setComment('')
-      toast('댓글을 등록했습니다.', { tone: 'success' })
+      await communityApi.createComment({ postId, content, parentCommentId })
+      toast(parentCommentId ? '답글을 등록했습니다.' : '댓글을 등록했습니다.', { tone: 'success' })
       await loadDetail()
     } catch (submitError) {
       toast(getUserMessage(submitError), { tone: 'danger' })
-    } finally {
-      setSubmitting(false)
     }
   }
 
   const handleReactionToggle = async (
-    targetType: 'post' | 'comment',
+    targetType: ReactionTargetType,
     targetId: string,
     type: ReactionType,
   ) => {
@@ -222,61 +201,15 @@ const PicsDetail = () => {
     }
   }
 
-  const handleCommentEditStart = (item: CommentRecord) => {
-    setEditingCommentId(item.id)
-    setEditingCommentContent(item.content)
-  }
-
-  const handleCommentEditCancel = () => {
-    setEditingCommentId(null)
-    setEditingCommentContent('')
-  }
-
-  const handleCommentUpdate = async (commentId: string) => {
-    if (!editingCommentContent.trim()) {
-      toast('댓글 내용을 입력해주세요.', { tone: 'warning' })
-      return
-    }
-
+  const handleCommentUpdate = async (commentId: string, content: string) => {
     setCommentActionSubmittingId(commentId)
 
     try {
-      await communityApi.updateComment({ commentId, content: editingCommentContent.trim() })
+      await communityApi.updateComment({ commentId, content })
       toast('댓글을 수정했습니다.', { tone: 'success' })
-      handleCommentEditCancel()
       await loadDetail()
     } catch (updateError) {
       toast(getUserMessage(updateError), { tone: 'danger' })
-    } finally {
-      setCommentActionSubmittingId(null)
-    }
-  }
-
-  const handleCommentReplyStart = (commentId: string) => {
-    setReplyingCommentId(commentId)
-    setReplyContent('')
-  }
-
-  const handleCommentReplyCancel = () => {
-    setReplyingCommentId(null)
-    setReplyContent('')
-  }
-
-  const handleCommentReplySubmit = async (parentCommentId: string) => {
-    if (!replyContent.trim()) {
-      toast('답글 내용을 입력해주세요.', { tone: 'warning' })
-      return
-    }
-
-    setCommentActionSubmittingId(parentCommentId)
-
-    try {
-      await communityApi.createComment({ postId, content: replyContent.trim(), parentCommentId })
-      toast('답글을 등록했습니다.', { tone: 'success' })
-      handleCommentReplyCancel()
-      await loadDetail()
-    } catch (submitError) {
-      toast(getUserMessage(submitError), { tone: 'danger' })
     } finally {
       setCommentActionSubmittingId(null)
     }
@@ -381,174 +314,11 @@ const PicsDetail = () => {
     alt: image.alt || post.title,
   }))
   const shareUrl = new URL(`${PICS_PATH}/${post.id}`, window.location.origin).toString()
+  const getCommentShareUrl = (commentId: string) => new URL(
+    `${PICS_PATH}/${post.id}?comment=${commentId}`,
+    window.location.origin,
+  ).toString()
   const canEditPost = canEditAuthoredRecord(post, user)
-  const commentThreads = createCommentThreads(comments)
-  const getCommentShareUrl = (commentId: string) => {
-    const url = new URL(shareUrl)
-    url.searchParams.set('comment', commentId)
-    return url.toString()
-  }
-  const renderComment = (node: CommentThreadNode, depth = 0): React.ReactNode => {
-    const item = node.comment
-    const canEditComment = canEditAuthoredRecord(item, user)
-    const isPostAuthorComment = item.author === post.author
-
-    return (
-      <article
-        className="comment-item"
-        data-depth={depth > 0 ? depth : undefined}
-        data-highlighted={highlightedCommentId === item.id || undefined}
-        data-post-author={isPostAuthorComment || undefined}
-        id={`comment-${item.id}`}
-        key={item.id}
-      >
-        <div className="comment-item__header">
-          <div className="comment-item__author">
-            <Avatar
-              src={getRecordAuthorAvatarUrl(item)}
-              name={getRecordAuthorName(item)}
-              size="sm"
-            />
-            <div className="comment-item__meta">
-              <strong>{getRecordAuthorName(item)}</strong>
-              {isPostAuthorComment ? <span className="comment-item__badge">글쓴이</span> : null}
-              <span>{formatRelativeTime(item.created)}</span>
-            </div>
-          </div>
-          <div className="comment-item__actions">
-            <ReactionActions
-              compact
-              likeCount={item.likeCount ?? 0}
-              dislikeCount={item.dislikeCount ?? 0}
-              selected={userReactions[getReactionKey('comment', item.id)] ?? null}
-              disabled={reactionSubmittingKey === getReactionKey('comment', item.id)}
-              onToggle={(type) => handleReactionToggle('comment', item.id, type)}
-            />
-            <ShareButton
-              title={`${getRecordAuthorName(item)} 댓글`}
-              text={item.content}
-              url={getCommentShareUrl(item.id)}
-              iconOnly
-            />
-          </div>
-        </div>
-
-        {editingCommentId === item.id ? (
-          <div className="comment-item__edit">
-            <TextArea
-              label="댓글 수정"
-              value={editingCommentContent}
-              onChange={(event) => setEditingCommentContent(event.target.value)}
-            />
-            <div className="comment-item__edit-actions">
-              <Button
-                type="button"
-                variant="outline"
-                tone="neutral"
-                size="sm"
-                onClick={handleCommentEditCancel}
-              >
-                취소
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                loading={commentActionSubmittingId === item.id}
-                onClick={() => void handleCommentUpdate(item.id)}
-              >
-                저장
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <p>{item.content}</p>
-        )}
-
-        {replyingCommentId === item.id ? (
-          <div className="comment-item__reply-form">
-            <TextArea
-              label="답글 작성"
-              value={replyContent}
-              onChange={(event) => setReplyContent(event.target.value)}
-              placeholder="답글을 입력해주세요."
-            />
-            <div className="comment-item__edit-actions">
-              <Button
-                type="button"
-                variant="outline"
-                tone="neutral"
-                size="sm"
-                onClick={handleCommentReplyCancel}
-              >
-                취소
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                loading={commentActionSubmittingId === item.id}
-                onClick={() => void handleCommentReplySubmit(item.id)}
-              >
-                등록
-              </Button>
-            </div>
-          </div>
-        ) : null}
-
-        {editingCommentId !== item.id ? (
-          <div className="comment-item__manage-actions" aria-label="댓글 관리">
-            <div className="comment-item__reply-actions">
-              {isAuthenticated ? (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  tone="neutral"
-                  size="sm"
-                  leftIcon={<Reply size={14} />}
-                  onClick={() => handleCommentReplyStart(item.id)}
-                >
-                  답글
-                </Button>
-              ) : null}
-            </div>
-            <div className="comment-item__owner-actions">
-              {canEditComment ? (
-                <>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  tone="neutral"
-                  size="sm"
-                  leftIcon={<Pencil size={14} />}
-                  onClick={() => handleCommentEditStart(item)}
-                >
-                  수정
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  tone="danger"
-                  size="sm"
-                  loading={commentActionSubmittingId === item.id}
-                  leftIcon={<Trash2 size={14} />}
-                  onClick={() => void handleCommentHide(item.id)}
-                >
-                  삭제
-                </Button>
-                </>
-              ) : null}
-            </div>
-          </div>
-        ) : null}
-
-        {node.replies.length > 0 ? (
-          <div className="comment-item__replies">
-            {node.replies.map((reply) => renderComment(reply, depth + 1))}
-          </div>
-        ) : null}
-      </article>
-    )
-  }
-
   return (
     <article className="container pics-detail">
       <header className="pics-detail__author">
@@ -570,16 +340,19 @@ const PicsDetail = () => {
 
       <div className="pics-detail__body">
         <p>{post.content}</p>
-        <div className="pic-card__actions">
-          <ReactionActions
-            likeCount={post.likeCount ?? 0}
-            dislikeCount={post.dislikeCount ?? 0}
-            selected={userReactions[getReactionKey('post', post.id)] ?? null}
-            disabled={reactionSubmittingKey === getReactionKey('post', post.id)}
-            onToggle={(type) => handleReactionToggle('post', post.id, type)}
-          />
-          <ShareButton title={post.title} text={post.content} url={shareUrl} />
-        </div>
+        <ContentActions
+          className="pic-card__actions"
+          targetType="post"
+          targetId={post.id}
+          likeCount={post.likeCount ?? 0}
+          dislikeCount={post.dislikeCount ?? 0}
+          selectedReaction={userReactions[getReactionKey('post', post.id)] ?? null}
+          reactionDisabled={reactionSubmittingKey === getReactionKey('post', post.id)}
+          shareTitle={post.title}
+          shareText={post.content}
+          shareUrl={shareUrl}
+          onReactionToggle={handleReactionToggle}
+        />
       </div>
 
       {canEditPost || isAdmin ? (
@@ -626,39 +399,31 @@ const PicsDetail = () => {
         </div>
       ) : null}
 
-      <section className="comment-box" aria-labelledby="pics-comments-title">
-        <h3 id="pics-comments-title">
-          <MessageCircle size={18} /> 댓글 {comments.length}
-        </h3>
-        <div className="comment-box__list">
-          {commentThreads.length > 0 ? (
-            commentThreads.map((thread) => renderComment(thread))
-          ) : (
-            <p className="board-page__message">아직 댓글이 없습니다.</p>
-          )}
-        </div>
-
-        {isAuthenticated ? (
-          <form className="comment-box__form" onSubmit={handleCommentSubmit}>
-            <TextArea
-              label="댓글 작성"
-              value={comment}
-              onChange={(event) => setComment(event.target.value)}
-              placeholder="댓글을 입력해주세요."
-            />
-            <Button type="submit" loading={submitting}>
-              댓글 등록
-            </Button>
-          </form>
-        ) : (
+      <CommentSection
+        titleId="pics-comments-title"
+        comments={comments}
+        ownerId={post.author}
+        canWrite={isAuthenticated}
+        writeFallback={
           <Link
             className="button-link"
             to={`${LOGIN_PATH}?redirect=${encodeURIComponent(location.pathname)}`}
           >
             로그인 후 댓글 작성
           </Link>
-        )}
-      </section>
+        }
+        highlightedCommentId={highlightedCommentId}
+        actionSubmittingId={commentActionSubmittingId}
+        reactionTargetType="comment"
+        reactionSubmittingKey={reactionSubmittingKey}
+        userReactions={userReactions}
+        canEditComment={(item) => canEditAuthoredRecord(item, user)}
+        getCommentShareUrl={getCommentShareUrl}
+        onCreateComment={handleCommentCreate}
+        onUpdateComment={handleCommentUpdate}
+        onDeleteComment={handleCommentHide}
+        onReactionToggle={handleReactionToggle}
+      />
     </article>
   )
 }

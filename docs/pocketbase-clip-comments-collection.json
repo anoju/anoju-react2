@@ -63,6 +63,19 @@
       "autogeneratePattern": ""
     },
     {
+      "id": "rel_clip_comment_parent",
+      "name": "parentComment",
+      "type": "relation",
+      "system": false,
+      "required": false,
+      "presentable": false,
+      "hidden": false,
+      "collectionId": "anoju_clipcomments",
+      "cascadeDelete": false,
+      "minSelect": 0,
+      "maxSelect": 1
+    },
+    {
       "id": "sel_clip_comment_status",
       "name": "status",
       "type": "select",
@@ -142,6 +155,7 @@
   ],
   "indexes": [
     "CREATE INDEX `idx_clip_comments_clip_created` ON `clip_comments` (`clip`, `created`)",
-    "CREATE INDEX `idx_clip_comments_author_created` ON `clip_comments` (`author`, `created`)"
+    "CREATE INDEX `idx_clip_comments_author_created` ON `clip_comments` (`author`, `created`)",
+    "CREATE INDEX `idx_clip_comments_parent` ON `clip_comments` (`parentComment`)"
   ]
 }

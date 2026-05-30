@@ -332,6 +332,7 @@ Clips 상세 댓글 컬렉션입니다. 로그인 및 이메일 인증 완료 �
 | `clip`      | relation clips | yes  |             | 댓글이 달린 Clips                                                       |
 | `author`    | relation users | yes  |             | 작성자                                                                  |
 | `content`   | text           | yes  |             | 댓글 내용, 최대 1000자                                                  |
+| `parentComment` | relation clip_comments | no |       | 대댓글 부모                                                             |
 | `status`    | select         | yes  | `published` | `published`, `hidden`, `deleted`                                        |
 | `likeCount` | number         | no   | `0`         | 좋아요 수. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다.             |
 | `dislikeCount` | number      | no   | `0`         | 싫어요 수. 0을 허용해야 하므로 Nonzero를 사용하지 않습니다.             |

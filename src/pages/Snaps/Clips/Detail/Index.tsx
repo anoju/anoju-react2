@@ -1,9 +1,8 @@
-import type React from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { Eye, MessageCircle, Pencil, Trash2 } from 'lucide-react';
-import { Avatar, Button, ReactionActions, ShareButton, TextArea, VideoPlayer, confirm, toast } from '@/components';
-import { clipApi, clipCommentApi, getClipPosterUrl, getClipVideoUrl, getUserMessage, reactionApi, type ReactionType } from '@/apis';
+import { Eye, Pencil, Trash2 } from 'lucide-react';
+import { Avatar, Button, CommentSection, ContentActions, VideoPlayer, confirm, toast } from '@/components';
+import { clipApi, clipCommentApi, getClipPosterUrl, getClipVideoUrl, getUserMessage, reactionApi, type ReactionTargetType, type ReactionType } from '@/apis';
 import { CLIPS_PATH, LOGIN_PATH } from '@/constants/app';
 import type { ClipCommentRecord, ClipRecord } from '@/types/domain';
 import { formatRelativeTime, getRecordAuthorAvatarUrl, getRecordAuthorName } from '@/utils/community';
@@ -20,16 +19,14 @@ const ClipsDetail = () => {
   const isAdmin = user?.role === 'admin';
   const [clip, setClip] = useState<ClipRecord | null>(null);
   const [comments, setComments] = useState<ClipCommentRecord[]>([]);
-  const [comment, setComment] = useState('');
-  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
-  const [editingCommentContent, setEditingCommentContent] = useState('');
+  const [highlightedCommentId, setHighlightedCommentId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [submittingComment, setSubmittingComment] = useState(false);
   const [commentActionId, setCommentActionId] = useState<string | null>(null);
   const [reactionSubmittingKey, setReactionSubmittingKey] = useState<string | null>(null);
   const [userReactions, setUserReactions] = useState<Record<string, ReactionType>>({});
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const canWriteInteraction = Boolean(isAuthenticated && user?.verified);
 
   const loadClip = useCallback(async () => {
     if (!clipId) {
@@ -83,6 +80,33 @@ const ClipsDetail = () => {
     void loadClip();
   }, [loadClip]);
 
+  useEffect(() => {
+    if (loading || comments.length === 0) {
+      return undefined;
+    }
+
+    const targetCommentId = new URLSearchParams(location.search).get('comment');
+
+    if (!targetCommentId || !comments.some((item) => item.id === targetCommentId)) {
+      return undefined;
+    }
+
+    const scrollTimer = window.setTimeout(() => {
+      document
+        .getElementById(`comment-${targetCommentId}`)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setHighlightedCommentId(targetCommentId);
+    }, 100);
+    const highlightTimer = window.setTimeout(() => {
+      setHighlightedCommentId((current) => (current === targetCommentId ? null : current));
+    }, 4500);
+
+    return () => {
+      window.clearTimeout(scrollTimer);
+      window.clearTimeout(highlightTimer);
+    };
+  }, [comments, loading, location.search]);
+
   const handleHideClip = async () => {
     const confirmed = await confirm('Clips를 목록에서 숨김 처리할까요?', {
       title: 'Clips 삭제 확인',
@@ -107,30 +131,18 @@ const ClipsDetail = () => {
     }
   };
 
-  const handleCommentSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (!comment.trim()) {
-      toast('댓글 내용을 입력해주세요.', { tone: 'warning' });
-      return;
-    }
-
-    setSubmittingComment(true);
-
+  const handleCommentCreate = async (content: string, parentCommentId?: string) => {
     try {
-      await clipCommentApi.createComment({ clipId, content: comment });
-      setComment('');
-      setComments(await clipCommentApi.listComments(clipId));
-      toast('댓글을 등록했습니다.', { tone: 'success' });
+      await clipCommentApi.createComment({ clipId, content, parentCommentId });
+      toast(parentCommentId ? '답글을 등록했습니다.' : '댓글을 등록했습니다.', { tone: 'success' });
+      await loadClip();
     } catch (submitError) {
       toast(getUserMessage(submitError), { tone: 'danger' });
-    } finally {
-      setSubmittingComment(false);
     }
   };
 
   const handleReactionToggle = async (
-    targetType: 'clip' | 'clip_comment',
+    targetType: ReactionTargetType,
     targetId: string,
     type: ReactionType,
   ) => {
@@ -193,20 +205,13 @@ const ClipsDetail = () => {
     }
   };
 
-  const handleCommentUpdate = async (commentId: string) => {
-    if (!editingCommentContent.trim()) {
-      toast('댓글 내용을 입력해주세요.', { tone: 'warning' });
-      return;
-    }
-
+  const handleCommentUpdate = async (commentId: string, content: string) => {
     setCommentActionId(commentId);
 
     try {
-      await clipCommentApi.updateComment({ commentId, content: editingCommentContent });
-      setEditingCommentId(null);
-      setEditingCommentContent('');
-      setComments(await clipCommentApi.listComments(clipId));
+      await clipCommentApi.updateComment({ commentId, content });
       toast('댓글을 수정했습니다.', { tone: 'success' });
+      await loadClip();
     } catch (updateError) {
       toast(getUserMessage(updateError), { tone: 'danger' });
     } finally {
@@ -229,8 +234,8 @@ const ClipsDetail = () => {
 
     try {
       await clipCommentApi.hideComment(commentId);
-      setComments(await clipCommentApi.listComments(clipId));
       toast('댓글을 삭제했습니다.', { tone: 'success' });
+      await loadClip();
     } catch (deleteError) {
       toast(getUserMessage(deleteError), { tone: 'danger' });
     } finally {
@@ -309,16 +314,18 @@ const ClipsDetail = () => {
         <p className="clips-detail__description">{clip.description}</p>
       </section>
 
-      <div className="board-detail__actions">
-        <ReactionActions
-          likeCount={clip.likeCount ?? 0}
-          dislikeCount={clip.dislikeCount ?? 0}
-          selected={userReactions[getReactionKey('clip', clip.id)] ?? null}
-          disabled={reactionSubmittingKey === getReactionKey('clip', clip.id)}
-          onToggle={(type) => handleReactionToggle('clip', clip.id, type)}
-        />
-        <ShareButton title={clip.title} text={clip.description} url={shareUrl} />
-      </div>
+      <ContentActions
+        targetType="clip"
+        targetId={clip.id}
+        likeCount={clip.likeCount ?? 0}
+        dislikeCount={clip.dislikeCount ?? 0}
+        selectedReaction={userReactions[getReactionKey('clip', clip.id)] ?? null}
+        reactionDisabled={reactionSubmittingKey === getReactionKey('clip', clip.id)}
+        shareTitle={clip.title}
+        shareText={clip.description}
+        shareUrl={shareUrl}
+        onReactionToggle={handleReactionToggle}
+      />
 
       {canEditClip || isAdmin ? (
         <div className="admin-actions" aria-label="Clips 관리">
@@ -364,120 +371,28 @@ const ClipsDetail = () => {
         </div>
       ) : null}
 
-      <section className="comment-box" aria-labelledby="clip-comments-title">
-        <h3 id="clip-comments-title">
-          <MessageCircle size={18} /> 댓글 {comments.length}
-        </h3>
-        <div className="comment-box__list">
-          {comments.length > 0 ? (
-            comments.map((item) => {
-              const canEditComment = canEditAuthoredRecord(item, user);
-
-              return (
-                <article className="comment-item" key={item.id}>
-                  <div className="comment-item__header">
-                    <div className="comment-item__author">
-                      <Avatar src={getRecordAuthorAvatarUrl(item)} name={getRecordAuthorName(item)} size="sm" />
-                      <div className="comment-item__meta">
-                        <strong>{getRecordAuthorName(item)}</strong>
-                        <span>{formatRelativeTime(item.created)}</span>
-                      </div>
-                    </div>
-                    <div className="comment-item__actions">
-                      <ReactionActions
-                        compact
-                        likeCount={item.likeCount ?? 0}
-                        dislikeCount={item.dislikeCount ?? 0}
-                        selected={userReactions[getReactionKey('clip_comment', item.id)] ?? null}
-                        disabled={reactionSubmittingKey === getReactionKey('clip_comment', item.id)}
-                        onToggle={(type) => handleReactionToggle('clip_comment', item.id, type)}
-                      />
-                      <ShareButton
-                        title={`${getRecordAuthorName(item)} 댓글`}
-                        text={item.content}
-                        url={getCommentShareUrl(item.id)}
-                        iconOnly
-                      />
-                    </div>
-                  </div>
-
-                  {editingCommentId === item.id ? (
-                    <div className="comment-item__edit">
-                      <TextArea
-                        label="댓글 수정"
-                        value={editingCommentContent}
-                        onChange={(event) => setEditingCommentContent(event.target.value)}
-                      />
-                      <div className="comment-item__edit-actions">
-                        <Button type="button" variant="outline" tone="neutral" size="sm" onClick={() => setEditingCommentId(null)}>
-                          취소
-                        </Button>
-                        <Button type="button" size="sm" loading={commentActionId === item.id} onClick={() => void handleCommentUpdate(item.id)}>
-                          저장
-                        </Button>
-                      </div>
-                    </div>
-                  ) : (
-                    <p>{item.content}</p>
-                  )}
-
-                  {canEditComment && editingCommentId !== item.id ? (
-                    <div className="comment-item__manage-actions" aria-label="댓글 관리">
-                      <div />
-                      <div className="comment-item__owner-actions">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          tone="neutral"
-                          size="sm"
-                          leftIcon={<Pencil size={14} />}
-                          onClick={() => {
-                            setEditingCommentId(item.id);
-                            setEditingCommentContent(item.content);
-                          }}
-                        >
-                          수정
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          tone="danger"
-                          size="sm"
-                          loading={commentActionId === item.id}
-                          leftIcon={<Trash2 size={14} />}
-                          onClick={() => void handleCommentHide(item.id)}
-                        >
-                          삭제
-                        </Button>
-                      </div>
-                    </div>
-                  ) : null}
-                </article>
-              );
-            })
-          ) : (
-            <p className="board-page__message">아직 댓글이 없습니다.</p>
-          )}
-        </div>
-
-        {isAuthenticated ? (
-          <form className="comment-box__form" onSubmit={handleCommentSubmit}>
-            <TextArea
-              label="댓글 작성"
-              value={comment}
-              onChange={(event) => setComment(event.target.value)}
-              placeholder="댓글을 입력해주세요."
-            />
-            <Button type="submit" loading={submittingComment}>
-              댓글 등록
-            </Button>
-          </form>
-        ) : (
+      <CommentSection
+        titleId="clip-comments-title"
+        comments={comments}
+        ownerId={clip.author}
+        canWrite={canWriteInteraction}
+        writeFallback={(
           <Link className="button-link" to={`${LOGIN_PATH}?redirect=${encodeURIComponent(location.pathname)}`}>
             로그인 후 댓글 작성
           </Link>
         )}
-      </section>
+        highlightedCommentId={highlightedCommentId}
+        actionSubmittingId={commentActionId}
+        reactionTargetType="clip_comment"
+        reactionSubmittingKey={reactionSubmittingKey}
+        userReactions={userReactions}
+        canEditComment={(item) => canEditAuthoredRecord(item, user)}
+        getCommentShareUrl={getCommentShareUrl}
+        onCreateComment={handleCommentCreate}
+        onUpdateComment={handleCommentUpdate}
+        onDeleteComment={handleCommentHide}
+        onReactionToggle={handleReactionToggle}
+      />
     </article>
   );
 };

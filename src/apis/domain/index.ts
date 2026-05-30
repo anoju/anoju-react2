@@ -9,6 +9,6 @@ export { noticeApi } from './noticeApi';
 export { notificationApi } from './notificationApi';
 export { picLogApi } from './picLogApi';
 export { postApi } from './postApi';
-export { reactionApi, type ReactionType } from './reactionApi';
+export { reactionApi, type ReactionTargetType, type ReactionType } from './reactionApi';
 export { reportApi } from './reportApi';
 export { userApi } from './userApi';

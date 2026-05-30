@@ -198,6 +198,7 @@ export interface ClipCommentRecord extends RecordModel {
   clip: string;
   author: string;
   content: string;
+  parentComment?: string;
   status: CommentStatus;
   likeCount: number;
   dislikeCount?: number;

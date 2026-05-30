@@ -1,13 +1,18 @@
 import type { CommentRecord } from '@/types/domain';
 
-export interface CommentThreadNode {
-  comment: CommentRecord;
-  replies: CommentThreadNode[];
+interface ThreadableComment {
+  id: string;
+  parentComment?: string;
 }
 
-export const createCommentThreads = (comments: CommentRecord[]) => {
-  const nodeMap = new Map<string, CommentThreadNode>();
-  const roots: CommentThreadNode[] = [];
+export interface CommentThreadNode<TComment extends ThreadableComment = CommentRecord> {
+  comment: TComment;
+  replies: Array<CommentThreadNode<TComment>>;
+}
+
+export const createCommentThreads = <TComment extends ThreadableComment>(comments: TComment[]) => {
+  const nodeMap = new Map<string, CommentThreadNode<TComment>>();
+  const roots: Array<CommentThreadNode<TComment>> = [];
 
   comments.forEach((comment) => {
     nodeMap.set(comment.id, { comment, replies: [] });
