@@ -64,7 +64,28 @@ export interface VideoUploadPreview {
   url: string;
   name: string;
   size: number;
+  duration: number;
+  width: number;
+  height: number;
 }
+
+export interface VideoUploadOptions {
+  maxSize?: number;
+  maxDurationSeconds?: number;
+  maxLongSide?: number;
+  maxShortSide?: number;
+  resolutionLabel?: string;
+}
+
+export const VIDEO_UPLOAD_PROFILES = {
+  clips: {
+    maxSize: UPLOAD_LIMITS.clipVideo,
+    maxDurationSeconds: 30,
+    maxLongSide: 1280,
+    maxShortSide: 720,
+    resolutionLabel: '720p',
+  },
+} as const satisfies Record<string, VideoUploadOptions>;
 
 export const validateImageFile = (file: File, maxSize: number) => {
   if (!IMAGE_TYPES.includes(file.type)) {
@@ -114,21 +135,105 @@ export const validateVideoFile = (file: File, maxSize = UPLOAD_LIMITS.clipVideo)
   return null;
 };
 
-export const createVideoUploadPreview = (file: File, maxSize = UPLOAD_LIMITS.clipVideo): VideoUploadPreview | null => {
-  const error = validateVideoFile(file, maxSize);
+const loadVideoMetadata = (url: string) =>
+  new Promise<{ duration: number; width: number; height: number }>((resolve, reject) => {
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+    video.muted = true;
+    video.playsInline = true;
+    video.src = url;
+
+    video.onloadedmetadata = () => {
+      resolve({
+        duration: video.duration,
+        width: video.videoWidth,
+        height: video.videoHeight,
+      });
+    };
+    video.onerror = () => reject(new Error('동영상 정보를 불러오지 못했습니다.'));
+  });
+
+const validateVideoMetadata = (
+  metadata: { duration: number; width: number; height: number },
+  { maxDurationSeconds, maxLongSide, maxShortSide, resolutionLabel }: VideoUploadOptions,
+) => {
+  if (maxDurationSeconds && metadata.duration > maxDurationSeconds) {
+    return `동영상은 ${maxDurationSeconds}초 이하로 업로드해주세요.`;
+  }
+
+  const longSide = Math.max(metadata.width, metadata.height);
+  const shortSide = Math.min(metadata.width, metadata.height);
+
+  if (maxLongSide && longSide > maxLongSide) {
+    return `동영상 해상도는 최대 ${resolutionLabel ?? `${maxLongSide}px`}까지 업로드할 수 있습니다.`;
+  }
+
+  if (maxShortSide && shortSide > maxShortSide) {
+    return `동영상 해상도는 최대 ${resolutionLabel ?? `${maxShortSide}px`}까지 업로드할 수 있습니다.`;
+  }
+
+  return null;
+};
+
+export const formatVideoDuration = (duration: number) => {
+  if (!Number.isFinite(duration)) {
+    return '0:00';
+  }
+
+  const totalSeconds = Math.max(0, Math.round(duration));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+
+  return `${minutes}:${String(seconds).padStart(2, '0')}`;
+};
+
+export const createVideoUploadPreview = async (
+  file: File,
+  options: VideoUploadOptions = VIDEO_UPLOAD_PROFILES.clips,
+): Promise<VideoUploadPreview | null> => {
+  const error = validateVideoFile(file, options.maxSize);
 
   if (error) {
     toast(error, { tone: 'danger' });
     return null;
   }
 
-  return {
-    id: createClientId('clip-video'),
-    file,
-    url: URL.createObjectURL(file),
-    name: file.name,
-    size: file.size,
-  };
+  const url = URL.createObjectURL(file);
+
+  try {
+    const metadata = await loadVideoMetadata(url);
+    const metadataError = validateVideoMetadata(metadata, options);
+
+    if (metadataError) {
+      URL.revokeObjectURL(url);
+      toast(metadataError, { tone: 'danger' });
+      return null;
+    }
+
+    return {
+      id: createClientId('clip-video'),
+      file,
+      url,
+      name: file.name,
+      size: file.size,
+      duration: metadata.duration,
+      width: metadata.width,
+      height: metadata.height,
+    };
+  } catch (loadError) {
+    URL.revokeObjectURL(url);
+    toast(loadError instanceof Error ? loadError.message : '동영상 정보를 확인하지 못했습니다.', { tone: 'danger' });
+    return null;
+  }
+};
+
+export const getVideoUploadPolicyText = ({ maxDurationSeconds, resolutionLabel }: VideoUploadOptions) => {
+  const parts = [
+    maxDurationSeconds ? `${maxDurationSeconds}초 이하` : '',
+    resolutionLabel ? `${resolutionLabel} 이하` : '',
+  ].filter(Boolean);
+
+  return parts.join(' · ');
 };
 
 export const revokeUploadPreviews = (previews: UploadPreview[]) => {

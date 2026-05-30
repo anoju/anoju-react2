@@ -1,16 +1,15 @@
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Camera, FileVideo, ImagePlus, X } from 'lucide-react';
-import { Button, FixedBottomActions, Img, Input, TextArea, VideoPlayer, toast } from '@/components';
+import { Camera, ImagePlus, X } from 'lucide-react';
+import { Button, FixedBottomActions, Img, Input, TextArea, VideoUploadField, toast } from '@/components';
 import { clipApi, getUserMessage } from '@/apis';
 import { CLIPS_PATH } from '@/constants/app';
 import { useUnsavedChanges } from '@/hooks/useUnsavedChanges';
 import {
   UPLOAD_LIMITS,
+  VIDEO_UPLOAD_PROFILES,
   createUploadPreviews,
-  createVideoUploadPreview,
-  formatFileSize,
   revokeUploadPreviews,
   revokeVideoUploadPreview,
   type UploadPreview,
@@ -83,21 +82,9 @@ const ClipsWrite = () => {
     [posterPreview, videoPreview],
   );
 
-  const handleVideoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-
-    if (!file) {
-      return;
-    }
-
-    const nextPreview = createVideoUploadPreview(file);
-
-    if (nextPreview) {
-      revokeVideoUploadPreview(videoPreview);
-      setVideoPreview(nextPreview);
-    }
-
-    event.target.value = '';
+  const handleVideoChange = (nextPreview: VideoUploadPreview) => {
+    revokeVideoUploadPreview(videoPreview);
+    setVideoPreview(nextPreview);
   };
 
   const handlePosterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -199,19 +186,15 @@ const ClipsWrite = () => {
       </header>
 
       <form className="write-page__form" onSubmit={handleSubmit}>
-        {videoPreview ? (
-          <section className="clip-upload-preview" aria-label="선택한 동영상">
-            <VideoPlayer src={videoPreview.url} title={title || videoPreview.name} poster={posterPreview?.url} />
-            <div className="clip-upload-preview__meta">
-              <span>
-                {videoPreview.name} · {formatFileSize(videoPreview.size)}
-              </span>
-              <Button type="button" variant="ghost" tone="danger" size="sm" leftIcon={<X size={16} />} onClick={handleVideoRemove}>
-                제거
-              </Button>
-            </div>
-          </section>
-        ) : null}
+        <VideoUploadField
+          value={videoPreview}
+          title={title}
+          poster={posterPreview?.url}
+          options={VIDEO_UPLOAD_PROFILES.clips}
+          uploading={submitting}
+          onChange={handleVideoChange}
+          onRemove={handleVideoRemove}
+        />
 
         {posterPreview ? (
           <figure className="clip-poster-preview">
@@ -226,12 +209,6 @@ const ClipsWrite = () => {
         ) : null}
 
         <div className="clip-upload-actions">
-          <label className="image-uploader">
-            <input type="file" accept="video/mp4,video/webm,video/quicktime" onChange={handleVideoChange} />
-            <span>
-              <FileVideo size={18} /> 동영상 선택
-            </span>
-          </label>
           <label className="image-uploader">
             <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handlePosterChange} />
             <span>

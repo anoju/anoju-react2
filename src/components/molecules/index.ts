@@ -13,3 +13,4 @@ export { RichTextEditor } from './RichTextEditor';
 export { ReactionActions } from './ReactionActions';
 export { ShareButton } from './ShareButton';
 export { VideoPlayer } from './VideoPlayer';
+export { VideoUploadField } from './VideoUploadField';

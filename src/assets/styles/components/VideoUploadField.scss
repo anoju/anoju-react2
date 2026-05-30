@@ -1,0 +1,65 @@
+.video-upload-field {
+  display: grid;
+  gap: var(--spacing-xs);
+
+  &__preview {
+    display: grid;
+    overflow: hidden;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-surface);
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-xs);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-xs);
+    gap: var(--spacing-xs);
+
+    span {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  &__trigger {
+    display: grid;
+    cursor: pointer;
+
+    input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      clip-path: inset(50%);
+    }
+
+    input:disabled + span {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    span {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 3rem;
+      border: 1px dashed var(--color-border-strong);
+      border-radius: var(--radius-md);
+      color: var(--color-text-link);
+      background: var(--color-bg-primary-soft);
+      font-weight: 720;
+      gap: var(--spacing-xs);
+    }
+  }
+
+  &__policy {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-xs);
+  }
+}

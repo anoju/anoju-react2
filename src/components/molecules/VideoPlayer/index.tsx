@@ -68,10 +68,17 @@ type PictureInPictureVideo = HTMLVideoElement & {
   requestPictureInPicture?: () => Promise<unknown>;
 };
 
+type SeekFeedback = {
+  direction: 'backward' | 'forward';
+  id: number;
+};
+
 export const VideoPlayer = ({ src, title, poster, className = '' }: VideoPlayerProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const hideTimerRef = useRef<number | null>(null);
+  const feedbackTimerRef = useRef<number | null>(null);
+  const seekFeedbackTimerRef = useRef<number | null>(null);
   const lastTapRef = useRef<{ time: number; x: number } | null>(null);
   const lastPointerTapAtRef = useRef(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -91,6 +98,7 @@ export const VideoPlayer = ({ src, title, poster, className = '' }: VideoPlayerP
   const [volume, setVolume] = useState(0.8);
   const [playbackRate, setPlaybackRate] = useState('1');
   const [feedback, setFeedback] = useState<React.ReactNode | null>(null);
+  const [seekFeedback, setSeekFeedback] = useState<SeekFeedback | null>(null);
   const [loading, setLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [isPointerInside, setIsPointerInside] = useState(false);
@@ -105,7 +113,22 @@ export const VideoPlayer = ({ src, title, poster, className = '' }: VideoPlayerP
 
   const showFeedback = useCallback((icon: React.ReactNode) => {
     setFeedback(icon);
-    window.setTimeout(() => setFeedback(null), 520);
+
+    if (feedbackTimerRef.current) {
+      window.clearTimeout(feedbackTimerRef.current);
+    }
+
+    feedbackTimerRef.current = window.setTimeout(() => setFeedback(null), 520);
+  }, []);
+
+  const showSeekFeedback = useCallback((direction: SeekFeedback['direction']) => {
+    setSeekFeedback({ direction, id: Date.now() });
+
+    if (seekFeedbackTimerRef.current) {
+      window.clearTimeout(seekFeedbackTimerRef.current);
+    }
+
+    seekFeedbackTimerRef.current = window.setTimeout(() => setSeekFeedback(null), 680);
   }, []);
 
   const revealControls = useCallback(() => {
@@ -124,6 +147,14 @@ export const VideoPlayer = ({ src, title, poster, className = '' }: VideoPlayerP
     () => () => {
       if (hideTimerRef.current) {
         window.clearTimeout(hideTimerRef.current);
+      }
+
+      if (feedbackTimerRef.current) {
+        window.clearTimeout(feedbackTimerRef.current);
+      }
+
+      if (seekFeedbackTimerRef.current) {
+        window.clearTimeout(seekFeedbackTimerRef.current);
       }
     },
     [],
@@ -207,7 +238,7 @@ export const VideoPlayer = ({ src, title, poster, className = '' }: VideoPlayerP
     revealControls();
   }, [revealControls, showFeedback, syncPlaybackState]);
 
-  const seekBy = useCallback((seconds: number) => {
+  const seekBy = useCallback((seconds: number, options?: { directionalFeedback?: boolean }) => {
     const video = videoRef.current;
 
     if (!video) {
@@ -215,9 +246,13 @@ export const VideoPlayer = ({ src, title, poster, className = '' }: VideoPlayerP
     }
 
     video.currentTime = Math.min(Math.max(video.currentTime + seconds, 0), duration || video.duration || 0);
-    showFeedback(seconds > 0 ? <RotateCw size={42} /> : <RotateCcw size={42} />);
+    if (options?.directionalFeedback) {
+      showSeekFeedback(seconds > 0 ? 'forward' : 'backward');
+    } else {
+      showFeedback(seconds > 0 ? <RotateCw size={42} /> : <RotateCcw size={42} />);
+    }
     revealControls();
-  }, [duration, revealControls, showFeedback]);
+  }, [duration, revealControls, showFeedback, showSeekFeedback]);
 
   const handleProgressChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const video = videoRef.current;
@@ -366,9 +401,21 @@ export const VideoPlayer = ({ src, title, poster, className = '' }: VideoPlayerP
     }
 
     const tappedLeft = clientX < rect.left + rect.width / 2;
-    seekBy(tappedLeft ? -SEEK_SECONDS : SEEK_SECONDS);
+    seekBy(tappedLeft ? -SEEK_SECONDS : SEEK_SECONDS, { directionalFeedback: true });
     return true;
   }, [seekBy]);
+
+  const handleDoubleClick = (event: React.MouseEvent<HTMLVideoElement>) => {
+    event.preventDefault();
+
+    if (Date.now() - lastPointerTapAtRef.current < 240) {
+      return;
+    }
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    const clickedLeft = event.clientX < rect.left + rect.width / 2;
+    seekBy(clickedLeft ? -SEEK_SECONDS : SEEK_SECONDS, { directionalFeedback: true });
+  };
 
   const handleTouchEnd = (event: React.TouchEvent<HTMLVideoElement>) => {
     if (Date.now() - lastPointerTapAtRef.current < 500) {
@@ -386,12 +433,21 @@ export const VideoPlayer = ({ src, title, poster, className = '' }: VideoPlayerP
   };
 
   const handlePointerUp = (event: React.PointerEvent<HTMLVideoElement>) => {
-    if (event.pointerType !== 'touch') {
+    if (event.button !== 0) {
       return;
     }
 
-    lastPointerTapAtRef.current = Date.now();
-    handleTapSeek(event.clientX, event.currentTarget.getBoundingClientRect());
+    if (event.pointerType === 'touch') {
+      lastPointerTapAtRef.current = Date.now();
+      handleTapSeek(event.clientX, event.currentTarget.getBoundingClientRect());
+      return;
+    }
+
+    const handled = handleTapSeek(event.clientX, event.currentTarget.getBoundingClientRect());
+
+    if (handled) {
+      lastPointerTapAtRef.current = Date.now();
+    }
   };
 
   const shellClassName = ['video-player-shell', className].filter(Boolean).join(' ');
@@ -424,7 +480,7 @@ export const VideoPlayer = ({ src, title, poster, className = '' }: VideoPlayerP
         preload="metadata"
         playsInline
         onClick={() => void togglePlay()}
-        onDoubleClick={() => void toggleFullscreen()}
+        onDoubleClick={handleDoubleClick}
         onPointerUp={handlePointerUp}
         onTouchEnd={handleTouchEnd}
         onLoadedMetadata={(event) => {
@@ -471,6 +527,18 @@ export const VideoPlayer = ({ src, title, poster, className = '' }: VideoPlayerP
       ) : null}
 
       {feedback ? <div className="video-player__feedback">{feedback}</div> : null}
+
+      {seekFeedback ? (
+        <div
+          className="video-player__seek-feedback"
+          data-direction={seekFeedback.direction}
+          key={seekFeedback.id}
+          aria-live="polite"
+        >
+          {seekFeedback.direction === 'backward' ? <RotateCcw size={34} /> : <RotateCw size={34} />}
+          <span>{SEEK_SECONDS}초</span>
+        </div>
+      ) : null}
 
       {!isPlaying ? (
         <button
