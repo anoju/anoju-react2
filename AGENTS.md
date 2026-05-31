@@ -22,11 +22,11 @@
 - **디자인 방향**: **Warm Minimalism**의 감성과 **Modern Essential**의 편의성을 결합하며, **퍼플(Purple)**을 시그니처 포인트 컬러로 사용합니다.
 - **UI 컴포넌트 구현 원칙**: UI 컴포넌트 라이브러리는 직접 도입하지 않고 프로젝트 내부에서 직접 구현합니다.
 - **UI 참조 기준**: 컴포넌트 API, 이벤트 명명, 상태 속성, 접근성 동작은 **Radix UI**를 1차 기준으로 참고합니다. 접근성이 복잡한 컴포넌트는 **React Aria**를 보조 기준으로 검증하고, 모바일 UX 흐름은 **Ant Design Mobile**을 참고합니다. **Shadcn UI**는 Radix 기반 조합 방식만 참고하며 디자인과 코드는 복제하지 않습니다.
-- **공통 UI 1차 범위**: 우선 구현 대상 공통 UI는 `Button`, `IconButton`, `Img`, `Input`, `TextArea`, `Checkbox`, `Radio`, `Switch`, `Tabs`, `Select`(단순형), `Toast`, `Dialog`, `Alert`, `Confirm`, `BottomSheet`, `Spinner`, `PageLoading`, `EmptyState`, `ErrorState`, `DataList`, `AppHeader`, `FloatingMenu`, `Page`, `VisuallyHidden`입니다.
+- **공통 UI 1차 범위**: 우선 구현 대상 공통 UI는 `Button`, `IconButton`, `Img`, `Input`, `TextArea`, `Checkbox`, `Radio`, `Switch`, `Tabs`, `Select`, `Toast`, `Dialog`, `Alert`, `Confirm`, `BottomSheet`, `Spinner`, `GlobalLoading`, `PageLoading`, `EmptyState`, `ErrorState`, `DataList`, `AppHeader`, `FloatingMenu`, `Page`, `VisuallyHidden`입니다.
 - **공통 UI API**: 공통 컴포넌트는 `size="xs|sm|md|lg|xl"`, `variant="solid|soft|outline|ghost|plain"`, `tone="primary|neutral|danger|success|warning|info"`를 기본 축으로 삼고, 상태는 `data-state`, `data-disabled`, `data-loading`, `data-selected`, `data-active`, `data-invalid`로 표현합니다.
 - **공통 피드백 정책**: 저장/복사 등 짧은 결과는 `Toast`, 단순 안내는 `Alert`, 삭제/로그아웃/작성 취소처럼 결정이 필요한 경우는 `Confirm`, 모바일 액션 선택은 `BottomSheet`, 페이지/섹션 실패는 `ErrorState`, 데이터 없음은 `EmptyState`, 짧은 진행 상태는 `Spinner`를 사용합니다.
 - **Dialog 사용 원칙**: `Dialog`는 콘텐츠나 복합 UI를 담는 범용 모달 컨테이너로 사용합니다. 안내 메시지와 확인/취소 메시지는 원시 `Dialog`를 직접 쓰지 않고, 사용성이 편한 `Alert`와 `Confirm` 래퍼를 사용합니다.
-- **로딩 정책**: 전체 페이지를 막는 `PageLoading`은 인증 초기화, 보호 라우트 판정, 필수 초기 데이터 확인처럼 어쩔 수 없는 경우에만 사용합니다. 버튼 액션은 `Button loading`, 리스트 추가 로딩은 리스트 하단 로딩을 사용합니다.
+- **로딩 정책**: 로고 기반 인터랙션을 가진 `GlobalLoading`을 전역 로딩의 시각 컴포넌트로 사용하고, 화면에서는 `PageLoading` 래퍼를 통해 호출합니다. 전체 페이지를 막는 `PageLoading`은 인증 초기화, 보호 라우트 판정, 필수 초기 데이터 확인, 상세/수정 화면의 첫 데이터 조회처럼 화면 렌더링 자체가 불가능한 경우에만 사용합니다. 버튼 액션은 `Button loading`, 리스트 추가 로딩은 리스트 하단 `Spinner` 로딩을 사용합니다. 이미 데이터가 보이는 상태의 재조회, 무한스크롤 추가 조회, 비디오 내부 버퍼링, 작은 위젯 로딩에는 `GlobalLoading/PageLoading`을 사용하지 않습니다.
 - **Skeleton 정책**: 짧은 Skeleton 노출은 오류처럼 보일 수 있으므로 기본 1차 컴포넌트에서는 제외하고, `500ms` 이상 예상되는 리스트/상세 구조에서만 2차로 제한 검토합니다.
 - **DataList 정책**: 리스트형 화면은 공통 `DataList`를 사용하며, 1차로 `mode="infinite"`와 `mode="loadMore"`를 지원합니다. 첫 조회 실패는 `ErrorState`, 데이터 없음은 `EmptyState`, 추가 조회 실패는 기존 목록 유지 후 하단 재시도 액션으로 처리합니다.
 - **폼 검증 정책**: 입력 중 과한 에러 노출을 피하고, `blur` 시 필드 검증, `submit` 시 전체 검증을 수행합니다. 제출 실패 시 첫 번째 에러 필드로 포커스를 이동하고, 필드 에러와 폼 에러를 분리합니다.
