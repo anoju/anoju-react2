@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { Save } from 'lucide-react';
 import { Button, Checkbox, Select } from '@/components/atoms';
 import { toast } from '@/components/feedback';
-import { PageLoading } from '@/components/molecules';
 import { contentSettingApi, getUserMessage } from '@/apis';
+import { usePageLoadingEffect } from '@/hooks';
 import type {
   ContentDeletePermission,
   ContentEditPermission,
@@ -82,6 +82,7 @@ const ContentSettings = () => {
   const [loading, setLoading] = useState(true);
   const [savingKey, setSavingKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  usePageLoadingEffect(loading, '운영 설정을 불러오고 있습니다.');
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -159,7 +160,7 @@ const ContentSettings = () => {
   };
 
   if (loading) {
-    return <PageLoading label="운영 설정을 불러오고 있습니다." />;
+    return null;
   }
 
   return (

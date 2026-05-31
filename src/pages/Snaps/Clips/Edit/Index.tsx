@@ -2,11 +2,12 @@ import type React from 'react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ImagePlus, X } from 'lucide-react';
-import { Button, FixedBottomActions, Img, Input, PageLoading, TextArea, VideoPlayer, toast } from '@/components';
+import { Button, FixedBottomActions, Img, Input, TextArea, VideoPlayer, toast } from '@/components';
 import { clipApi, getClipPosterUrl, getClipVideoUrl, getUserMessage } from '@/apis';
 import { CLIPS_PATH } from '@/constants/app';
 import type { ClipRecord } from '@/types/domain';
-import { useUnsavedChanges } from '@/hooks/useUnsavedChanges';
+import { usePageLoadingEffect } from '@/hooks';
+import { useUnsavedChanges } from '@/hooks';
 import { useAuthStore } from '@/stores/authStore';
 import { canEditAuthoredRecord } from '@/utils/recordPermission';
 import {
@@ -31,6 +32,7 @@ const ClipsEdit = () => {
     clip && (title !== clip.title || description !== clip.description || posterPreview),
   );
   const { confirmLeave } = useUnsavedChanges(dirty && !submitting);
+  usePageLoadingEffect(loading, 'Clips를 불러오고 있습니다.');
 
   useEffect(
     () => () => {
@@ -116,7 +118,7 @@ const ClipsEdit = () => {
   };
 
   if (loading) {
-    return <PageLoading label="Clips를 불러오고 있습니다." />;
+    return null;
   }
 
   if (error || !clip) {

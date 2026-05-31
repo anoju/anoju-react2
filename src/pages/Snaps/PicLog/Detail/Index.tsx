@@ -25,11 +25,11 @@ import {
   IconButton,
   Img,
   Input,
-  PageLoading,
   TextArea,
   toast,
 } from '@/components'
 import { PIC_LOG_PATH } from '@/constants/app'
+import { usePageLoadingEffect } from '@/hooks'
 import { useAuthStore } from '@/stores/authStore'
 import type {
   PicLogCommentRecord,
@@ -75,6 +75,7 @@ const PicLogDetail = () => {
   const commentFormRef = useRef<HTMLFormElement>(null)
   const currentUserId = user?.id ?? ''
   const isAdmin = user?.role === 'admin'
+  usePageLoadingEffect(loading, 'picLog를 불러오고 있습니다.')
 
   const loadDetail = useCallback(async () => {
     if (!logId) {
@@ -277,7 +278,7 @@ const PicLogDetail = () => {
   }
 
   if (loading) {
-    return <PageLoading label="picLog를 불러오고 있습니다." />
+    return null
   }
 
   if (!bundle) {

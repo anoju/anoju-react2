@@ -3,8 +3,9 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { KeyRound, LogIn } from 'lucide-react';
 import { getUserMessage, picLogApi } from '@/apis';
-import { Button, EmptyState, Input, PageLoading, toast } from '@/components';
+import { Button, EmptyState, Input, toast } from '@/components';
 import { PIC_LOG_PATH } from '@/constants/app';
+import { usePageLoadingEffect } from '@/hooks';
 import { useAuthStore } from '@/stores/authStore';
 import type { PicLogRecord } from '@/types/domain';
 import { formatPicLogDate } from '../data';
@@ -19,6 +20,7 @@ const PicLogJoin = () => {
   const [passwordError, setPasswordError] = useState('');
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  usePageLoadingEffect(loading, '초대 정보를 확인하고 있습니다.');
 
   const loadLog = useCallback(async () => {
     if (!logId) {
@@ -83,7 +85,7 @@ const PicLogJoin = () => {
   };
 
   if (loading) {
-    return <PageLoading label="초대 정보를 확인하고 있습니다." />;
+    return null;
   }
 
   if (!log) {

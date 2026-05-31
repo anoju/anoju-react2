@@ -7,8 +7,7 @@ import {
   CommentSection,
   ContentActions,
   Img,
-  PageLoading,
-  confirm,
+  showConfirm,
   toast,
 } from '@/components'
 import { communityApi, getUserMessage, reactionApi, type ReactionTargetType, type ReactionType } from '@/apis'
@@ -24,6 +23,7 @@ import {
 } from '@/utils/community'
 import { sanitizeRichTextHtml } from '@/utils/richTextSecurity'
 import { applyReactionCount, getReactionKey } from '@/utils/reactionState'
+import { usePageLoadingEffect } from '@/hooks'
 import { useAuthStore } from '@/stores/authStore'
 import { canEditAuthoredRecord } from '@/utils/recordPermission'
 import { canWriteBoardContent, FREE_BOARD_CONFIG, type LoungeBoardConfig } from '../../boardConfig'
@@ -50,6 +50,7 @@ const FreeBoardDetail = ({ config = FREE_BOARD_CONFIG }: FreeBoardDetailProps) =
   const user = useAuthStore((state) => state.user)
   const isAdmin = user?.role === 'admin'
   const canWriteInteraction = canWriteBoardContent(config, user)
+  usePageLoadingEffect(loading, '게시글을 불러오고 있습니다.')
 
   const loadDetail = useCallback(async () => {
     if (!postId) {
@@ -232,7 +233,7 @@ const FreeBoardDetail = ({ config = FREE_BOARD_CONFIG }: FreeBoardDetailProps) =
   }
 
   const handleCommentHide = async (commentId: string) => {
-    const confirmed = await confirm('댓글을 삭제할까요? 삭제 후 목록에서 숨김 처리됩니다.', {
+    const confirmed = await showConfirm('댓글을 삭제할까요? 삭제 후 목록에서 숨김 처리됩니다.', {
       title: '댓글 삭제 확인',
       confirmLabel: '삭제',
       tone: 'danger',
@@ -256,7 +257,7 @@ const FreeBoardDetail = ({ config = FREE_BOARD_CONFIG }: FreeBoardDetailProps) =
   }
 
   const handleHidePost = async () => {
-    const confirmed = await confirm(
+    const confirmed = await showConfirm(
       '게시글을 목록에서 숨김 처리할까요? 숨김 처리 후 관리자만 확인할 수 있습니다.',
       {
         title: '삭제 확인',
@@ -283,7 +284,7 @@ const FreeBoardDetail = ({ config = FREE_BOARD_CONFIG }: FreeBoardDetailProps) =
   }
 
   const handleDeletePostPermanently = async () => {
-    const confirmed = await confirm(
+    const confirmed = await showConfirm(
       '게시글과 연결된 이미지, 댓글을 완전히 삭제할까요? 이 작업은 되돌릴 수 없습니다.',
       {
         title: '완전 삭제 확인',
@@ -310,7 +311,7 @@ const FreeBoardDetail = ({ config = FREE_BOARD_CONFIG }: FreeBoardDetailProps) =
   }
 
   if (loading) {
-    return <PageLoading label="게시글을 불러오고 있습니다." />
+    return null
   }
 
   if (error || !post) {

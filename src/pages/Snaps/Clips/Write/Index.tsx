@@ -5,7 +5,7 @@ import { Camera, ImagePlus, X } from 'lucide-react';
 import { Button, FixedBottomActions, Img, Input, TextArea, VideoUploadField, toast } from '@/components';
 import { clipApi, getUserMessage } from '@/apis';
 import { CLIPS_PATH } from '@/constants/app';
-import { useUnsavedChanges } from '@/hooks/useUnsavedChanges';
+import { useUnsavedChanges } from '@/hooks';
 import {
   UPLOAD_LIMITS,
   VIDEO_UPLOAD_PROFILES,

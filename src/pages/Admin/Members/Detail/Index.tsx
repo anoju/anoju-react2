@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { ShieldOff, ShieldCheck } from 'lucide-react';
 import { Button, Input, Select, TextArea } from '@/components/atoms';
-import { PageLoading } from '@/components/molecules';
-import { confirm, toast } from '@/components/feedback';
+import { showConfirm, toast } from '@/components/feedback';
 import { getUserMessage, userApi } from '@/apis';
+import { usePageLoadingEffect } from '@/hooks';
 import { useAuthStore } from '@/stores/authStore';
 import type { UserRecord, UserStatus } from '@/types/domain';
 import { formatDate, formatRelativeTime } from '@/utils/community';
@@ -26,6 +26,7 @@ const MemberDetail = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  usePageLoadingEffect(loading, '회원 정보를 불러오고 있습니다.');
 
   useEffect(() => {
     const loadMember = async () => {
@@ -60,7 +61,7 @@ const MemberDetail = () => {
       return;
     }
 
-    const confirmed = await confirm('회원 상태를 저장할까요?', {
+    const confirmed = await showConfirm('회원 상태를 저장할까요?', {
       title: '회원 상태 변경',
       confirmLabel: '저장',
     });
@@ -89,7 +90,7 @@ const MemberDetail = () => {
   };
 
   if (loading) {
-    return <PageLoading label="회원 정보를 불러오고 있습니다." />;
+    return null;
   }
 
   if (error || !member) {

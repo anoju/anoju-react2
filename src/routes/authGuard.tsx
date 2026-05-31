@@ -1,6 +1,6 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { LOGIN_PATH } from '@/constants/app';
-import { PageLoading } from '@/components';
+import { usePageLoadingEffect } from '@/hooks';
 import { useAuthStore } from '@/stores/authStore';
 import type { AppRouteConfig } from './types';
 
@@ -12,13 +12,15 @@ interface AuthGuardProps {
 export const AuthGuard = ({ route, children }: AuthGuardProps) => {
   const location = useLocation();
   const { status, user } = useAuthStore();
+  const checkingAuth = status === 'initializing';
+  usePageLoadingEffect(checkingAuth, '인증 상태를 확인하고 있습니다.');
 
   if (!route.requiresAuth && !route.adminOnly && !route.roles?.length) {
     return <>{children}</>;
   }
 
-  if (status === 'initializing') {
-    return <PageLoading label="인증 상태를 확인하고 있습니다." />;
+  if (checkingAuth) {
+    return null;
   }
 
   if (status === 'anonymous' || (status === 'authenticated' && route.requiresAuth && !user?.id)) {

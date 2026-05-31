@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { MonitorSmartphone, Pencil, Trash2 } from 'lucide-react'
-import { Button, PageLoading, ShareButton, confirm, toast } from '@/components'
+import { Button, ShareButton, showConfirm, toast } from '@/components'
 import { deviceReportApi, getUserMessage } from '@/apis'
 import { DEVICE_INFO_PATH } from '@/constants/app'
 import type { DeviceReportRecord } from '@/types/domain'
+import { usePageLoadingEffect } from '@/hooks'
 import { formatRelativeTime } from '@/utils/community'
 import { canEditAuthoredRecord } from '@/utils/recordPermission'
 import { useAuthStore } from '@/stores/authStore'
@@ -19,6 +20,7 @@ const DeviceInfoDetail = () => {
   const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const shareUrl = useMemo(() => (typeof window === 'undefined' ? '' : window.location.href), [])
+  usePageLoadingEffect(loading, '디바이스 정보를 불러오고 있습니다.')
 
   useEffect(() => {
     if (!deviceReportId) {
@@ -42,7 +44,7 @@ const DeviceInfoDetail = () => {
       return
     }
 
-    const confirmed = await confirm('디바이스 정보를 목록에서 숨김 처리할까요?', {
+    const confirmed = await showConfirm('디바이스 정보를 목록에서 숨김 처리할까요?', {
       title: '삭제 확인',
       confirmLabel: '삭제',
       tone: 'danger',
@@ -66,7 +68,7 @@ const DeviceInfoDetail = () => {
   }
 
   if (loading) {
-    return <PageLoading label="디바이스 정보를 불러오고 있습니다." />
+    return null
   }
 
   if (error || !report) {

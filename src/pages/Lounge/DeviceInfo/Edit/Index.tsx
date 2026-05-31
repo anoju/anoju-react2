@@ -2,12 +2,13 @@ import type React from 'react'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { RefreshCw } from 'lucide-react'
-import { Button, FixedBottomActions, Input, PageLoading, Select, TextArea, toast } from '@/components'
+import { Button, FixedBottomActions, Input, Select, TextArea, toast } from '@/components'
 import { deviceReportApi, getUserMessage } from '@/apis'
 import { DEVICE_INFO_PATH } from '@/constants/app'
 import type { SelectOption } from '@/components'
 import type { DeviceOrientation, DeviceReportRecord } from '@/types/domain'
-import { useUnsavedChanges } from '@/hooks/useUnsavedChanges'
+import { usePageLoadingEffect } from '@/hooks'
+import { useUnsavedChanges } from '@/hooks'
 import { useAuthStore } from '@/stores/authStore'
 import { canEditAuthoredRecord } from '@/utils/recordPermission'
 import { DIRECT_INPUT_VALUE, getCurrentDeviceSnapshot, isIosUserAgent } from '../utils'
@@ -68,6 +69,7 @@ const DeviceInfoEdit = () => {
       description !== (report.description ?? '')),
   )
   const { confirmLeave } = useUnsavedChanges(dirty && !submitting)
+  usePageLoadingEffect(loading, '디바이스 정보를 불러오고 있습니다.')
 
   useEffect(() => {
     void deviceReportApi
@@ -199,7 +201,7 @@ const DeviceInfoEdit = () => {
   }
 
   if (loading) {
-    return <PageLoading label="디바이스 정보를 불러오고 있습니다." />
+    return null
   }
 
   if (error || !report) {

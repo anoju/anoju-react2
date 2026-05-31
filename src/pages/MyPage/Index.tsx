@@ -1,7 +1,7 @@
 import { Bell, FileText, LogOut, MessageSquareText, UserRound } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { authApi } from '@/apis';
-import { Button, confirm, toast } from '@/components';
+import { Button, showConfirm, toast } from '@/components';
 import {
   DEFAULT_HOME_PATH,
   MY_PAGE_COMMENTS_PATH,
@@ -17,7 +17,7 @@ const MyPage = () => {
   const displayName = user?.nickname ?? user?.email ?? '사용자';
 
   const handleLogout = async () => {
-    const confirmed = await confirm('로그아웃하시겠습니까?', {
+    const confirmed = await showConfirm('로그아웃하시겠습니까?', {
       title: '로그아웃',
       confirmLabel: '로그아웃',
     });

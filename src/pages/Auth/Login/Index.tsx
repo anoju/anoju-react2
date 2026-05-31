@@ -1,10 +1,11 @@
 import type React from 'react'
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { Button, Checkbox, Input, PageLoading, SocialLoginButtons, TurnstileWidget, confirm, toast } from '@/components'
+import { Button, Checkbox, Input, SocialLoginButtons, TurnstileWidget, showConfirm, toast } from '@/components'
 import { authApi, toAppError } from '@/apis'
 import { DEFAULT_HOME_PATH, REGISTER_PATH } from '@/constants/app'
-import { useOAuthProviders } from '@/hooks/useOAuthProviders'
+import { usePageLoadingEffect } from '@/hooks'
+import { useOAuthProviders } from '@/hooks'
 import { resolveLoginRedirectPath } from '@/routes/redirects'
 import { useAuthStore } from '@/stores/authStore'
 
@@ -30,6 +31,8 @@ const Login = () => {
   const [submitting, setSubmitting] = useState(false)
   const authStatus = useAuthStore((state) => state.status)
   const { providers, loading: providersLoading } = useOAuthProviders()
+  const checkingAuth = authStatus === 'initializing' || authStatus === 'authenticated'
+  usePageLoadingEffect(checkingAuth, '인증 상태를 확인하고 있습니다.')
 
   const redirectPath = useMemo(() => {
     const params = new URLSearchParams(location.search)
@@ -44,8 +47,8 @@ const Login = () => {
     navigate(redirectPath, { replace: true })
   }, [authStatus, navigate, redirectPath])
 
-  if (authStatus === 'initializing' || authStatus === 'authenticated') {
-    return <PageLoading label="인증 상태를 확인하고 있습니다." />
+  if (checkingAuth) {
+    return null
   }
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (event) => {
@@ -83,7 +86,7 @@ const Login = () => {
       return
     }
 
-    const confirmed = await confirm(`${identity.trim()} 주소로 비밀번호 재설정 메일을 보낼까요?`, {
+    const confirmed = await showConfirm(`${identity.trim()} 주소로 비밀번호 재설정 메일을 보낼까요?`, {
       title: '비밀번호 재설정',
       confirmLabel: '발송',
     })

@@ -2,11 +2,11 @@ import type React from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Trash2, Upload, UserX } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Avatar, Button, Dialog, Input, Slider, SocialLoginButtons, confirm, toast } from '@/components';
+import { Avatar, Button, Dialog, Input, Slider, SocialLoginButtons, showConfirm, toast } from '@/components';
 import { authApi, getUserMessage, toAppError } from '@/apis';
 import type { LinkedOAuthProvider, SupportedOAuthProvider } from '@/apis/authApi';
 import { DEFAULT_HOME_PATH } from '@/constants/app';
-import { useOAuthProviders } from '@/hooks/useOAuthProviders';
+import { useOAuthProviders } from '@/hooks';
 import { useAuthStore } from '@/stores/authStore';
 import { isNicknameConflictMessage, normalizeNickname, validateNickname } from '@/utils/nickname';
 import { UPLOAD_LIMITS, validateImageFile } from '@/utils/uploadPolicy';
@@ -191,7 +191,7 @@ const MyPageProfile = () => {
       return;
     }
 
-    const confirmed = await confirm('프로필 이미지를 삭제하시겠습니까?', {
+    const confirmed = await showConfirm('프로필 이미지를 삭제하시겠습니까?', {
       title: '프로필 이미지 삭제',
       confirmLabel: '삭제',
       tone: 'danger',
@@ -313,7 +313,7 @@ const MyPageProfile = () => {
       return;
     }
 
-    const confirmed = await confirm(`${provider} 계정 연결을 해제하시겠습니까?`, {
+    const confirmed = await showConfirm(`${provider} 계정 연결을 해제하시겠습니까?`, {
       title: '소셜 계정 연결 해제',
       confirmLabel: '해제',
       tone: 'danger',
@@ -331,7 +331,7 @@ const MyPageProfile = () => {
   };
 
   const handleWithdraw = async () => {
-    const confirmed = await confirm('회원 탈퇴 시 계정은 삭제되지 않고 탈퇴 상태로 숨김 처리됩니다. 탈퇴하시겠습니까?', {
+    const confirmed = await showConfirm('회원 탈퇴 시 계정은 삭제되지 않고 탈퇴 상태로 숨김 처리됩니다. 탈퇴하시겠습니까?', {
       title: '회원 탈퇴',
       confirmLabel: '다음',
       tone: 'danger',
@@ -339,7 +339,7 @@ const MyPageProfile = () => {
 
     if (!confirmed) return;
 
-    const finalConfirmed = await confirm('마지막 확인입니다. 탈퇴 후에는 이 계정으로 서비스를 이용할 수 없습니다.', {
+    const finalConfirmed = await showConfirm('마지막 확인입니다. 탈퇴 후에는 이 계정으로 서비스를 이용할 수 없습니다.', {
       title: '정말 탈퇴할까요?',
       confirmLabel: '탈퇴',
       tone: 'danger',

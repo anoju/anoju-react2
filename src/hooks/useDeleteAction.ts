@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { confirm, toast } from '@/components/feedback';
+import { showConfirm, toast } from '@/components/feedback';
 
 interface DeleteActionOptions {
   successPath?: string;
@@ -10,7 +10,7 @@ export const useDeleteAction = (deleteAction: () => Promise<unknown>, options: D
   const navigate = useNavigate();
 
   const requestDelete = async () => {
-    const confirmed = await confirm('삭제한 내용은 목록에서 보이지 않게 됩니다. 삭제하시겠습니까?', {
+    const confirmed = await showConfirm('삭제한 내용은 목록에서 보이지 않게 됩니다. 삭제하시겠습니까?', {
       title: '삭제 확인',
       confirmLabel: '삭제',
       cancelLabel: '취소',

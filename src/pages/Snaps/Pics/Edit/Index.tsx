@@ -1,11 +1,12 @@
 import type React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Button, FixedBottomActions, Img, PageLoading, TextArea, toast } from '@/components';
+import { Button, FixedBottomActions, Img, TextArea, toast } from '@/components';
 import { communityApi, getUserMessage } from '@/apis';
 import { PICS_PATH } from '@/constants/app';
 import type { PostImageRecord, PostRecord } from '@/types/domain';
-import { useUnsavedChanges } from '@/hooks/useUnsavedChanges';
+import { usePageLoadingEffect } from '@/hooks';
+import { useUnsavedChanges } from '@/hooks';
 import { useAuthStore } from '@/stores/authStore';
 import { getPostImageUrl } from '@/utils/community';
 import { canEditAuthoredRecord } from '@/utils/recordPermission';
@@ -23,6 +24,7 @@ const PicsEdit = () => {
   const resolvedTitle = useMemo(() => caption.trim().replace(/\s+/g, ' ').slice(0, 40) || 'Pics', [caption]);
   const dirty = Boolean(post && caption !== post.content);
   const { confirmLeave } = useUnsavedChanges(dirty && !submitting);
+  usePageLoadingEffect(loading, 'Pics를 불러오고 있습니다.');
 
   useEffect(() => {
     if (!postId) {
@@ -77,7 +79,7 @@ const PicsEdit = () => {
   };
 
   if (loading) {
-    return <PageLoading label="Pics를 불러오고 있습니다." />;
+    return null;
   }
 
   if (error || !post) {

@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { BrowserRouter } from 'react-router-dom';
+import { PageLoadingOverlay } from '@/components';
 import { AppRoutes } from '@/routes/AppRoutes';
 import { useAuthStore } from '@/stores/authStore';
 import { initializeThemeAttributes } from '@/stores/themeStore';
@@ -15,6 +16,7 @@ function App() {
   return (
     <BrowserRouter>
       <AppRoutes />
+      <PageLoadingOverlay />
     </BrowserRouter>
   );
 }

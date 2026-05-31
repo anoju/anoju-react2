@@ -5,7 +5,7 @@ import { ImagePlus } from 'lucide-react';
 import { getUserMessage, picLogApi } from '@/apis';
 import { Button, FixedBottomActions, Img, Input, TextArea, toast } from '@/components';
 import { PIC_LOG_PATH } from '@/constants/app';
-import { useUnsavedChanges } from '@/hooks/useUnsavedChanges';
+import { useUnsavedChanges } from '@/hooks';
 import { createUploadPreviews, revokeUploadPreviews, type UploadPreview } from '@/utils/uploadPolicy';
 import { getChapterLabel, getCurrentPicLogChapter } from '../data';
 

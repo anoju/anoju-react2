@@ -1,10 +1,11 @@
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Button, FixedBottomActions, Input, PageLoading, RichTextEditor, toast } from '@/components';
+import { Button, FixedBottomActions, Input, RichTextEditor, toast } from '@/components';
 import { communityApi, getUserMessage } from '@/apis';
 import type { PostRecord } from '@/types/domain';
-import { useUnsavedChanges } from '@/hooks/useUnsavedChanges';
+import { usePageLoadingEffect } from '@/hooks';
+import { useUnsavedChanges } from '@/hooks';
 import { useAuthStore } from '@/stores/authStore';
 import { canEditAuthoredRecord } from '@/utils/recordPermission';
 import { FREE_BOARD_CONFIG, type LoungeBoardConfig } from '../../boardConfig';
@@ -32,6 +33,7 @@ const FreeBoardEdit = ({ config = FREE_BOARD_CONFIG }: FreeBoardEditProps) => {
   const [error, setError] = useState<string | null>(null);
   const dirty = Boolean(post && (title !== post.title || content !== post.content));
   const { confirmLeave } = useUnsavedChanges(dirty && !submitting);
+  usePageLoadingEffect(loading, '게시글을 불러오고 있습니다.');
 
   useEffect(() => {
     if (!postId) {
@@ -91,7 +93,7 @@ const FreeBoardEdit = ({ config = FREE_BOARD_CONFIG }: FreeBoardEditProps) => {
   };
 
   if (loading) {
-    return <PageLoading label="게시글을 불러오고 있습니다." />;
+    return null;
   }
 
   if (error || !post) {

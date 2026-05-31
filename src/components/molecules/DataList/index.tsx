@@ -1,9 +1,9 @@
 import type React from 'react';
 import { useEffect, useRef } from 'react';
 import { Button, Spinner } from '@/components/atoms';
+import { usePageLoadingEffect } from '@/hooks';
 import { EmptyState } from '../EmptyState';
 import { ErrorState } from '../ErrorState';
-import { PageLoading } from '../PageLoading';
 
 interface DataListProps<T> {
   items: T[];
@@ -43,6 +43,7 @@ export const DataList = <T,>({
   const sentinelRef = useRef<HTMLDivElement>(null);
   const requestingRef = useRef(false);
   const classNames = ['data-list', className].join(' ').trim();
+  usePageLoadingEffect(loadingInitial, '목록을 불러오고 있습니다.');
 
   useEffect(() => {
     requestingRef.current = loadingMore;
@@ -91,7 +92,7 @@ export const DataList = <T,>({
   }, [hasMore, mode, onLoadMore]);
 
   if (loadingInitial) {
-    return <PageLoading label="목록을 불러오고 있습니다." />;
+    return null;
   }
 
   if (error && items.length === 0) {

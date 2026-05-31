@@ -5,7 +5,7 @@ import { Button, FixedBottomActions, Input, Select, TextArea, toast } from '@/co
 import { deviceReportApi, getUserMessage } from '@/apis'
 import { DEVICE_INFO_PATH } from '@/constants/app'
 import type { SelectOption } from '@/components'
-import { useUnsavedChanges } from '@/hooks/useUnsavedChanges'
+import { useUnsavedChanges } from '@/hooks'
 import {
   DIRECT_INPUT_VALUE,
   formatScreenSize,

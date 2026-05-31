@@ -5,7 +5,7 @@ import { Button, Input, SocialLoginButtons, TurnstileWidget, toast } from '@/com
 import { authApi } from '@/apis';
 import { DEFAULT_HOME_PATH, LOGIN_PATH } from '@/constants/app';
 import { getUserMessage, toAppError } from '@/apis/apiError';
-import { useOAuthProviders } from '@/hooks/useOAuthProviders';
+import { useOAuthProviders } from '@/hooks';
 import { isNicknameConflictMessage, normalizeNickname, validateNickname } from '@/utils/nickname';
 
 const Register = () => {

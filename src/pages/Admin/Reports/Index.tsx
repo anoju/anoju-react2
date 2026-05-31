@@ -3,7 +3,7 @@ import type React from 'react';
 import { Search } from 'lucide-react';
 import { Button, Input, Select, TextArea } from '@/components/atoms';
 import { DataList } from '@/components/molecules';
-import { confirm, toast } from '@/components/feedback';
+import { showConfirm, toast } from '@/components/feedback';
 import { getUserMessage, reportApi } from '@/apis';
 import { useAuthStore } from '@/stores/authStore';
 import type { ReportRecord, ReportStatus } from '@/types/domain';
@@ -75,7 +75,7 @@ const Reports = () => {
   };
 
   const handleStatusUpdate = async (report: ReportRecord, nextStatus: ReportStatus) => {
-    const confirmed = await confirm(`신고 상태를 '${reportStatusLabels[nextStatus]}'로 변경할까요?`, {
+    const confirmed = await showConfirm(`신고 상태를 '${reportStatusLabels[nextStatus]}'로 변경할까요?`, {
       title: '신고 처리',
       confirmLabel: '변경',
     });
@@ -103,7 +103,7 @@ const Reports = () => {
   };
 
   const handleHideTarget = async (report: ReportRecord) => {
-    const confirmed = await confirm('신고 대상을 숨김 처리할까요?', {
+    const confirmed = await showConfirm('신고 대상을 숨김 처리할까요?', {
       title: '신고 대상 숨김',
       confirmLabel: '숨김 처리',
     });
@@ -132,7 +132,7 @@ const Reports = () => {
   };
 
   const handleDeleteTarget = async (report: ReportRecord) => {
-    const confirmed = await confirm('신고 대상을 영구 삭제할까요? 이 작업은 되돌릴 수 없습니다.', {
+    const confirmed = await showConfirm('신고 대상을 영구 삭제할까요? 이 작업은 되돌릴 수 없습니다.', {
       title: '신고 대상 영구 삭제',
       confirmLabel: '영구 삭제',
       tone: 'danger',

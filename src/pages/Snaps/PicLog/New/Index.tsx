@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button, FixedBottomActions, Input, Select, toast } from '@/components';
 import { getUserMessage, picLogApi } from '@/apis';
 import { PIC_LOG_PATH } from '@/constants/app';
-import { useUnsavedChanges } from '@/hooks/useUnsavedChanges';
+import { useUnsavedChanges } from '@/hooks';
 import { formatPicLogDate, getDateKey } from '../data';
 import type { PicLogVisibility } from '@/types/domain';
 

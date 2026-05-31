@@ -7,8 +7,7 @@ import {
   CommentSection,
   ContentActions,
   ImageSwipe,
-  PageLoading,
-  confirm,
+  showConfirm,
   toast,
   type ImageSwipeItem,
 } from '@/components'
@@ -23,6 +22,7 @@ import {
   getRecordAuthorName,
 } from '@/utils/community'
 import { applyReactionCount, getReactionKey } from '@/utils/reactionState'
+import { usePageLoadingEffect } from '@/hooks'
 import { useAuthStore } from '@/stores/authStore'
 import { canEditAuthoredRecord } from '@/utils/recordPermission'
 
@@ -43,6 +43,7 @@ const PicsDetail = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
   const user = useAuthStore((state) => state.user)
   const isAdmin = user?.role === 'admin'
+  usePageLoadingEffect(loading, 'Pics를 불러오고 있습니다.')
 
   const loadDetail = useCallback(async () => {
     if (!postId) {
@@ -217,7 +218,7 @@ const PicsDetail = () => {
   }
 
   const handleCommentHide = async (commentId: string) => {
-    const confirmed = await confirm('댓글을 삭제할까요? 삭제 후 목록에서 숨김 처리됩니다.', {
+    const confirmed = await showConfirm('댓글을 삭제할까요? 삭제 후 목록에서 숨김 처리됩니다.', {
       title: '댓글 삭제 확인',
       confirmLabel: '삭제',
       tone: 'danger',
@@ -241,7 +242,7 @@ const PicsDetail = () => {
   }
 
   const handleHidePost = async () => {
-    const confirmed = await confirm(
+    const confirmed = await showConfirm(
       'Pics를 피드에서 숨김 처리할까요? 숨김 처리 후 관리자만 확인할 수 있습니다.',
       {
         title: '삭제 확인',
@@ -268,7 +269,7 @@ const PicsDetail = () => {
   }
 
   const handleDeletePostPermanently = async () => {
-    const confirmed = await confirm(
+    const confirmed = await showConfirm(
       'Pics와 연결된 이미지, 댓글을 완전히 삭제할까요? 이 작업은 되돌릴 수 없습니다.',
       {
         title: '완전 삭제 확인',
@@ -295,7 +296,7 @@ const PicsDetail = () => {
   }
 
   if (loading) {
-    return <PageLoading label="Pics를 불러오고 있습니다." />
+    return null
   }
 
   if (error || !post) {

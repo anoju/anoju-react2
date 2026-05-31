@@ -2,9 +2,10 @@ import type React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { CalendarDays, Clock, ImagePlus, Plus, Users } from 'lucide-react';
-import { Avatar, Checkbox, FloatingActionButton, FloatingActions, Img, PageLoading, toast } from '@/components';
+import { Avatar, Checkbox, FloatingActionButton, FloatingActions, Img, toast } from '@/components';
 import { getUserMessage, picLogApi } from '@/apis';
 import { LOGIN_PATH, PIC_LOG_NEW_PATH, PIC_LOG_PATH } from '@/constants/app';
+import { usePageLoadingEffect } from '@/hooks';
 import { useAuthStore } from '@/stores/authStore';
 import {
   formatPicLogDate,
@@ -38,6 +39,7 @@ const PicLog = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const user = useAuthStore((state) => state.user);
   const showMyLogs = searchParams.get('mine') === '1';
+  usePageLoadingEffect(loading, 'picLog를 불러오고 있습니다.');
 
   const loadLogs = useCallback(async () => {
     setLoading(true);
@@ -187,9 +189,7 @@ const PicLog = () => {
               </Link>
             );
           })
-        ) : loading ? (
-          <PageLoading label="picLog를 불러오고 있습니다." />
-        ) : (
+        ) : loading ? null : (
           <div className="pic-log-empty">
             <ImagePlus size={28} />
             <strong>보여줄 picLog가 없습니다.</strong>

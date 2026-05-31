@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Eye, Pencil, Trash2 } from 'lucide-react';
-import { Avatar, Button, CommentSection, ContentActions, PageLoading, VideoPlayer, confirm, toast } from '@/components';
+import { Avatar, Button, CommentSection, ContentActions, VideoPlayer, showConfirm, toast } from '@/components';
 import { clipApi, clipCommentApi, getClipPosterUrl, getClipVideoUrl, getUserMessage, reactionApi, type ReactionTargetType, type ReactionType } from '@/apis';
 import { CLIPS_PATH, LOGIN_PATH } from '@/constants/app';
 import type { ClipCommentRecord, ClipRecord } from '@/types/domain';
+import { usePageLoadingEffect } from '@/hooks';
 import { formatRelativeTime, getRecordAuthorAvatarUrl, getRecordAuthorName } from '@/utils/community';
 import { canEditAuthoredRecord } from '@/utils/recordPermission';
 import { applyReactionCount, getReactionKey } from '@/utils/reactionState';
@@ -27,6 +28,7 @@ const ClipsDetail = () => {
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const canWriteInteraction = Boolean(isAuthenticated && user?.verified);
+  usePageLoadingEffect(loading, 'Clips를 불러오고 있습니다.');
 
   const loadClip = useCallback(async () => {
     if (!clipId) {
@@ -108,7 +110,7 @@ const ClipsDetail = () => {
   }, [comments, loading, location.search]);
 
   const handleHideClip = async () => {
-    const confirmed = await confirm('Clips를 목록에서 숨김 처리할까요?', {
+    const confirmed = await showConfirm('Clips를 목록에서 숨김 처리할까요?', {
       title: 'Clips 삭제 확인',
       confirmLabel: '삭제',
       tone: 'danger',
@@ -220,7 +222,7 @@ const ClipsDetail = () => {
   };
 
   const handleCommentHide = async (commentId: string) => {
-    const confirmed = await confirm('댓글을 삭제할까요? 삭제 후 목록에서 숨김 처리됩니다.', {
+    const confirmed = await showConfirm('댓글을 삭제할까요? 삭제 후 목록에서 숨김 처리됩니다.', {
       title: '댓글 삭제 확인',
       confirmLabel: '삭제',
       tone: 'danger',
@@ -244,7 +246,7 @@ const ClipsDetail = () => {
   };
 
   const handleDeleteClipPermanently = async () => {
-    const confirmed = await confirm('Clips와 연결된 동영상을 완전히 삭제할까요? 이 작업은 되돌릴 수 없습니다.', {
+    const confirmed = await showConfirm('Clips와 연결된 동영상을 완전히 삭제할까요? 이 작업은 되돌릴 수 없습니다.', {
       title: '완전 삭제 확인',
       confirmLabel: '완전 삭제',
       tone: 'danger',
@@ -268,7 +270,7 @@ const ClipsDetail = () => {
   };
 
   if (loading) {
-    return <PageLoading label="Clips를 불러오고 있습니다." />;
+    return null;
   }
 
   if (error || !clip) {

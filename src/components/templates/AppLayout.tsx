@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react';
 import type React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { APP_NAME } from '@/constants/app';
-import { useScrollDirection } from '@/hooks/useScrollDirection';
+import { useScrollDirection } from '@/hooks';
 import { useLayoutStore } from '@/stores/layoutStore';
 import type { AppRouteConfig } from '@/routes/types';
 import { AppHeader } from './AppHeader';

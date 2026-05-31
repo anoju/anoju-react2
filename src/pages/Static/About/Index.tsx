@@ -1,7 +1,8 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { Images, MessageCircle, SlidersHorizontal } from 'lucide-react'
-import { useState } from 'react'
-import { Button, GlobalLoading, TimedVideoCapture } from '@/components'
+import { useRef, useState } from 'react'
+import { Button, TimedVideoCapture } from '@/components'
+import { closePageLoading, openPageLoading } from '@/stores/pageLoadingStore'
 
 const aboutHighlights = [
   {
@@ -35,13 +36,25 @@ const aboutHighlights = [
 
 const About = () => {
   const [activeId, setActiveId] = useState<(typeof aboutHighlights)[number]['id']>('community')
-  const [showLoadingPreview, setShowLoadingPreview] = useState(false)
+  const loadingPreviewIdRef = useRef<string | null>(null)
   const activeHighlight = aboutHighlights.find((item) => item.id === activeId) ?? aboutHighlights[0]
   const ActiveIcon = activeHighlight.icon
 
   const handleLoadingPreview = () => {
-    setShowLoadingPreview(true)
-    window.setTimeout(() => setShowLoadingPreview(false), 2200)
+    const loadingId = openPageLoading('Anoju를 준비하고 있습니다.')
+    loadingPreviewIdRef.current = loadingId
+    window.setTimeout(() => {
+      closePageLoading(loadingId)
+
+      if (loadingPreviewIdRef.current === loadingId) {
+        loadingPreviewIdRef.current = null
+      }
+    }, 2200)
+  }
+
+  const handleLoadingPreviewCloseAll = () => {
+    loadingPreviewIdRef.current = null
+    closePageLoading({ all: true })
   }
 
   return (
@@ -51,11 +64,14 @@ const About = () => {
         Anoju는 가볍게 이야기를 남기고, 사진을 모으고, 나만의 작은 순간을 오래 보관하기 위한 모바일
         중심 공간입니다.
       </p>
-      {/* <div className="simple-page__actions">
+      <div className="simple-page__actions">
         <Button type="button" variant="outline" tone="neutral" onClick={handleLoadingPreview}>
-          글로벌 로딩 보기
+          페이지 로딩 보기
         </Button>
-      </div> */}
+        <Button type="button" variant="ghost" tone="neutral" onClick={handleLoadingPreviewCloseAll}>
+          로딩 전체 닫기
+        </Button>
+      </div>
 
       <div className="about-page__interactive" aria-label="Anoju 주요 경험">
         <div className="about-page__selector" role="tablist" aria-label="소개 항목">
@@ -133,20 +149,6 @@ const About = () => {
         <TimedVideoCapture />
       </div>
 
-      <AnimatePresence>
-        {showLoadingPreview ? (
-          <motion.div
-            className="about-page__loading-preview"
-            role="presentation"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.18 }}
-          >
-            <GlobalLoading label="Anoju를 준비하고 있습니다." />
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
     </section>
   )
 }

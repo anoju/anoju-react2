@@ -2,7 +2,7 @@ import { Camera, ImagePlus, RotateCcw, Square, Video, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Button, IconButton } from '@/components/atoms';
 import { BottomSheet } from '@/components/feedback';
-import { useTimedVideoRecorder } from '@/hooks/useTimedVideoRecorder';
+import { useTimedVideoRecorder } from '@/hooks';
 import type { TimedVideoResult } from '@/types/mediaCapture';
 
 interface TimedVideoCaptureProps {

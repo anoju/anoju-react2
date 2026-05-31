@@ -6,7 +6,7 @@ import { Button, FixedBottomActions, Img, TextArea, toast } from '@/components';
 import { communityApi, getUserMessage } from '@/apis';
 import { PICS_PATH } from '@/constants/app';
 import { createUploadPreviews, revokeUploadPreviews, type UploadPreview } from '@/utils/uploadPolicy';
-import { useUnsavedChanges } from '@/hooks/useUnsavedChanges';
+import { useUnsavedChanges } from '@/hooks';
 
 const PicsWrite = () => {
   const navigate = useNavigate();

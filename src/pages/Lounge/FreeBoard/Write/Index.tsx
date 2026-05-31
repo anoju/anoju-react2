@@ -13,7 +13,7 @@ import {
   type FileAttachmentPreview,
   type UploadPreview,
 } from '@/utils/uploadPolicy';
-import { useUnsavedChanges } from '@/hooks/useUnsavedChanges';
+import { useUnsavedChanges } from '@/hooks';
 import { FREE_BOARD_CONFIG, type LoungeBoardConfig } from '../../boardConfig';
 
 const getPlainText = (html: string) =>
