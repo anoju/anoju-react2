@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { DataList } from '@/components';
 import { clipApi, clipCommentApi, communityApi, getUserMessage } from '@/apis';
-import { CLIPS_PATH, FREE_BOARD_PATH, IT_LOGS_PATH, PICS_PATH } from '@/constants/app';
+import { CLIPS_PATH, FREE_BOARD_PATH, DEV_LOG_PATH, PICS_PATH } from '@/constants/app';
 import type { ClipCommentRecord, ClipRecord, CommentRecord, PostRecord } from '@/types/domain';
 import { compareByCreatedDesc, formatRelativeTime } from '@/utils/community';
 
@@ -26,7 +26,7 @@ const getPostPath = (post?: PostRecord) => {
   }
 
   if (post?.type === 'it_logs') {
-    return IT_LOGS_PATH;
+    return DEV_LOG_PATH;
   }
 
   return FREE_BOARD_PATH;
@@ -38,7 +38,7 @@ const getPostTypeLabel = (post?: PostRecord) => {
   }
 
   if (post?.type === 'it_logs') {
-    return 'ITLogs';
+    return 'DevLog';
   }
 
   return '자유게시판';

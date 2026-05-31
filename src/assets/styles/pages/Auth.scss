@@ -150,6 +150,36 @@
       font-size: var(--font-size-sm);
       line-height: var(--line-height-base);
     }
+
+    &--quiet {
+      margin-top: var(--spacing-sm);
+      padding: var(--spacing-sm) 0 0;
+      border-width: 1px 0 0;
+      border-color: var(--color-border-default);
+      border-radius: 0;
+      background: transparent;
+      gap: var(--spacing-xs);
+
+      h3 {
+        color: var(--color-text-muted);
+        font-size: var(--font-size-sm);
+        font-weight: 680;
+      }
+
+      p {
+        color: var(--color-text-muted);
+        font-size: var(--font-size-xs);
+      }
+
+      .button {
+        justify-self: start;
+        min-height: 2rem;
+        padding-right: 0;
+        padding-left: 0;
+        color: var(--color-text-muted);
+        font-size: var(--font-size-xs);
+      }
+    }
   }
 
   &__form,

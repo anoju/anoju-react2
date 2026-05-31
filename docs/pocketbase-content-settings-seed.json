@@ -38,11 +38,11 @@
     "status": "active"
   },
   {
-    "contentKey": "itLogs",
-    "label": "ITLogs",
+    "contentKey": "devLog",
+    "label": "DevLog",
     "group": "playground",
     "contentType": "board",
-    "listPath": "/playground/it-logs",
+    "listPath": "/playground/dev-log",
     "writePermission": "adminOnly",
     "editPermission": "adminOnly",
     "deletePermission": "adminOnly",

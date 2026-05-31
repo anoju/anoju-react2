@@ -504,11 +504,11 @@ const MyPageProfile = () => {
         />
       </section>
 
-      <section className="my-page__notice" aria-labelledby="withdraw-title">
+      <section className="my-page__notice my-page__notice--quiet" aria-labelledby="withdraw-title">
         <h3 id="withdraw-title">회원 탈퇴</h3>
         <p>탈퇴하면 회원 정보는 삭제하지 않고 탈퇴 상태로 숨김 처리합니다.</p>
-        <Button type="button" variant="ghost" tone="danger" onClick={handleWithdraw}>
-          <UserX size={16} /> 회원 탈퇴
+        <Button type="button" size="sm" variant="plain" tone="neutral" onClick={handleWithdraw}>
+          <UserX size={14} /> 회원 탈퇴
         </Button>
       </section>
 

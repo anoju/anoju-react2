@@ -252,7 +252,7 @@
 
 - **전용 관리 UI:** 게시판, 갤러리, 댓글 등 주요 서비스 영역에서 관리자 전용 관리 도구 및 메뉴 노출.
 - **관리자 라우트:** 관리자 화면은 `/admin` 하위로 분리하고, 모든 관리자 라우트는 `requiresAuth: true`, `adminOnly: true`, `robots: 'noindex'`를 적용합니다. 1차 화면은 `/admin`, `/admin/content-settings`, `/admin/reports`, `/admin/members`, `/admin/members/:userId`를 기준으로 합니다.
-- **콘텐츠 운영 설정:** `자유게시판`, `디바이스정보`, `ITLogs`, `Pics`, `picLog`, `Clips`를 포함한 현재의 모든 게시판/갤러리와 추후 추가되는 모든 게시판/갤러리는 관리자 설정 대상으로 등록합니다. 설정은 화면별 하드코딩이 아니라 `content_settings` 같은 운영 설정 데이터로 관리해 신규 게시판/갤러리 추가 시 같은 정책 구조를 재사용합니다.
+- **콘텐츠 운영 설정:** `자유게시판`, `디바이스정보`, `DevLog`, `Pics`, `picLog`, `Clips`를 포함한 현재의 모든 게시판/갤러리와 추후 추가되는 모든 게시판/갤러리는 관리자 설정 대상으로 등록합니다. 설정은 화면별 하드코딩이 아니라 `content_settings` 같은 운영 설정 데이터로 관리해 신규 게시판/갤러리 추가 시 같은 정책 구조를 재사용합니다.
 - **콘텐츠 설정 항목:** 관리자 설정 화면에서는 작성 권한, 수정 권한, 삭제 권한, 보기 권한, 댓글 노출 여부, 댓글 작성 허용 여부, 좋아요/싫어요 노출 여부, 좋아요/싫어요 사용 허용 여부, 공유하기 노출 여부, 신고하기 노출 여부, 목록 노출 여부, 운영 상태를 관리합니다. 프론트 버튼/섹션 노출 제어와 별개로 작성/수정/삭제/보기 권한은 PocketBase API Rules 또는 서버 hook에서 최종 검증합니다.
 - **신고 관리 페이지:** `/admin/reports`에서는 신고 목록, 대상 타입, 대상 링크, 신고자, 신고 사유, 상세 내용, 누적 신고 수, 상태, 처리 담당자, 처리 메모를 확인합니다. 관리자는 신고 대상 숨김 처리, 댓글 삭제, 회원 경고, 회원 정지, 신고 기각, 처리 완료 메모 기록을 수행할 수 있습니다.
 - **2단계 삭제 시스템:**
@@ -753,7 +753,7 @@ API 호출 규칙은 다음을 따릅니다.
   - 신고 사유는 `spam`, `abuse`, `sexual`, `violence`, `illegal`, `privacy`, `copyright`, `other` 후보를 기본으로 하고, `other` 또는 추가 설명이 필요한 사유는 `detail`을 입력받습니다.
 - **content_settings:** 게시판/갤러리 운영 설정
   - `contentKey`, `label`, `group`, `contentType`, `listPath`, `writePermission`, `editPermission`, `deletePermission`, `viewPermission`, `showComments`, `allowComments`, `showReactions`, `allowReactions`, `showShare`, `showReport`, `showInList`, `status`, `created`, `updated`
-  - `contentKey`: `freeBoard | deviceInfo | itLogs | pics | picLog | clips`와 추후 추가되는 게시판/갤러리 키
+  - `contentKey`: `freeBoard | deviceInfo | devLog | pics | picLog | clips`와 추후 추가되는 게시판/갤러리 키
   - `contentType`: `board | gallery`
   - `writePermission`: `adminOnly | verifiedUser | user | closed`
   - `editPermission`: `authorAndAdmin | adminOnly | closed`
@@ -804,7 +804,7 @@ PocketBase hook은 NAS 운영 환경의 JSVM 특성과 배포 재시작 절차�
 - **hook 리뷰 체크:** `pb_hooks` 수정 시 `onRecord`, `onModel`, `router`, `cron` callback 본문에서 참조하는 모든 식별자가 callback 내부에서 선언되었거나 PocketBase가 제공하는 전역 API인지 확인합니다. `rg "function |const |let |var " pb_hooks/*.pb.js`로 파일 상단 helper가 남아 있는지 점검하고, 전역 helper가 있으면 배포 전에 callback 내부로 이동합니다.
 - **검증 hook:** Turnstile, 업로드 제한, 권한 제한처럼 요청 성공 여부를 결정하는 검증은 `e.next()` 전에 수행합니다. 실패 시 한글 메시지를 가진 `BadRequestError` 또는 `e.badRequestError()`를 사용해 의도적으로 요청을 중단합니다.
 - **파생 동기화 hook:** 좋아요/싫어요 카운트, 댓글 수, 통계처럼 원본 요청 이후 맞춰지는 파생 데이터는 실패하더라도 원본 create/update/delete 요청을 깨지 않도록 `try-catch`와 logger 중심으로 설계합니다. 파생 동기화 실패는 Admin UI Logs에서 확인하고 재동기화할 수 있게 합니다.
-- **댓글/멘션 알림 hook:** 자유게시판, ITLogs, Pics의 댓글 생성 후 알림은 `comment_notifications.pb.js`가 담당합니다. 내 글 댓글, 내 댓글 답글, 댓글 본문 `@nickname` 멘션 알림을 서버 권한으로 생성하며, 일반 회원의 `users` list rule 제한 때문에 프론트에서 멘션 대상 닉네임을 직접 검색하지 않습니다. 알림 생성 실패는 원 댓글 생성을 롤백하지 않고 Admin UI Logs에 기록합니다.
+- **댓글/멘션 알림 hook:** 자유게시판, DevLog, Pics의 댓글 생성 후 알림은 `comment_notifications.pb.js`가 담당합니다. 내 글 댓글, 내 댓글 답글, 댓글 본문 `@nickname` 멘션 알림을 서버 권한으로 생성하며, 일반 회원의 `users` list rule 제한 때문에 프론트에서 멘션 대상 닉네임을 직접 검색하지 않습니다. 알림 생성 실패는 원 댓글 생성을 롤백하지 않고 Admin UI Logs에 기록합니다.
 - **외부 명령 hook:** `ffmpeg`, `ffprobe`처럼 컨테이너 외부 명령에 의존하는 hook은 명령 존재 여부, timeout, 임시 파일 cleanup, 출력 파싱 실패를 모두 방어합니다. 임시 파일은 성공/실패 경로 모두에서 정리하고, 저장 파일로 넘긴 결과물은 PocketBase가 처리할 수 있게 분리합니다.
 - **배포 검증:** NAS 경로 `/volume1/docker/pocketbase/pb_hooks`에 파일을 올린 뒤 운영 컨테이너 `anoju-pocketbase-ffmpeg-1`를 재시작합니다. Admin UI Logs에서 hook 로딩 오류, `ReferenceError`, `TypeError`가 없는지 확인하고, 변경 대상 컬렉션의 create/update/delete 요청을 실제로 테스트합니다.
 - **운영 스키마 일치:** hook이 참조하는 컬렉션명, 필드명, 인덱스, API Rule은 `docs/pocketbase-schema-and-rules.md`와 운영 PocketBase Export collections 결과가 일치해야 합니다. 불일치가 발견되면 hook 수정 전에 스키마/문서를 먼저 맞춥니다.

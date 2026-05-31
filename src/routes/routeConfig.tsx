@@ -22,10 +22,10 @@ import FreeBoard from "@/pages/Playground/FreeBoard/Index";
 import FreeBoardDetail from "@/pages/Playground/FreeBoard/Detail/Index";
 import FreeBoardEdit from "@/pages/Playground/FreeBoard/Edit/Index";
 import FreeBoardWrite from "@/pages/Playground/FreeBoard/Write/Index";
-import ITLogs from "@/pages/Playground/ITLogs/Index";
-import ITLogsDetail from "@/pages/Playground/ITLogs/Detail/Index";
-import ITLogsEdit from "@/pages/Playground/ITLogs/Edit/Index";
-import ITLogsWrite from "@/pages/Playground/ITLogs/Write/Index";
+import DevLog from "@/pages/Playground/DevLog/Index";
+import DevLogDetail from "@/pages/Playground/DevLog/Detail/Index";
+import DevLogEdit from "@/pages/Playground/DevLog/Edit/Index";
+import DevLogWrite from "@/pages/Playground/DevLog/Write/Index";
 import Snaps from "@/pages/Snaps/Index";
 import Clips from "@/pages/Snaps/Clips/Index";
 import ClipsDetail from "@/pages/Snaps/Clips/Detail/Index";
@@ -58,9 +58,9 @@ import {
   FREE_BOARD_EDIT_PATH,
   FREE_BOARD_PATH,
   FREE_BOARD_WRITE_PATH,
-  IT_LOGS_EDIT_PATH,
-  IT_LOGS_PATH,
-  IT_LOGS_WRITE_PATH,
+  DEV_LOG_EDIT_PATH,
+  DEV_LOG_PATH,
+  DEV_LOG_WRITE_PATH,
   LOGIN_PATH,
   MENU_PATH,
   MY_PAGE_PATH,
@@ -427,58 +427,58 @@ export const routeConfig = [
     roles: ["user", "admin"],
   },
   {
-    id: "it-logs",
-    path: IT_LOGS_PATH,
-    element: <ITLogs />,
+    id: "dev-log",
+    path: DEV_LOG_PATH,
+    element: <DevLog />,
     meta: {
-      title: "ITLogs",
-      description: "ITLogs 목록 화면입니다.",
+      title: "DevLog",
+      description: "DevLog 목록 화면입니다.",
     },
     layout: {
-      header: defaultHeader("ITLogs"),
+      header: defaultHeader("DevLog"),
       floatingMenu: defaultFloatingMenu,
     },
   },
   {
-    id: "it-logs-write",
-    path: IT_LOGS_WRITE_PATH,
-    element: <ITLogsWrite />,
+    id: "dev-log-write",
+    path: DEV_LOG_WRITE_PATH,
+    element: <DevLogWrite />,
     meta: {
-      title: "ITLogs 글쓰기",
-      description: "ITLogs 글 작성 화면입니다.",
+      title: "DevLog 글쓰기",
+      description: "DevLog 글 작성 화면입니다.",
       robots: "noindex",
     },
     layout: {
-      header: defaultHeader("ITLogs 글쓰기"),
+      header: defaultHeader("DevLog 글쓰기"),
       floatingMenu: defaultFloatingMenu,
     },
     requiresAuth: true,
     adminOnly: true,
   },
   {
-    id: "it-logs-detail",
-    path: `${IT_LOGS_PATH}/:postId`,
-    element: <ITLogsDetail />,
+    id: "dev-log-detail",
+    path: `${DEV_LOG_PATH}/:postId`,
+    element: <DevLogDetail />,
     meta: {
-      title: "ITLogs 상세",
-      description: "ITLogs 게시글 상세 화면입니다.",
+      title: "DevLog 상세",
+      description: "DevLog 게시글 상세 화면입니다.",
     },
     layout: {
-      header: defaultHeader("ITLogs"),
+      header: defaultHeader("DevLog"),
       floatingMenu: defaultFloatingMenu,
     },
   },
   {
-    id: "it-logs-edit",
-    path: IT_LOGS_EDIT_PATH,
-    element: <ITLogsEdit />,
+    id: "dev-log-edit",
+    path: DEV_LOG_EDIT_PATH,
+    element: <DevLogEdit />,
     meta: {
-      title: "ITLogs 수정",
-      description: "ITLogs 게시글 수정 화면입니다.",
+      title: "DevLog 수정",
+      description: "DevLog 게시글 수정 화면입니다.",
       robots: "noindex",
     },
     layout: {
-      header: defaultHeader("ITLogs 수정"),
+      header: defaultHeader("DevLog 수정"),
       floatingMenu: defaultFloatingMenu,
     },
     requiresAuth: true,

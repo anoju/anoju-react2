@@ -281,7 +281,7 @@ Delete rule: @request.auth.role = "admin"
 
 | 필드 | 타입 | 필수 | 기본값 | 설명 |
 | ---- | ---- | ---- | ------ | ---- |
-| `contentKey` | text | yes | | `freeBoard`, `deviceInfo`, `itLogs`, `pics`, `picLog`, `clips`와 추후 추가 키 |
+| `contentKey` | text | yes | | `freeBoard`, `deviceInfo`, `devLog`, `pics`, `picLog`, `clips`와 추후 추가 키 |
 | `label` | text | yes | | 관리자 화면 노출명 |
 | `group` | select | yes | | `playground`, `snaps` |
 | `contentType` | select | yes | | `board`, `gallery` |
@@ -425,7 +425,7 @@ API Rules:
 List rule: status = "published" && deleted = false && (visibility = "public" || visibility = "link" || participants ?= @request.auth.id || author = @request.auth.id || @request.auth.role = "admin")
 View rule: status = "published" && deleted = false && (visibility = "public" || visibility = "link" || participants ?= @request.auth.id || author = @request.auth.id || @request.auth.role = "admin" || (@request.auth.id != "" && @request.auth.verified = true && visibility != "private"))
 Create rule: @request.auth.id != "" && @request.auth.verified = true
-Update rule: (author = @request.auth.id && status != "hidden") || @request.auth.role = "admin" || (@request.auth.id != "" && @request.auth.verified = true && visibility != "private" && invitePassword = @request.body.invitePassword && @request.body.participants ?= @request.auth.id)
+Update rule: (author = @request.auth.id && status != "hidden") || @request.auth.role = "admin" || (@request.auth.id != "" && @request.auth.verified = true && visibility != "private" && invitePassword = @request.body.invitePassword)
 Delete rule: @request.auth.role = "admin"
 ```
 

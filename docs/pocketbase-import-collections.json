@@ -2151,7 +2151,7 @@
     "listRule": "status = \"published\" && deleted = false && (visibility = \"public\" || visibility = \"link\" || participants ?= @request.auth.id || author = @request.auth.id || @request.auth.role = \"admin\")",
     "viewRule": "status = \"published\" && deleted = false && (visibility = \"public\" || visibility = \"link\" || participants ?= @request.auth.id || author = @request.auth.id || @request.auth.role = \"admin\" || (@request.auth.id != \"\" && @request.auth.verified = true && visibility != \"private\"))",
     "createRule": "@request.auth.id != \"\" && @request.auth.verified = true",
-    "updateRule": "(author = @request.auth.id && status != \"hidden\") || @request.auth.role = \"admin\" || (@request.auth.id != \"\" && @request.auth.verified = true && visibility != \"private\" && invitePassword = @request.body.invitePassword && @request.body.participants ?= @request.auth.id)",
+    "updateRule": "(author = @request.auth.id && status != \"hidden\") || @request.auth.role = \"admin\" || (@request.auth.id != \"\" && @request.auth.verified = true && visibility != \"private\" && invitePassword = @request.body.invitePassword)",
     "deleteRule": "@request.auth.role = \"admin\"",
     "name": "pic_logs",
     "type": "base",

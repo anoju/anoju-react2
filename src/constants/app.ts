@@ -36,11 +36,11 @@ export const FREE_BOARD_WRITE_PATH = '/playground/free-board/write';
 
 export const FREE_BOARD_EDIT_PATH = '/playground/free-board/:postId/edit';
 
-export const IT_LOGS_PATH = '/playground/it-logs';
+export const DEV_LOG_PATH = '/playground/dev-log';
 
-export const IT_LOGS_WRITE_PATH = '/playground/it-logs/write';
+export const DEV_LOG_WRITE_PATH = '/playground/dev-log/write';
 
-export const IT_LOGS_EDIT_PATH = '/playground/it-logs/:postId/edit';
+export const DEV_LOG_EDIT_PATH = '/playground/dev-log/:postId/edit';
 
 export const DEVICE_INFO_PATH = '/playground/device';
 

@@ -1,6 +1,6 @@
 import { pb } from '@/lib/pocketBase';
 import { PB_COLLECTIONS } from '@/constants/pocketbaseCollections';
-import type { ContentSettingRecord, ContentSettingKey, UpdatePayload } from '@/types/domain';
+import type { ContentSettingRecord, ContentSettingKey, CreatePayload, UpdatePayload } from '@/types/domain';
 import { runApi } from '../apiClient';
 
 export const contentSettingApi = {
@@ -19,6 +19,9 @@ export const contentSettingApi = {
         { $autoCancel: false },
       ),
     ),
+
+  create: (payload: CreatePayload) =>
+    runApi(() => pb.collection(PB_COLLECTIONS.contentSettings).create<ContentSettingRecord>(payload, { $autoCancel: false })),
 
   update: (id: string, payload: UpdatePayload) =>
     runApi(() => pb.collection(PB_COLLECTIONS.contentSettings).update<ContentSettingRecord>(id, payload, { $autoCancel: false })),

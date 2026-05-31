@@ -12,7 +12,7 @@ onRecordAfterCreateSuccess(function (e) {
     }
 
     if (postType === 'it_logs') {
-      return '/playground/it-logs/' + postId;
+      return '/playground/dev-log/' + postId;
     }
 
     return '/playground/free-board/' + postId;
@@ -22,7 +22,7 @@ onRecordAfterCreateSuccess(function (e) {
     var postType = postRecord.get('type');
 
     if (postType === 'gallery') return 'Pics';
-    if (postType === 'it_logs') return 'ITLogs';
+    if (postType === 'it_logs') return 'DevLog';
     return '자유게시판';
   }
 

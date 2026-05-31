@@ -5,7 +5,7 @@ import {
   DEVICE_INFO_PATH,
   CLIPS_PATH,
   FREE_BOARD_PATH,
-  IT_LOGS_PATH,
+  DEV_LOG_PATH,
   LOGIN_PATH,
   MY_PAGE_PATH,
   MY_PAGE_NOTIFICATIONS_PATH,
@@ -55,7 +55,7 @@ const Menu = () => {
       items: [
         { label: 'playground Home', path: PLAYGROUND_PATH },
         { label: '자유게시판', path: FREE_BOARD_PATH },
-        { label: 'ITLogs', path: IT_LOGS_PATH },
+        { label: 'DevLog', path: DEV_LOG_PATH },
         { label: '디바이스정보', path: DEVICE_INFO_PATH },
       ],
     },

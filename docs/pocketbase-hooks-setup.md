@@ -77,7 +77,7 @@ kakao_{providerUserId}@oauth.anoju.synology.me
 
 목적:
 
-- 자유게시판, ITLogs, Pics 댓글 생성 시 알림을 서버에서 생성합니다.
+- 자유게시판, DevLog, Pics 댓글 생성 시 알림을 서버에서 생성합니다.
 - 내 글 댓글, 내 댓글 답글, `@nickname` 멘션 알림을 처리합니다.
 - 일반 회원이 `users` 목록을 조회할 수 없는 권한 구조에서도 서버 hook이 닉네임을 매칭합니다.
 - 알림 생성 실패가 댓글 작성 성공을 깨지 않도록 후처리 `try-catch`로 기록합니다.

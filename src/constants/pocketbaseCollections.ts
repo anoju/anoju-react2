@@ -36,7 +36,7 @@ export const REPORT_STATUSES = ['pending', 'reviewing', 'reviewed', 'resolved', 
 
 export const REPORT_REASONS = ['spam', 'abuse', 'sexual', 'violence', 'illegal', 'privacy', 'copyright', 'other'] as const;
 
-export const CONTENT_SETTING_KEYS = ['freeBoard', 'deviceInfo', 'itLogs', 'pics', 'picLog', 'clips'] as const;
+export const CONTENT_SETTING_KEYS = ['freeBoard', 'deviceInfo', 'devLog', 'pics', 'picLog', 'clips'] as const;
 
 export const CONTENT_SETTING_TYPES = ['board', 'gallery'] as const;
 

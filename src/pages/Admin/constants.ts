@@ -2,7 +2,7 @@ import {
   CLIPS_PATH,
   DEVICE_INFO_PATH,
   FREE_BOARD_PATH,
-  IT_LOGS_PATH,
+  DEV_LOG_PATH,
   PICS_PATH,
   PIC_LOG_PATH,
 } from '@/constants/app';
@@ -57,11 +57,11 @@ export const defaultContentSettings: Omit<ContentSettingRecord, 'id' | 'collecti
     status: 'active',
   },
   {
-    contentKey: 'itLogs',
-    label: 'ITLogs',
+    contentKey: 'devLog',
+    label: 'DevLog',
     group: 'playground',
     contentType: 'board',
-    listPath: IT_LOGS_PATH,
+    listPath: DEV_LOG_PATH,
     writePermission: 'adminOnly',
     editPermission: 'adminOnly',
     deletePermission: 'adminOnly',

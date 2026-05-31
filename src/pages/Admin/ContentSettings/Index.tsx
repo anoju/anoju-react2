@@ -64,6 +64,15 @@ const getEditableSetting = (setting: ContentSettingRecord): EditableSetting => (
   status: setting.status,
 });
 
+const getCreatePayload = (setting: ContentSettingRecord, draft: EditableSetting) => ({
+  contentKey: setting.contentKey,
+  label: setting.label,
+  group: setting.group,
+  contentType: setting.contentType,
+  listPath: setting.listPath,
+  ...draft,
+});
+
 const ContentSettings = () => {
   const [settings, setSettings] = useState<ContentSettingRecord[]>([]);
   const [drafts, setDrafts] = useState<Record<string, EditableSetting>>({});
@@ -123,15 +132,13 @@ const ContentSettings = () => {
       return;
     }
 
-    if (setting.id.startsWith('missing-')) {
-      toast('PocketBase에 content_settings 기본 데이터가 필요합니다.', { tone: 'warning' });
-      return;
-    }
-
     setSavingKey(setting.contentKey);
 
     try {
-      const updated = await contentSettingApi.update(setting.id, draft);
+      const updated = setting.id.startsWith('missing-')
+        ? await contentSettingApi.create(getCreatePayload(setting, draft))
+        : await contentSettingApi.update(setting.id, draft);
+
       setSettings((current) =>
         current.map((item) => (item.contentKey === updated.contentKey ? updated : item)),
       );
@@ -220,22 +227,22 @@ const ContentSettings = () => {
 
               <div className="admin-setting-card__checks">
                 <Checkbox
-                  label="댓글 노출"
+                  label="댓글 영역 표시"
                   checked={draft.showComments}
                   onChange={(event) => updateDraft(setting.contentKey, 'showComments', event.target.checked)}
                 />
                 <Checkbox
-                  label="댓글 작성 허용"
+                  label="새 댓글 작성 허용"
                   checked={draft.allowComments}
                   onChange={(event) => updateDraft(setting.contentKey, 'allowComments', event.target.checked)}
                 />
                 <Checkbox
-                  label="좋아요/싫어요 노출"
+                  label="반응 영역 표시"
                   checked={draft.showReactions}
                   onChange={(event) => updateDraft(setting.contentKey, 'showReactions', event.target.checked)}
                 />
                 <Checkbox
-                  label="좋아요/싫어요 사용 허용"
+                  label="새 반응 허용"
                   checked={draft.allowReactions}
                   onChange={(event) => updateDraft(setting.contentKey, 'allowReactions', event.target.checked)}
                 />

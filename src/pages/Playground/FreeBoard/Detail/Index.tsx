@@ -148,7 +148,7 @@ const FreeBoardDetail = ({ config = FREE_BOARD_CONFIG }: FreeBoardDetailProps) =
     type: ReactionType,
   ) => {
     if (!canWriteInteraction) {
-      toast(config.adminOnlyWrite ? 'ITLogs 반응은 관리자만 남길 수 있습니다.' : '로그인 후 반응을 남길 수 있습니다.', {
+      toast(config.adminOnlyWrite ? 'DevLog 반응은 관리자만 남길 수 있습니다.' : '로그인 후 반응을 남길 수 있습니다.', {
         tone: 'warning',
       })
       return
