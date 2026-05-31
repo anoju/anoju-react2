@@ -12,7 +12,7 @@ interface BoardPermissionUser {
   role?: UserRole;
 }
 
-export interface PlaygroundBoardConfig {
+export interface LoungeBoardConfig {
   type: Extract<PostType, 'board' | 'it_logs'>;
   title: string;
   eyebrow: string;
@@ -28,10 +28,10 @@ export interface PlaygroundBoardConfig {
   adminOnlyWrite: boolean;
 }
 
-export const FREE_BOARD_CONFIG: PlaygroundBoardConfig = {
+export const FREE_BOARD_CONFIG: LoungeBoardConfig = {
   type: 'board',
   title: '자유게시판',
-  eyebrow: 'playground',
+  eyebrow: 'Lounge',
   description: '편하게 쓰고 천천히 이어가는 모바일 커뮤니티 게시판입니다.',
   listPath: FREE_BOARD_PATH,
   writePath: FREE_BOARD_WRITE_PATH,
@@ -44,10 +44,10 @@ export const FREE_BOARD_CONFIG: PlaygroundBoardConfig = {
   adminOnlyWrite: false,
 };
 
-export const DEV_LOG_CONFIG: PlaygroundBoardConfig = {
+export const DEV_LOG_CONFIG: LoungeBoardConfig = {
   type: 'it_logs',
   title: 'DevLog',
-  eyebrow: 'playground',
+  eyebrow: 'Lounge',
   description: '관리자가 IT 기록과 안내를 정리하는 게시판입니다.',
   listPath: DEV_LOG_PATH,
   writePath: DEV_LOG_WRITE_PATH,
@@ -60,7 +60,7 @@ export const DEV_LOG_CONFIG: PlaygroundBoardConfig = {
   adminOnlyWrite: true,
 };
 
-export const canWriteBoardContent = (config: PlaygroundBoardConfig, user?: BoardPermissionUser | null) => {
+export const canWriteBoardContent = (config: LoungeBoardConfig, user?: BoardPermissionUser | null) => {
   if (config.adminOnlyWrite) {
     return user?.role === 'admin';
   }

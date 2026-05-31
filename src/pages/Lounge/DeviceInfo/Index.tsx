@@ -122,7 +122,7 @@ const DeviceInfo = () => {
     <section className="container board-page device-page">
       <header className="board-page__header">
         <div>
-          <span className="board-page__eyebrow">playground</span>
+          <span className="board-page__eyebrow">Lounge</span>
           <h2>디바이스정보</h2>
           <p>모바일 기기별 웹 해상도와 표시 설정을 함께 모아봅니다.</p>
         </div>

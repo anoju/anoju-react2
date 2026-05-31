@@ -5,7 +5,7 @@ import {
   LOGIN_PATH,
   MENU_PATH,
   MY_PAGE_PATH,
-  PLAYGROUND_PATH,
+  LOUNGE_PATH,
   SNAPS_PATH,
 } from "@/constants/app";
 import { useAuthStore } from "@/stores/authStore";
@@ -44,9 +44,9 @@ export const FloatingMenu = ({ config, visible }: FloatingMenuProps) => {
           <Menu size={20} />
           <span>Menu</span>
         </NavLink>
-        <NavLink to={PLAYGROUND_PATH} className="floating-menu__item">
+        <NavLink to={LOUNGE_PATH} className="floating-menu__item">
           <Gamepad2 size={20} />
-          <span>Playground</span>
+          <span>Lounge</span>
         </NavLink>
         <NavLink to={SNAPS_PATH} className="floating-menu__item">
           <Images size={20} />

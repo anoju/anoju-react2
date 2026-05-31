@@ -1,7 +1,7 @@
 import { motion, type Variants } from 'framer-motion';
 import { NavLink } from 'react-router-dom';
 import { StarBurstBackground } from '@/components';
-import { PLAYGROUND_PATH, REGISTER_PATH } from '@/constants/app';
+import { LOUNGE_PATH, REGISTER_PATH } from '@/constants/app';
 import { useAuthStore } from '@/stores/authStore';
 
 const containerVariants: Variants = {
@@ -26,7 +26,7 @@ const itemVariants: Variants = {
 
 const Home = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  const startPath = isAuthenticated ? PLAYGROUND_PATH : REGISTER_PATH;
+  const startPath = isAuthenticated ? LOUNGE_PATH : REGISTER_PATH;
 
   return (
     <div className="home-page">

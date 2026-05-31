@@ -9,12 +9,12 @@ import type { PostRecord } from '@/types/domain';
 import { createTextFilter } from '@/utils/queryString';
 import { compareByCreatedDesc, formatRelativeTime, getRecordAuthorAvatarUrl, getRecordAuthorName } from '@/utils/community';
 import { useAuthStore } from '@/stores/authStore';
-import { canWriteBoardContent, FREE_BOARD_CONFIG, type PlaygroundBoardConfig } from '../boardConfig';
+import { canWriteBoardContent, FREE_BOARD_CONFIG, type LoungeBoardConfig } from '../boardConfig';
 
 const PER_PAGE = 20;
 
 interface FreeBoardProps {
-  config?: PlaygroundBoardConfig;
+  config?: LoungeBoardConfig;
 }
 
 const FreeBoard = ({ config = FREE_BOARD_CONFIG }: FreeBoardProps) => {

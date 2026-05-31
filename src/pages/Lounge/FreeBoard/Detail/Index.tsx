@@ -25,10 +25,10 @@ import { sanitizeRichTextHtml } from '@/utils/richTextSecurity'
 import { applyReactionCount, getReactionKey } from '@/utils/reactionState'
 import { useAuthStore } from '@/stores/authStore'
 import { canEditAuthoredRecord } from '@/utils/recordPermission'
-import { canWriteBoardContent, FREE_BOARD_CONFIG, type PlaygroundBoardConfig } from '../../boardConfig'
+import { canWriteBoardContent, FREE_BOARD_CONFIG, type LoungeBoardConfig } from '../../boardConfig'
 
 interface FreeBoardDetailProps {
-  config?: PlaygroundBoardConfig
+  config?: LoungeBoardConfig
 }
 
 const FreeBoardDetail = ({ config = FREE_BOARD_CONFIG }: FreeBoardDetailProps) => {

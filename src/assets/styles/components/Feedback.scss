@@ -93,10 +93,43 @@
     box-shadow: var(--shadow-lg);
   }
 
+  &__header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+    gap: var(--spacing-sm);
+  }
+
   &__title {
-    margin: 0 0 var(--spacing-md);
+    margin: 0;
     font-size: var(--font-size-lg);
     line-height: var(--line-height-tight);
+  }
+
+  &__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 0;
+    border-radius: var(--radius-full);
+    color: var(--color-icon-muted);
+    background: transparent;
+    cursor: pointer;
+    transition: var(--transition-base);
+
+    &:hover,
+    &:focus-visible {
+      color: var(--color-icon-primary);
+      background: var(--color-bg-surface-soft);
+    }
+
+    &:focus-visible {
+      outline: 0;
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-border-focus), transparent 78%);
+    }
   }
 }
 

@@ -14,7 +14,7 @@ import {
   type UploadPreview,
 } from '@/utils/uploadPolicy';
 import { useUnsavedChanges } from '@/hooks/useUnsavedChanges';
-import { FREE_BOARD_CONFIG, type PlaygroundBoardConfig } from '../../boardConfig';
+import { FREE_BOARD_CONFIG, type LoungeBoardConfig } from '../../boardConfig';
 
 const getPlainText = (html: string) =>
   html
@@ -23,7 +23,7 @@ const getPlainText = (html: string) =>
     .trim();
 
 interface FreeBoardWriteProps {
-  config?: PlaygroundBoardConfig;
+  config?: LoungeBoardConfig;
 }
 
 const FreeBoardWrite = ({ config = FREE_BOARD_CONFIG }: FreeBoardWriteProps) => {

@@ -166,7 +166,7 @@ server {
 try_files $uri $uri/ /index.html;
 ```
 
-이 설정이 있어야 `/my-page`, `/playground/free-board` 같은 React Router 경로에서 새로고침해도 404가 나지 않습니다.
+이 설정이 있어야 `/my-page`, `/lounge/free-board` 같은 React Router 경로에서 새로고침해도 404가 나지 않습니다.
 
 ## 7. Docker 이미지 빌드
 
@@ -370,7 +370,7 @@ React Router 확인 예시:
 
 ```text
 https://anoju.synology.me/my-page
-https://anoju.synology.me/playground/free-board
+https://anoju.synology.me/lounge/free-board
 ```
 
 이 주소에서 새로고침해도 화면이 유지되어야 합니다.

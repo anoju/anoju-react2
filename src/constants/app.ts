@@ -28,25 +28,25 @@ export const ADMIN_REPORTS_PATH = '/admin/reports';
 
 export const ADMIN_MEMBERS_PATH = '/admin/members';
 
-export const PLAYGROUND_PATH = '/playground';
+export const LOUNGE_PATH = '/lounge';
 
-export const FREE_BOARD_PATH = '/playground/free-board';
+export const FREE_BOARD_PATH = '/lounge/free-board';
 
-export const FREE_BOARD_WRITE_PATH = '/playground/free-board/write';
+export const FREE_BOARD_WRITE_PATH = '/lounge/free-board/write';
 
-export const FREE_BOARD_EDIT_PATH = '/playground/free-board/:postId/edit';
+export const FREE_BOARD_EDIT_PATH = '/lounge/free-board/:postId/edit';
 
-export const DEV_LOG_PATH = '/playground/dev-log';
+export const DEV_LOG_PATH = '/lounge/dev-log';
 
-export const DEV_LOG_WRITE_PATH = '/playground/dev-log/write';
+export const DEV_LOG_WRITE_PATH = '/lounge/dev-log/write';
 
-export const DEV_LOG_EDIT_PATH = '/playground/dev-log/:postId/edit';
+export const DEV_LOG_EDIT_PATH = '/lounge/dev-log/:postId/edit';
 
-export const DEVICE_INFO_PATH = '/playground/device';
+export const DEVICE_INFO_PATH = '/lounge/device';
 
-export const DEVICE_INFO_WRITE_PATH = '/playground/device/write';
+export const DEVICE_INFO_WRITE_PATH = '/lounge/device/write';
 
-export const DEVICE_INFO_EDIT_PATH = '/playground/device/:deviceReportId/edit';
+export const DEVICE_INFO_EDIT_PATH = '/lounge/device/:deviceReportId/edit';
 
 export const SNAPS_PATH = '/snaps';
 

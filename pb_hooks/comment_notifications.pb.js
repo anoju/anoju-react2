@@ -12,10 +12,10 @@ onRecordAfterCreateSuccess(function (e) {
     }
 
     if (postType === 'it_logs') {
-      return '/playground/dev-log/' + postId;
+      return '/lounge/dev-log/' + postId;
     }
 
-    return '/playground/free-board/' + postId;
+    return '/lounge/free-board/' + postId;
   }
 
   function getPostTypeLabel(postRecord) {

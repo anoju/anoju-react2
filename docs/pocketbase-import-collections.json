@@ -3401,7 +3401,7 @@
         "system": false,
         "type": "select",
         "values": [
-          "playground",
+          "lounge",
           "snaps"
         ]
       },

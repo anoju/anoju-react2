@@ -10,7 +10,7 @@ import {
   MY_PAGE_PATH,
   MY_PAGE_NOTIFICATIONS_PATH,
   PICS_PATH,
-  PLAYGROUND_PATH,
+  LOUNGE_PATH,
   REGISTER_PATH,
   SETTINGS_PATH,
   SNAPS_PATH,
@@ -51,9 +51,9 @@ const Menu = () => {
       ],
     },
     {
-      label: 'playground',
+      label: 'Lounge',
       items: [
-        { label: 'playground Home', path: PLAYGROUND_PATH },
+        { label: 'Lounge Home', path: LOUNGE_PATH },
         { label: '자유게시판', path: FREE_BOARD_PATH },
         { label: 'DevLog', path: DEV_LOG_PATH },
         { label: '디바이스정보', path: DEVICE_INFO_PATH },

@@ -7,7 +7,7 @@ const aboutHighlights = [
   {
     id: 'community',
     title: '편안한 커뮤니티',
-    summary: '짧은 생각부터 긴 기록까지 자연스럽게 나누는 playground입니다.',
+    summary: '짧은 생각부터 긴 기록까지 자연스럽게 나누는 lounge입니다.',
     detail:
       '자유게시판에서는 조회는 열어두고, 작성과 댓글은 인증된 회원을 기준으로 운영해 부담 없는 대화를 지향합니다.',
     icon: MessageCircle,

@@ -2,15 +2,15 @@ import { FileText, MonitorSmartphone, MessageCircle } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { DEVICE_INFO_PATH, FREE_BOARD_PATH, DEV_LOG_PATH } from '@/constants/app';
 
-const Playground = () => (
+const Lounge = () => (
   <section className="container hub-page">
     <header className="hub-page__header">
-      <span className="hub-page__eyebrow">playground</span>
+      <span className="hub-page__eyebrow">Lounge</span>
       <h2>가볍게 꺼내놓는 이야기들</h2>
       <p>자유롭게 묻고, 남기고, 이어가는 커뮤니티 공간입니다.</p>
     </header>
 
-    <nav className="hub-page__grid" aria-label="playground 하위 메뉴">
+    <nav className="hub-page__grid" aria-label="Lounge 하위 메뉴">
       <NavLink to={FREE_BOARD_PATH} className="hub-card">
         <span className="hub-card__icon" aria-hidden="true">
           <MessageCircle size={22} />
@@ -42,4 +42,4 @@ const Playground = () => (
   </section>
 );
 
-export default Playground;
+export default Lounge;

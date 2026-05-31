@@ -40,7 +40,7 @@ export const CONTENT_SETTING_KEYS = ['freeBoard', 'deviceInfo', 'devLog', 'pics'
 
 export const CONTENT_SETTING_TYPES = ['board', 'gallery'] as const;
 
-export const CONTENT_SETTING_GROUPS = ['playground', 'snaps'] as const;
+export const CONTENT_SETTING_GROUPS = ['lounge', 'snaps'] as const;
 
 export const CONTENT_WRITE_PERMISSIONS = ['adminOnly', 'verifiedUser', 'user', 'closed'] as const;
 

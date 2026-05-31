@@ -7,7 +7,7 @@ import type { PostRecord } from '@/types/domain';
 import { useUnsavedChanges } from '@/hooks/useUnsavedChanges';
 import { useAuthStore } from '@/stores/authStore';
 import { canEditAuthoredRecord } from '@/utils/recordPermission';
-import { FREE_BOARD_CONFIG, type PlaygroundBoardConfig } from '../../boardConfig';
+import { FREE_BOARD_CONFIG, type LoungeBoardConfig } from '../../boardConfig';
 
 const getPlainText = (html: string) =>
   html
@@ -16,7 +16,7 @@ const getPlainText = (html: string) =>
     .trim();
 
 interface FreeBoardEditProps {
-  config?: PlaygroundBoardConfig;
+  config?: LoungeBoardConfig;
 }
 
 const FreeBoardEdit = ({ config = FREE_BOARD_CONFIG }: FreeBoardEditProps) => {

@@ -283,7 +283,7 @@ Delete rule: @request.auth.role = "admin"
 | ---- | ---- | ---- | ------ | ---- |
 | `contentKey` | text | yes | | `freeBoard`, `deviceInfo`, `devLog`, `pics`, `picLog`, `clips`와 추후 추가 키 |
 | `label` | text | yes | | 관리자 화면 노출명 |
-| `group` | select | yes | | `playground`, `snaps` |
+| `group` | select | yes | | `lounge`, `snaps` |
 | `contentType` | select | yes | | `board`, `gallery` |
 | `listPath` | text | yes | | 목록 경로 |
 | `writePermission` | select | yes | `verifiedUser` | `adminOnly`, `verifiedUser`, `user`, `closed` |

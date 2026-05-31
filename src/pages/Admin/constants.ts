@@ -21,7 +21,7 @@ export const defaultContentSettings: Omit<ContentSettingRecord, 'id' | 'collecti
   {
     contentKey: 'freeBoard',
     label: '자유게시판',
-    group: 'playground',
+    group: 'lounge',
     contentType: 'board',
     listPath: FREE_BOARD_PATH,
     writePermission: 'verifiedUser',
@@ -40,7 +40,7 @@ export const defaultContentSettings: Omit<ContentSettingRecord, 'id' | 'collecti
   {
     contentKey: 'deviceInfo',
     label: '디바이스정보',
-    group: 'playground',
+    group: 'lounge',
     contentType: 'board',
     listPath: DEVICE_INFO_PATH,
     writePermission: 'verifiedUser',
@@ -59,7 +59,7 @@ export const defaultContentSettings: Omit<ContentSettingRecord, 'id' | 'collecti
   {
     contentKey: 'devLog',
     label: 'DevLog',
-    group: 'playground',
+    group: 'lounge',
     contentType: 'board',
     listPath: DEV_LOG_PATH,
     writePermission: 'adminOnly',
@@ -138,13 +138,13 @@ export const writePermissionLabels: Record<ContentWritePermission, string> = {
   adminOnly: '관리자만',
   verifiedUser: '이메일 인증 회원',
   user: '로그인 회원',
-  closed: '작성 닫힘',
+  closed: '작성 불가',
 };
 
 export const editPermissionLabels: Record<ContentEditPermission, string> = {
   authorAndAdmin: '작성자와 관리자',
   adminOnly: '관리자만',
-  closed: '수정 닫힘',
+  closed: '수정 불가',
 };
 
 export const deletePermissionLabels: Record<ContentDeletePermission, string> = {

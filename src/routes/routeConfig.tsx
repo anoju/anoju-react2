@@ -13,19 +13,19 @@ import AdminContentSettings from "@/pages/Admin/ContentSettings/Index";
 import AdminReports from "@/pages/Admin/Reports/Index";
 import AdminMembers from "@/pages/Admin/Members/Index";
 import AdminMemberDetail from "@/pages/Admin/Members/Detail/Index";
-import Playground from "@/pages/Playground/Index";
-import DeviceInfo from "@/pages/Playground/DeviceInfo/Index";
-import DeviceInfoDetail from "@/pages/Playground/DeviceInfo/Detail/Index";
-import DeviceInfoEdit from "@/pages/Playground/DeviceInfo/Edit/Index";
-import DeviceInfoWrite from "@/pages/Playground/DeviceInfo/Write/Index";
-import FreeBoard from "@/pages/Playground/FreeBoard/Index";
-import FreeBoardDetail from "@/pages/Playground/FreeBoard/Detail/Index";
-import FreeBoardEdit from "@/pages/Playground/FreeBoard/Edit/Index";
-import FreeBoardWrite from "@/pages/Playground/FreeBoard/Write/Index";
-import DevLog from "@/pages/Playground/DevLog/Index";
-import DevLogDetail from "@/pages/Playground/DevLog/Detail/Index";
-import DevLogEdit from "@/pages/Playground/DevLog/Edit/Index";
-import DevLogWrite from "@/pages/Playground/DevLog/Write/Index";
+import Lounge from "@/pages/Lounge/Index";
+import DeviceInfo from "@/pages/Lounge/DeviceInfo/Index";
+import DeviceInfoDetail from "@/pages/Lounge/DeviceInfo/Detail/Index";
+import DeviceInfoEdit from "@/pages/Lounge/DeviceInfo/Edit/Index";
+import DeviceInfoWrite from "@/pages/Lounge/DeviceInfo/Write/Index";
+import FreeBoard from "@/pages/Lounge/FreeBoard/Index";
+import FreeBoardDetail from "@/pages/Lounge/FreeBoard/Detail/Index";
+import FreeBoardEdit from "@/pages/Lounge/FreeBoard/Edit/Index";
+import FreeBoardWrite from "@/pages/Lounge/FreeBoard/Write/Index";
+import DevLog from "@/pages/Lounge/DevLog/Index";
+import DevLogDetail from "@/pages/Lounge/DevLog/Detail/Index";
+import DevLogEdit from "@/pages/Lounge/DevLog/Edit/Index";
+import DevLogWrite from "@/pages/Lounge/DevLog/Write/Index";
 import Snaps from "@/pages/Snaps/Index";
 import Clips from "@/pages/Snaps/Clips/Index";
 import ClipsDetail from "@/pages/Snaps/Clips/Detail/Index";
@@ -76,12 +76,13 @@ import {
   PIC_LOG_JOIN_PATH,
   PIC_LOG_NEW_PATH,
   PIC_LOG_PATH,
-  PLAYGROUND_PATH,
+  LOUNGE_PATH,
   REGISTER_PATH,
   SETTINGS_PATH,
   SNAPS_PATH,
 } from "@/constants/app";
 import type { AppRouteConfig, HeaderConfig, FloatingMenuConfig } from "./types";
+import { LegacyLoungeRedirect } from "./LegacyLoungeRedirect";
 
 const defaultHeader = (title: string): HeaderConfig => ({
   enabled: true,
@@ -353,19 +354,33 @@ export const routeConfig = [
     adminOnly: true,
   },
   {
-    id: "playground",
-    path: PLAYGROUND_PATH,
-    element: <Playground />,
+    id: "lounge",
+    path: LOUNGE_PATH,
+    element: <Lounge />,
     meta: {
-      title: "playground",
-      description: "커뮤니티 메뉴를 모아보는 playground 서브 메인입니다.",
+      title: "Lounge",
+      description: "커뮤니티 메뉴를 모아보는 Lounge 서브 메인입니다.",
     },
     layout: {
-      header: defaultHeader("playground"),
+      header: defaultHeader("Lounge"),
       floatingMenu: {
         ...defaultFloatingMenu,
         enabled: true,
       },
+    },
+  },
+  {
+    id: "legacy-playground",
+    path: "/playground/*",
+    element: <LegacyLoungeRedirect />,
+    meta: {
+      title: "Lounge",
+      description: "이전 playground 경로를 Lounge 경로로 이동합니다.",
+      robots: "noindex",
+    },
+    layout: {
+      header: defaultHeader("Lounge"),
+      floatingMenu: defaultFloatingMenu,
     },
   },
   {

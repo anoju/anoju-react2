@@ -46,7 +46,9 @@ const mergeWithDefaults = (settings: ContentSettingRecord[]) =>
   defaultContentSettings.map((defaultSetting) => {
     const savedSetting = settings.find((setting) => setting.contentKey === defaultSetting.contentKey);
 
-    return savedSetting ?? ({ ...defaultSetting, id: `missing-${defaultSetting.contentKey}` } as ContentSettingRecord);
+    return savedSetting
+      ? ({ ...savedSetting, ...defaultSetting } as ContentSettingRecord)
+      : ({ ...defaultSetting, id: `missing-${defaultSetting.contentKey}` } as ContentSettingRecord);
   });
 
 const getEditableSetting = (setting: ContentSettingRecord): EditableSetting => ({
@@ -135,9 +137,10 @@ const ContentSettings = () => {
     setSavingKey(setting.contentKey);
 
     try {
+      const payload = getCreatePayload(setting, draft);
       const updated = setting.id.startsWith('missing-')
         ? await contentSettingApi.create(getCreatePayload(setting, draft))
-        : await contentSettingApi.update(setting.id, draft);
+        : await contentSettingApi.update(setting.id, payload);
 
       setSettings((current) =>
         current.map((item) => (item.contentKey === updated.contentKey ? updated : item)),
