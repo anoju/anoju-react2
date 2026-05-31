@@ -2,7 +2,7 @@ import type React from 'react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ImagePlus, X } from 'lucide-react';
-import { Button, FixedBottomActions, Img, Input, TextArea, VideoPlayer, toast } from '@/components';
+import { Button, FixedBottomActions, Img, Input, PageLoading, TextArea, VideoPlayer, toast } from '@/components';
 import { clipApi, getClipPosterUrl, getClipVideoUrl, getUserMessage } from '@/apis';
 import { CLIPS_PATH } from '@/constants/app';
 import type { ClipRecord } from '@/types/domain';
@@ -116,7 +116,7 @@ const ClipsEdit = () => {
   };
 
   if (loading) {
-    return <section className="container write-page">Clips를 불러오고 있습니다.</section>;
+    return <PageLoading label="Clips를 불러오고 있습니다." />;
   }
 
   if (error || !clip) {

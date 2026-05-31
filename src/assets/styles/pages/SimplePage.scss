@@ -250,6 +250,17 @@
       line-height: var(--line-height-base);
     }
   }
+
+  &__loading-preview {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-index-dialog);
+    display: grid;
+    place-items: center;
+    padding: var(--spacing-lg);
+    background: color-mix(in srgb, var(--color-bg-body), transparent 8%);
+    backdrop-filter: blur(12px);
+  }
 }
 
 @media (max-width: 420px) {

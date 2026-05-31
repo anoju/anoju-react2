@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { MonitorSmartphone, Pencil, Trash2 } from 'lucide-react'
-import { Button, ShareButton, confirm, toast } from '@/components'
+import { Button, PageLoading, ShareButton, confirm, toast } from '@/components'
 import { deviceReportApi, getUserMessage } from '@/apis'
 import { DEVICE_INFO_PATH } from '@/constants/app'
 import type { DeviceReportRecord } from '@/types/domain'
@@ -66,7 +66,7 @@ const DeviceInfoDetail = () => {
   }
 
   if (loading) {
-    return <section className="container board-page">디바이스 정보를 불러오고 있습니다.</section>
+    return <PageLoading label="디바이스 정보를 불러오고 있습니다." />
   }
 
   if (error || !report) {

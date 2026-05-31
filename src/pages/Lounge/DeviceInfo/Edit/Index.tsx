@@ -2,7 +2,7 @@ import type React from 'react'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { RefreshCw } from 'lucide-react'
-import { Button, FixedBottomActions, Input, Select, TextArea, toast } from '@/components'
+import { Button, FixedBottomActions, Input, PageLoading, Select, TextArea, toast } from '@/components'
 import { deviceReportApi, getUserMessage } from '@/apis'
 import { DEVICE_INFO_PATH } from '@/constants/app'
 import type { SelectOption } from '@/components'
@@ -199,7 +199,7 @@ const DeviceInfoEdit = () => {
   }
 
   if (loading) {
-    return <section className="container write-page">디바이스 정보를 불러오고 있습니다.</section>
+    return <PageLoading label="디바이스 정보를 불러오고 있습니다." />
   }
 
   if (error || !report) {

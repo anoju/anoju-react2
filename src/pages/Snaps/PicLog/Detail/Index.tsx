@@ -25,6 +25,7 @@ import {
   IconButton,
   Img,
   Input,
+  PageLoading,
   TextArea,
   toast,
 } from '@/components'
@@ -276,11 +277,7 @@ const PicLogDetail = () => {
   }
 
   if (loading) {
-    return (
-      <section className="container pic-log-detail">
-        <EmptyState title="picLog를 불러오는 중입니다." />
-      </section>
-    )
+    return <PageLoading label="picLog를 불러오고 있습니다." />
   }
 
   if (!bundle) {

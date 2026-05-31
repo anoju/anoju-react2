@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Save } from 'lucide-react';
 import { Button, Checkbox, Select } from '@/components/atoms';
 import { toast } from '@/components/feedback';
+import { PageLoading } from '@/components/molecules';
 import { contentSettingApi, getUserMessage } from '@/apis';
 import type {
   ContentDeletePermission,
@@ -157,6 +158,10 @@ const ContentSettings = () => {
     }
   };
 
+  if (loading) {
+    return <PageLoading label="운영 설정을 불러오고 있습니다." />;
+  }
+
   return (
     <section className="container admin-page">
       <header className="admin-page__header">
@@ -166,8 +171,6 @@ const ContentSettings = () => {
       </header>
 
       {error ? <p className="admin-page__notice">{error} 기본 설계값으로 화면을 표시합니다.</p> : null}
-      {loading ? <p className="admin-page__notice">운영 설정을 불러오고 있습니다.</p> : null}
-
       <div className="admin-setting-list">
         {settings.map((setting) => {
           const draft = drafts[setting.contentKey] ?? getEditableSetting(setting);

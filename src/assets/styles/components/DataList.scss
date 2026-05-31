@@ -21,4 +21,14 @@
     width: 100%;
     height: 1px;
   }
+
+  &__loading-more {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3rem;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    gap: var(--spacing-xs);
+  }
 }

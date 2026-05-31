@@ -1,6 +1,6 @@
 import type React from 'react';
 import { useEffect, useRef } from 'react';
-import { Button } from '@/components/atoms';
+import { Button, Spinner } from '@/components/atoms';
 import { EmptyState } from '../EmptyState';
 import { ErrorState } from '../ErrorState';
 import { PageLoading } from '../PageLoading';
@@ -130,7 +130,12 @@ export const DataList = <T,>({
           </Button>
         ) : null}
         {mode === 'infinite' ? <div ref={sentinelRef} className="data-list__sentinel" aria-hidden="true" /> : null}
-        {loadingMore && mode === 'infinite' ? <PageLoading label="다음 목록을 불러오고 있습니다." /> : null}
+        {loadingMore && mode === 'infinite' ? (
+          <div className="data-list__loading-more" role="status" aria-live="polite">
+            <Spinner size="sm" label="다음 목록을 불러오고 있습니다." />
+            <span>다음 목록을 불러오고 있습니다.</span>
+          </div>
+        ) : null}
       </div>
     </div>
   );

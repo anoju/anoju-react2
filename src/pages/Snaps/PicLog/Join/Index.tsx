@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { KeyRound, LogIn } from 'lucide-react';
 import { getUserMessage, picLogApi } from '@/apis';
-import { Button, EmptyState, Input, toast } from '@/components';
+import { Button, EmptyState, Input, PageLoading, toast } from '@/components';
 import { PIC_LOG_PATH } from '@/constants/app';
 import { useAuthStore } from '@/stores/authStore';
 import type { PicLogRecord } from '@/types/domain';
@@ -83,11 +83,7 @@ const PicLogJoin = () => {
   };
 
   if (loading) {
-    return (
-      <section className="container pic-log-join">
-        <EmptyState title="초대 정보를 확인하는 중입니다." />
-      </section>
-    );
+    return <PageLoading label="초대 정보를 확인하고 있습니다." />;
   }
 
   if (!log) {

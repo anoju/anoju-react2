@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { ShieldOff, ShieldCheck } from 'lucide-react';
 import { Button, Input, Select, TextArea } from '@/components/atoms';
+import { PageLoading } from '@/components/molecules';
 import { confirm, toast } from '@/components/feedback';
 import { getUserMessage, userApi } from '@/apis';
 import { useAuthStore } from '@/stores/authStore';
@@ -88,7 +89,7 @@ const MemberDetail = () => {
   };
 
   if (loading) {
-    return <section className="container admin-page">회원 정보를 불러오고 있습니다.</section>;
+    return <PageLoading label="회원 정보를 불러오고 있습니다." />;
   }
 
   if (error || !member) {

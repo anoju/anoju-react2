@@ -2,7 +2,7 @@ import type React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { CalendarDays, Clock, ImagePlus, Plus, Users } from 'lucide-react';
-import { Avatar, Checkbox, FloatingActionButton, FloatingActions, Img, toast } from '@/components';
+import { Avatar, Checkbox, FloatingActionButton, FloatingActions, Img, PageLoading, toast } from '@/components';
 import { getUserMessage, picLogApi } from '@/apis';
 import { LOGIN_PATH, PIC_LOG_NEW_PATH, PIC_LOG_PATH } from '@/constants/app';
 import { useAuthStore } from '@/stores/authStore';
@@ -188,9 +188,7 @@ const PicLog = () => {
             );
           })
         ) : loading ? (
-          <div className="pic-log-empty">
-            <strong>picLog를 불러오는 중입니다.</strong>
-          </div>
+          <PageLoading label="picLog를 불러오고 있습니다." />
         ) : (
           <div className="pic-log-empty">
             <ImagePlus size={28} />

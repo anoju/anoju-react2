@@ -6,6 +6,7 @@ export { SocialLoginButtons } from './SocialLoginButtons';
 export { TurnstileWidget } from './TurnstileWidget';
 export { TimedVideoCapture } from './TimedVideoCapture';
 export { PageLoading } from './PageLoading';
+export { GlobalLoading } from './GlobalLoading';
 export { EmptyState } from './EmptyState';
 export { ErrorState } from './ErrorState';
 export { GlassSurface } from './GlassSurface/Index';

@@ -7,6 +7,7 @@ import {
   CommentSection,
   ContentActions,
   Img,
+  PageLoading,
   confirm,
   toast,
 } from '@/components'
@@ -309,7 +310,7 @@ const FreeBoardDetail = ({ config = FREE_BOARD_CONFIG }: FreeBoardDetailProps) =
   }
 
   if (loading) {
-    return <section className="container board-page">게시글을 불러오고 있습니다.</section>
+    return <PageLoading label="게시글을 불러오고 있습니다." />
   }
 
   if (error || !post) {

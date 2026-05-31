@@ -7,6 +7,7 @@ import {
   CommentSection,
   ContentActions,
   ImageSwipe,
+  PageLoading,
   confirm,
   toast,
   type ImageSwipeItem,
@@ -294,7 +295,7 @@ const PicsDetail = () => {
   }
 
   if (loading) {
-    return <section className="container pics-detail">Pics를 불러오고 있습니다.</section>
+    return <PageLoading label="Pics를 불러오고 있습니다." />
   }
 
   if (error || !post) {

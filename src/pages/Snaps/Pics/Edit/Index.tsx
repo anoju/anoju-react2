@@ -1,7 +1,7 @@
 import type React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Button, FixedBottomActions, Img, TextArea, toast } from '@/components';
+import { Button, FixedBottomActions, Img, PageLoading, TextArea, toast } from '@/components';
 import { communityApi, getUserMessage } from '@/apis';
 import { PICS_PATH } from '@/constants/app';
 import type { PostImageRecord, PostRecord } from '@/types/domain';
@@ -77,7 +77,7 @@ const PicsEdit = () => {
   };
 
   if (loading) {
-    return <section className="container write-page">Pics를 불러오고 있습니다.</section>;
+    return <PageLoading label="Pics를 불러오고 있습니다." />;
   }
 
   if (error || !post) {

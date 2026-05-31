@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Eye, Pencil, Trash2 } from 'lucide-react';
-import { Avatar, Button, CommentSection, ContentActions, VideoPlayer, confirm, toast } from '@/components';
+import { Avatar, Button, CommentSection, ContentActions, PageLoading, VideoPlayer, confirm, toast } from '@/components';
 import { clipApi, clipCommentApi, getClipPosterUrl, getClipVideoUrl, getUserMessage, reactionApi, type ReactionTargetType, type ReactionType } from '@/apis';
 import { CLIPS_PATH, LOGIN_PATH } from '@/constants/app';
 import type { ClipCommentRecord, ClipRecord } from '@/types/domain';
@@ -268,7 +268,7 @@ const ClipsDetail = () => {
   };
 
   if (loading) {
-    return <section className="container clips-detail">Clips를 불러오고 있습니다.</section>;
+    return <PageLoading label="Clips를 불러오고 있습니다." />;
   }
 
   if (error || !clip) {

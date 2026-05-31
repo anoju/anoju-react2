@@ -1,7 +1,7 @@
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Button, FixedBottomActions, Input, RichTextEditor, toast } from '@/components';
+import { Button, FixedBottomActions, Input, PageLoading, RichTextEditor, toast } from '@/components';
 import { communityApi, getUserMessage } from '@/apis';
 import type { PostRecord } from '@/types/domain';
 import { useUnsavedChanges } from '@/hooks/useUnsavedChanges';
@@ -91,7 +91,7 @@ const FreeBoardEdit = ({ config = FREE_BOARD_CONFIG }: FreeBoardEditProps) => {
   };
 
   if (loading) {
-    return <section className="container write-page">게시글을 불러오고 있습니다.</section>;
+    return <PageLoading label="게시글을 불러오고 있습니다." />;
   }
 
   if (error || !post) {
