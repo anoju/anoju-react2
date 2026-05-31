@@ -1,12 +1,21 @@
 import type { RecordModel } from 'pocketbase';
 import type {
   COMMENT_STATUSES,
+  CONTENT_DELETE_PERMISSIONS,
+  CONTENT_EDIT_PERMISSIONS,
+  CONTENT_SETTING_GROUPS,
+  CONTENT_SETTING_KEYS,
+  CONTENT_SETTING_STATUSES,
+  CONTENT_SETTING_TYPES,
+  CONTENT_VIEW_PERMISSIONS,
+  CONTENT_WRITE_PERMISSIONS,
   NOTICE_PLACEMENTS,
   NOTIFICATION_TYPES,
   POST_STATUSES,
   POST_TYPES,
   REPORT_STATUSES,
   REPORT_TARGET_TYPES,
+  REPORT_REASONS,
   USER_ROLES,
   USER_STATUSES,
   DEVICE_ORIENTATIONS,
@@ -29,6 +38,24 @@ export type CommentStatus = (typeof COMMENT_STATUSES)[number];
 export type ReportTargetType = (typeof REPORT_TARGET_TYPES)[number];
 
 export type ReportStatus = (typeof REPORT_STATUSES)[number];
+
+export type ReportReason = (typeof REPORT_REASONS)[number];
+
+export type ContentSettingKey = (typeof CONTENT_SETTING_KEYS)[number];
+
+export type ContentSettingType = (typeof CONTENT_SETTING_TYPES)[number];
+
+export type ContentSettingGroup = (typeof CONTENT_SETTING_GROUPS)[number];
+
+export type ContentWritePermission = (typeof CONTENT_WRITE_PERMISSIONS)[number];
+
+export type ContentEditPermission = (typeof CONTENT_EDIT_PERMISSIONS)[number];
+
+export type ContentDeletePermission = (typeof CONTENT_DELETE_PERMISSIONS)[number];
+
+export type ContentViewPermission = (typeof CONTENT_VIEW_PERMISSIONS)[number];
+
+export type ContentSettingStatus = (typeof CONTENT_SETTING_STATUSES)[number];
 
 export type NoticePlacement = (typeof NOTICE_PLACEMENTS)[number];
 
@@ -77,6 +104,12 @@ export interface UserRecord extends RecordModel {
   role: UserRoleValue;
   status: UserStatus;
   verified?: boolean;
+  suspendedAt?: string;
+  suspendedUntil?: string;
+  suspendedReason?: string;
+  suspendedBy?: string;
+  adminMemo?: string;
+  warningCount?: number;
 }
 
 export interface PostRecord extends RecordModel {
@@ -131,9 +164,37 @@ export interface ReportRecord extends RecordModel {
   targetType: ReportTargetType;
   targetId: string;
   reporter: string;
-  reason: string;
+  reason: ReportReason;
   detail?: string;
   status: ReportStatus;
+  handledBy?: string;
+  handledAt?: string;
+  resolution?: string;
+  adminMemo?: string;
+  expand?: {
+    reporter?: UserRecord;
+    handledBy?: UserRecord;
+  };
+}
+
+export interface ContentSettingRecord extends RecordModel {
+  contentKey: ContentSettingKey | string;
+  label: string;
+  group: ContentSettingGroup | string;
+  contentType: ContentSettingType;
+  listPath: string;
+  writePermission: ContentWritePermission;
+  editPermission: ContentEditPermission;
+  deletePermission: ContentDeletePermission;
+  viewPermission: ContentViewPermission;
+  showComments: boolean;
+  allowComments: boolean;
+  showReactions: boolean;
+  allowReactions: boolean;
+  showShare: boolean;
+  showReport: boolean;
+  showInList: boolean;
+  status: ContentSettingStatus;
 }
 
 export interface NoticeRecord extends RecordModel {

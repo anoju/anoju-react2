@@ -8,6 +8,11 @@ import MyPosts from "@/pages/MyPage/Posts/Index";
 import MyComments from "@/pages/MyPage/Comments/Index";
 import Notifications from "@/pages/MyPage/Notifications/Index";
 import Settings from "@/pages/Settings/Index";
+import Admin from "@/pages/Admin/Index";
+import AdminContentSettings from "@/pages/Admin/ContentSettings/Index";
+import AdminReports from "@/pages/Admin/Reports/Index";
+import AdminMembers from "@/pages/Admin/Members/Index";
+import AdminMemberDetail from "@/pages/Admin/Members/Detail/Index";
 import Playground from "@/pages/Playground/Index";
 import DeviceInfo from "@/pages/Playground/DeviceInfo/Index";
 import DeviceInfoDetail from "@/pages/Playground/DeviceInfo/Detail/Index";
@@ -39,6 +44,10 @@ import PicLogNew from "@/pages/Snaps/PicLog/New/Index";
 import About from "@/pages/Static/About/Index";
 import NotFound from "@/pages/System/NotFound/Index";
 import {
+  ADMIN_PATH,
+  ADMIN_CONTENT_SETTINGS_PATH,
+  ADMIN_MEMBERS_PATH,
+  ADMIN_REPORTS_PATH,
   CLIPS_PATH,
   CLIPS_EDIT_PATH,
   CLIPS_WRITE_PATH,
@@ -178,6 +187,7 @@ export const routeConfig = [
       },
     },
     requiresAuth: true,
+    allowEmailUnverified: true,
     roles: ["user", "admin"],
   },
   {
@@ -194,6 +204,7 @@ export const routeConfig = [
       floatingMenu: defaultFloatingMenu,
     },
     requiresAuth: true,
+    allowEmailUnverified: true,
     roles: ["user", "admin"],
   },
   {
@@ -260,6 +271,86 @@ export const routeConfig = [
         enabled: true,
       },
     },
+  },
+  {
+    id: "admin",
+    path: ADMIN_PATH,
+    element: <Admin />,
+    meta: {
+      title: "관리자",
+      description: "관리자 전용 운영 화면입니다.",
+      robots: "noindex",
+    },
+    layout: {
+      header: defaultHeader("관리자"),
+      floatingMenu: defaultFloatingMenu,
+    },
+    requiresAuth: true,
+    adminOnly: true,
+  },
+  {
+    id: "admin-content-settings",
+    path: ADMIN_CONTENT_SETTINGS_PATH,
+    element: <AdminContentSettings />,
+    meta: {
+      title: "콘텐츠 운영 설정",
+      description: "게시판과 갤러리 운영 설정을 관리하는 관리자 화면입니다.",
+      robots: "noindex",
+    },
+    layout: {
+      header: defaultHeader("콘텐츠 운영 설정"),
+      floatingMenu: defaultFloatingMenu,
+    },
+    requiresAuth: true,
+    adminOnly: true,
+  },
+  {
+    id: "admin-reports",
+    path: ADMIN_REPORTS_PATH,
+    element: <AdminReports />,
+    meta: {
+      title: "신고 관리",
+      description: "신고된 콘텐츠와 회원을 검토하는 관리자 화면입니다.",
+      robots: "noindex",
+    },
+    layout: {
+      header: defaultHeader("신고 관리"),
+      floatingMenu: defaultFloatingMenu,
+    },
+    requiresAuth: true,
+    adminOnly: true,
+  },
+  {
+    id: "admin-members",
+    path: ADMIN_MEMBERS_PATH,
+    element: <AdminMembers />,
+    meta: {
+      title: "회원 관리",
+      description: "회원 목록과 상태를 관리하는 관리자 화면입니다.",
+      robots: "noindex",
+    },
+    layout: {
+      header: defaultHeader("회원 관리"),
+      floatingMenu: defaultFloatingMenu,
+    },
+    requiresAuth: true,
+    adminOnly: true,
+  },
+  {
+    id: "admin-member-detail",
+    path: `${ADMIN_MEMBERS_PATH}/:userId`,
+    element: <AdminMemberDetail />,
+    meta: {
+      title: "회원 상세",
+      description: "회원 상태와 정지 정보를 관리하는 관리자 화면입니다.",
+      robots: "noindex",
+    },
+    layout: {
+      header: defaultHeader("회원 상세"),
+      floatingMenu: defaultFloatingMenu,
+    },
+    requiresAuth: true,
+    adminOnly: true,
   },
   {
     id: "playground",
@@ -486,7 +577,7 @@ export const routeConfig = [
     element: <Clips />,
     meta: {
       title: "Clips",
-      description: "동영상 Clips 목록 화면입니다.",
+      description: "30초의 짧은 순간을 영상으로 기록하고 나누는 Clips 목록 화면입니다.",
     },
     layout: {
       header: defaultHeader("Clips"),
@@ -499,7 +590,7 @@ export const routeConfig = [
     element: <ClipsDetail />,
     meta: {
       title: "Clips 상세",
-      description: "Clips 동영상 상세 화면입니다.",
+      description: "30초의 짧은 순간을 담은 Clips 상세 화면입니다.",
     },
     layout: {
       header: defaultHeader("Clips"),

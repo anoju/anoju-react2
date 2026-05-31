@@ -1,4 +1,7 @@
 onRecordCreateRequest(function (e) {
+  var TURNSTILE_SITEVERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+  var TURNSTILE_DEV_DUMMY_TOKEN = 'XXXX.DUMMY.TOKEN.XXXX';
+
   function isBlank(value) {
     return typeof value !== 'string' || value.trim() === '';
   }
@@ -10,16 +13,43 @@ onRecordCreateRequest(function (e) {
     return typeof token === 'string' ? token.trim() : '';
   }
 
+  function getRequestOrigin() {
+    var headers = e.requestInfo().headers || {};
+    var origin = headers.origin || headers.Origin || '';
+
+    return typeof origin === 'string' ? origin.trim() : '';
+  }
+
+  function isAllowedDevOrigin(origin) {
+    return (
+      origin.indexOf('http://localhost:') === 0 ||
+      origin.indexOf('http://127.0.0.1:') === 0 ||
+      origin.indexOf('http://192.168.0.85:') === 0
+    );
+  }
+
+  function canBypassDevTurnstile(token) {
+    return (
+      $os.getenv('TURNSTILE_ALLOW_DEV_BYPASS') === 'true' &&
+      token === TURNSTILE_DEV_DUMMY_TOKEN &&
+      isAllowedDevOrigin(getRequestOrigin())
+    );
+  }
+
   function verifyTurnstile() {
     var secretKey = $os.getenv('TURNSTILE_SECRET_KEY');
     var token = getTurnstileToken();
 
-    if (isBlank(secretKey)) {
-      throw e.internalServerError('보안 확인 설정이 필요합니다.', {});
-    }
-
     if (isBlank(token)) {
       throw e.badRequestError('보안 확인을 완료해주세요.', {});
+    }
+
+    if (canBypassDevTurnstile(token)) {
+      return;
+    }
+
+    if (isBlank(secretKey)) {
+      throw e.internalServerError('보안 확인 설정이 필요합니다.', {});
     }
 
     var formData = new FormData();
@@ -37,9 +67,9 @@ onRecordCreateRequest(function (e) {
     try {
       response = $http.send({
         method: 'POST',
-        url: 'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+        url: TURNSTILE_SITEVERIFY_URL,
         body: formData,
-        timeout: 10
+        timeout: 10,
       });
     } catch (error) {
       e.app.logger().error('Turnstile Siteverify 요청 실패', 'error', error);
@@ -61,6 +91,9 @@ onRecordCreateRequest(function (e) {
 }, 'users');
 
 onRecordAuthWithPasswordRequest(function (e) {
+  var TURNSTILE_SITEVERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+  var TURNSTILE_DEV_DUMMY_TOKEN = 'XXXX.DUMMY.TOKEN.XXXX';
+
   function isBlank(value) {
     return typeof value !== 'string' || value.trim() === '';
   }
@@ -72,16 +105,43 @@ onRecordAuthWithPasswordRequest(function (e) {
     return typeof token === 'string' ? token.trim() : '';
   }
 
+  function getRequestOrigin() {
+    var headers = e.requestInfo().headers || {};
+    var origin = headers.origin || headers.Origin || '';
+
+    return typeof origin === 'string' ? origin.trim() : '';
+  }
+
+  function isAllowedDevOrigin(origin) {
+    return (
+      origin.indexOf('http://localhost:') === 0 ||
+      origin.indexOf('http://127.0.0.1:') === 0 ||
+      origin.indexOf('http://192.168.0.85:') === 0
+    );
+  }
+
+  function canBypassDevTurnstile(token) {
+    return (
+      $os.getenv('TURNSTILE_ALLOW_DEV_BYPASS') === 'true' &&
+      token === TURNSTILE_DEV_DUMMY_TOKEN &&
+      isAllowedDevOrigin(getRequestOrigin())
+    );
+  }
+
   function verifyTurnstile() {
     var secretKey = $os.getenv('TURNSTILE_SECRET_KEY');
     var token = getTurnstileToken();
 
-    if (isBlank(secretKey)) {
-      throw e.internalServerError('보안 확인 설정이 필요합니다.', {});
-    }
-
     if (isBlank(token)) {
       throw e.badRequestError('보안 확인을 완료해주세요.', {});
+    }
+
+    if (canBypassDevTurnstile(token)) {
+      return;
+    }
+
+    if (isBlank(secretKey)) {
+      throw e.internalServerError('보안 확인 설정이 필요합니다.', {});
     }
 
     var formData = new FormData();
@@ -99,9 +159,9 @@ onRecordAuthWithPasswordRequest(function (e) {
     try {
       response = $http.send({
         method: 'POST',
-        url: 'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+        url: TURNSTILE_SITEVERIFY_URL,
         body: formData,
-        timeout: 10
+        timeout: 10,
       });
     } catch (error) {
       e.app.logger().error('Turnstile Siteverify 요청 실패', 'error', error);

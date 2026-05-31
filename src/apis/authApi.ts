@@ -87,6 +87,14 @@ export const authApi = {
         },
       });
       await useAuthStore.getState().initialize();
+      const authStatus = useAuthStore.getState().status;
+
+      if (authStatus === 'suspended' || authStatus === 'withdrawn') {
+        pb.authStore.clear();
+        useAuthStore.getState().logout();
+        throw new Error(authStatus === 'suspended' ? '정지된 계정입니다.' : '탈퇴한 계정입니다.');
+      }
+
       return result;
     }),
 
@@ -94,6 +102,22 @@ export const authApi = {
     pb.authStore.clear();
     useAuthStore.getState().logout();
   },
+
+  withdrawAccount: () =>
+    runApi(async () => {
+      const userId = pb.authStore.model?.id;
+
+      if (!userId) {
+        throw new Error('로그인이 필요합니다.');
+      }
+
+      const result = await pb.collection(USERS_COLLECTION).update<UserRecord>(userId, {
+        status: 'withdrawn',
+      });
+      pb.authStore.clear();
+      useAuthStore.getState().logout();
+      return result;
+    }),
 
   register: (params: RegisterParams) =>
     runApi(async () => {

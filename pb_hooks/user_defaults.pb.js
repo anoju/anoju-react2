@@ -47,9 +47,12 @@ onRecordUpdateRequest(function (e) {
     var original = e.record.original();
     var originalRole = original.get('role');
     var originalStatus = original.get('status');
+    var authId = e.auth && e.auth.id ? e.auth.id : '';
+    var requestedStatus = e.record.get('status');
+    var isSelfWithdraw = authId !== '' && authId === e.record.id && requestedStatus === 'withdrawn';
 
     e.record.set('role', isBlank(originalRole) ? 'user' : originalRole);
-    e.record.set('status', isBlank(originalStatus) ? 'active' : originalStatus);
+    e.record.set('status', isSelfWithdraw ? 'withdrawn' : (isBlank(originalStatus) ? 'active' : originalStatus));
   }
 
   lockUserPermissionFields();

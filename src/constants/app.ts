@@ -20,6 +20,14 @@ export const MY_PAGE_NOTIFICATIONS_PATH = '/my-page/notifications';
 
 export const SETTINGS_PATH = '/settings';
 
+export const ADMIN_PATH = '/admin';
+
+export const ADMIN_CONTENT_SETTINGS_PATH = '/admin/content-settings';
+
+export const ADMIN_REPORTS_PATH = '/admin/reports';
+
+export const ADMIN_MEMBERS_PATH = '/admin/members';
+
 export const PLAYGROUND_PATH = '/playground';
 
 export const FREE_BOARD_PATH = '/playground/free-board';

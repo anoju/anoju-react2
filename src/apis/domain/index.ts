@@ -2,6 +2,7 @@ export { bookmarkApi } from './bookmarkApi';
 export { clipCommentApi } from './clipCommentApi';
 export { clipApi, getClipPosterUrl, getClipVideoUrl } from './clipApi';
 export { commentApi } from './commentApi';
+export { contentSettingApi } from './contentSettingApi';
 export { communityApi } from './communityApi';
 export { createCrudApi } from './createCrudApi';
 export { deviceReportApi } from './deviceReportApi';

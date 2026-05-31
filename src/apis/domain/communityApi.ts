@@ -1,9 +1,7 @@
 import { PB_COLLECTIONS } from '@/constants/pocketbaseCollections';
-import { FREE_BOARD_PATH, IT_LOGS_PATH, PICS_PATH } from '@/constants/app';
 import { pb } from '@/lib/pocketBase';
 import type { CommentRecord, ListParams, PostImageRecord, PostRecord, PostType } from '@/types/domain';
 import { runApi } from '../apiClient';
-import { notificationApi } from './notificationApi';
 
 const getPublishedFilter = (type: PostType, extraFilter?: string) =>
   [`type = "${type}"`, 'status = "published"', 'deleted = false', extraFilter ? `(${extraFilter})` : '']
@@ -45,30 +43,6 @@ export interface UpdateCommentParams {
   commentId: string;
   content: string;
 }
-
-const getPostPath = (post: PostRecord) => {
-  if (post.type === 'gallery') {
-    return `${PICS_PATH}/${post.id}`;
-  }
-
-  if (post.type === 'it_logs') {
-    return `${IT_LOGS_PATH}/${post.id}`;
-  }
-
-  return `${FREE_BOARD_PATH}/${post.id}`;
-};
-
-const getPostTypeLabel = (post: PostRecord) => {
-  if (post.type === 'gallery') {
-    return 'Pics';
-  }
-
-  if (post.type === 'it_logs') {
-    return 'ITLogs';
-  }
-
-  return '자유게시판';
-};
 
 export const communityApi = {
   listPosts: ({ type, page = 1, perPage = 20, filter, authorId, expand = 'author' }: PostListParams) =>
@@ -181,12 +155,7 @@ export const communityApi = {
         throw new Error('로그인이 필요합니다.');
       }
 
-      const [post, parentComment] = await Promise.all([
-        pb.collection(PB_COLLECTIONS.posts).getOne<PostRecord>(postId, { $autoCancel: false }),
-        parentCommentId
-          ? pb.collection(PB_COLLECTIONS.comments).getOne<CommentRecord>(parentCommentId, { $autoCancel: false })
-          : Promise.resolve(null),
-      ]);
+      const post = await pb.collection(PB_COLLECTIONS.posts).getOne<PostRecord>(postId, { $autoCancel: false });
 
       const comment = await pb.collection(PB_COLLECTIONS.comments).create<CommentRecord>({
         post: postId,
@@ -207,47 +176,6 @@ export const communityApi = {
         );
       } catch {
         // 댓글 수 집계 갱신은 서버 권한 설정에 따라 실패할 수 있으므로 댓글 등록 성공을 우선합니다.
-      }
-
-      try {
-        const targetUrl = `${getPostPath(post)}#comment-${comment.id}`;
-        const targetLabel = getPostTypeLabel(post);
-
-        await notificationApi.createSafely({
-          recipientId: post.author,
-          actorId: author,
-          type: 'post_comment',
-          title: '내 글에 새 댓글이 달렸습니다.',
-          message: `${targetLabel} "${post.title}"에 댓글이 달렸습니다.`,
-          targetUrl,
-          targetType: 'comment',
-          targetId: comment.id,
-        });
-
-        if (parentComment?.author) {
-          await notificationApi.createSafely({
-            recipientId: parentComment.author,
-            actorId: author,
-            type: 'comment_reply',
-            title: '내 댓글에 답글이 달렸습니다.',
-            message: `${targetLabel} "${post.title}"의 댓글에 답글이 달렸습니다.`,
-            targetUrl,
-            targetType: 'comment',
-            targetId: comment.id,
-          });
-        }
-
-        await notificationApi.notifyMentionedUsers({
-          content,
-          actorId: author,
-          title: '회원님을 태그했습니다.',
-          message: `${targetLabel} "${post.title}"의 댓글에서 회원님을 태그했습니다.`,
-          targetUrl,
-          targetType: 'comment',
-          targetId: comment.id,
-        });
-      } catch {
-        // 알림 생성은 댓글 작성 흐름을 막지 않습니다.
       }
 
       return comment;

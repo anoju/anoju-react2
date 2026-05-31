@@ -16,10 +16,10 @@ import {
 } from './data';
 
 const getLatestEntry = (bundle: PicLogBundle) =>
-  [...bundle.entries].sort((a, b) => b.created.localeCompare(a.created))[0];
+  [...bundle.entries].sort((a, b) => (b.created ?? '').localeCompare(a.created ?? ''))[0];
 
 const getCoverEntries = (bundle: PicLogBundle) =>
-  [...bundle.entries].sort((a, b) => b.created.localeCompare(a.created)).slice(0, 4);
+  [...bundle.entries].sort((a, b) => (b.created ?? '').localeCompare(a.created ?? '')).slice(0, 4);
 
 const getEntryDateLabel = (entry?: { logDate: string; chapter: string }) => {
   if (!entry) {
@@ -84,8 +84,8 @@ const PicLog = () => {
         return bundle.log.title.toLowerCase().includes(keyword);
       })
       .sort((a, b) => {
-        const latestA = getLatestEntry(a)?.created ?? a.log.updated;
-        const latestB = getLatestEntry(b)?.created ?? b.log.updated;
+        const latestA = getLatestEntry(a)?.created ?? a.log.updated ?? a.log.created ?? a.log.logDate ?? '';
+        const latestB = getLatestEntry(b)?.created ?? b.log.updated ?? b.log.created ?? b.log.logDate ?? '';
         return latestB.localeCompare(latestA);
       });
   }, [bundles, searchParams]);
@@ -134,7 +134,9 @@ const PicLog = () => {
             const { log, participants } = bundle;
             const coverEntries = getCoverEntries(bundle);
             const latestEntry = getLatestEntry(bundle);
-            const participantOrder = log.participantOrder.length > 0 ? log.participantOrder : log.participants;
+            const logParticipantOrder = Array.isArray(log.participantOrder) ? log.participantOrder : [];
+            const logParticipants = Array.isArray(log.participants) ? log.participants : [];
+            const participantOrder = logParticipantOrder.length > 0 ? logParticipantOrder : logParticipants;
 
             return (
               <Link key={log.id} to={`${PIC_LOG_PATH}/${log.id}`} className="pic-log-card">

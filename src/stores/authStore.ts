@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import type { AuthRecord } from 'pocketbase';
 import { pb } from '@/lib/pocketBase';
 import type { AuthStatus, UserRole } from '@/types/common';
 import { isVirtualOAuthEmail } from '@/utils/oauthEmail';
@@ -26,6 +27,19 @@ interface AuthState {
 }
 
 let unsubscribeAuthStore: (() => void) | null = null;
+let initializeVersion = 0;
+
+const syncCurrentUserRecord = async () => {
+  const model = pb.authStore.model;
+  const token = pb.authStore.token;
+
+  if (!pb.authStore.isValid || !model?.id || !token) {
+    return;
+  }
+
+  const user = await pb.collection(USERS_COLLECTION).getOne<AuthRecord>(model.id, { $autoCancel: false });
+  pb.authStore.save(token, user);
+};
 
 const getUserFromStore = (): AuthUser | null => {
   const model = pb.authStore.model;
@@ -34,7 +48,7 @@ const getUserFromStore = (): AuthUser | null => {
     return null;
   }
 
-  const role = typeof model.role === 'string' ? (model.role as UserRole) : 'user';
+  const role = typeof model.role === 'string' ? (model.role as UserRole) : 'guest';
 
   return {
     id: model.id,
@@ -67,6 +81,9 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isAuthenticated: false,
   initialize: async () => {
+    const currentVersion = initializeVersion + 1;
+    initializeVersion = currentVersion;
+
     if (unsubscribeAuthStore) {
       unsubscribeAuthStore();
       unsubscribeAuthStore = null;
@@ -77,9 +94,14 @@ export const useAuthStore = create<AuthState>((set) => ({
     if (pb.authStore.isValid) {
       try {
         await pb.collection(USERS_COLLECTION).authRefresh();
+        await syncCurrentUserRecord();
       } catch {
         pb.authStore.clear();
       }
+    }
+
+    if (currentVersion !== initializeVersion) {
+      return;
     }
 
     const status = getStatusFromStore();
@@ -87,6 +109,10 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ status, user, isAuthenticated: status === 'authenticated' });
 
     unsubscribeAuthStore = pb.authStore.onChange(() => {
+      if (currentVersion !== initializeVersion) {
+        return;
+      }
+
       const nextStatus = getStatusFromStore();
       const nextUser = getUserFromStore();
       set({
@@ -94,7 +120,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         user: nextUser,
         isAuthenticated: nextStatus === 'authenticated',
       });
-    }, true);
+    });
   },
   setAnonymous: () => set({ status: 'anonymous', user: null, isAuthenticated: false }),
   logout: () => {

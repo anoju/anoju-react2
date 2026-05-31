@@ -26,7 +26,7 @@ const Snaps = () => (
         </span>
         <span className="hub-card__content">
           <strong>Clips</strong>
-          <span>유튜브처럼 목록에서 고르고 플레이어로 집중해서 봅니다.</span>
+          <span>30초의 짧은 순간을 영상으로 기록하고 나눕니다.</span>
         </span>
       </NavLink>
       <NavLink to={PIC_LOG_PATH} className="hub-card">

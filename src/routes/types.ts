@@ -45,6 +45,7 @@ export interface AppRouteConfig {
   meta: RouteMeta;
   layout: LayoutMeta;
   requiresAuth?: boolean;
+  allowEmailUnverified?: boolean;
   roles?: UserRole[];
   adminOnly?: boolean;
 }

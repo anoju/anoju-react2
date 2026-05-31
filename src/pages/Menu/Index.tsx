@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import {
+  ADMIN_PATH,
   DEFAULT_HOME_PATH,
   DEVICE_INFO_PATH,
   CLIPS_PATH,
@@ -28,6 +29,7 @@ interface MenuGroup {
 
 const Menu = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  const user = useAuthStore((state) => state.user)
   const memberItems: MenuItem[] = [
     {
       label: isAuthenticated ? '마이페이지' : '로그인',
@@ -69,6 +71,14 @@ const Menu = () => {
       label: 'Members',
       items: memberItems,
     },
+    ...(user?.role === 'admin'
+      ? [
+          {
+            label: 'Admin',
+            items: [{ label: '관리자', path: ADMIN_PATH }],
+          },
+        ]
+      : []),
   ]
 
   return (

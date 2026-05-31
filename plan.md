@@ -243,7 +243,7 @@
 - **분류 및 탐색:**
   - **해시태그:** `#` 키워드 기반 태그 등록 및 태그 클라우드/필터링 검색.
   - **통합 검색:** 제목, 내용, 작성자, 태그를 아우르는 실시간 기반 검색 결과 제공.
-- **신고 시스템:** 부적절 컨텐츠 신고 기능 및 관리자 페이지 검토 목록 연동.
+- **신고 시스템:** 부적절 컨텐츠 신고 기능 및 관리자 페이지 검토 목록 연동. 신고는 로그인 및 이메일 인증 완료 사용자만 사용할 수 있고, 본인이 작성한 대상은 신고할 수 없으며, 같은 사용자는 같은 대상에 중복 신고할 수 없습니다. 신고 대상은 게시글, 댓글, Pics, picLog, Clips, Clips 댓글, 회원을 포함합니다. 신고 사유는 고정 목록과 상세 입력을 함께 사용하고, 신고 접수만으로 자동 삭제하지 않으며 관리자 검토 후 조치합니다.
 - **권한 및 실시간성:**
   - **상세 권한:** PocketBase API Rules를 통한 읽기/쓰기/본인 수정 권한 엄격 분리.
   - **실시간 업데이트:** SDK의 Subscribe 기능을 통한 실시간 댓글 알림 및 수치 반영.
@@ -251,6 +251,10 @@
 ### 6.3 관리자 기능 (Administrator Features)
 
 - **전용 관리 UI:** 게시판, 갤러리, 댓글 등 주요 서비스 영역에서 관리자 전용 관리 도구 및 메뉴 노출.
+- **관리자 라우트:** 관리자 화면은 `/admin` 하위로 분리하고, 모든 관리자 라우트는 `requiresAuth: true`, `adminOnly: true`, `robots: 'noindex'`를 적용합니다. 1차 화면은 `/admin`, `/admin/content-settings`, `/admin/reports`, `/admin/members`, `/admin/members/:userId`를 기준으로 합니다.
+- **콘텐츠 운영 설정:** `자유게시판`, `디바이스정보`, `ITLogs`, `Pics`, `picLog`, `Clips`를 포함한 현재의 모든 게시판/갤러리와 추후 추가되는 모든 게시판/갤러리는 관리자 설정 대상으로 등록합니다. 설정은 화면별 하드코딩이 아니라 `content_settings` 같은 운영 설정 데이터로 관리해 신규 게시판/갤러리 추가 시 같은 정책 구조를 재사용합니다.
+- **콘텐츠 설정 항목:** 관리자 설정 화면에서는 작성 권한, 수정 권한, 삭제 권한, 보기 권한, 댓글 노출 여부, 댓글 작성 허용 여부, 좋아요/싫어요 노출 여부, 좋아요/싫어요 사용 허용 여부, 공유하기 노출 여부, 신고하기 노출 여부, 목록 노출 여부, 운영 상태를 관리합니다. 프론트 버튼/섹션 노출 제어와 별개로 작성/수정/삭제/보기 권한은 PocketBase API Rules 또는 서버 hook에서 최종 검증합니다.
+- **신고 관리 페이지:** `/admin/reports`에서는 신고 목록, 대상 타입, 대상 링크, 신고자, 신고 사유, 상세 내용, 누적 신고 수, 상태, 처리 담당자, 처리 메모를 확인합니다. 관리자는 신고 대상 숨김 처리, 댓글 삭제, 회원 경고, 회원 정지, 신고 기각, 처리 완료 메모 기록을 수행할 수 있습니다.
 - **2단계 삭제 시스템:**
   - **1차 처리:** 사용자/관리자 삭제 시 '숨김' 처리 (Soft Delete).
   - **2차 처리:** 숨김 상태의 데이터를 관리자가 영구 삭제 (Hard Delete).
@@ -260,7 +264,7 @@
 - **회원 관리 페이지:** 별도의 관리자 전용 메뉴를 통한 체계적인 회원 관리 기능 제공.
   - **목록 및 검색:** 전체 회원 현황 파악 및 필터링 검색 (닉네임, 이메일, 상태 등).
   - **정보 수정 및 권한:** 관리자에 의한 회원 정보 보정 및 등급/권한 부여 수정.
-  - **상태 제어:** 경고 부여, 서비스 이용 정지(차단), 강제 탈퇴 처리 기능.
+  - **상태 제어:** 경고 부여, 서비스 이용 정지(차단), 정지 해제, 강제 탈퇴 처리 기능. 회원 차단은 `users.status = 'suspended'`를 기본으로 사용하고, 정지 사유, 정지 시각, 정지 만료 시각, 처리 관리자, 관리자 메모를 함께 남깁니다.
   - **컨텐츠 매핑:** 특정 회원이 작성한 게시글 및 댓글 목록 조회 및 일괄 관리.
   - **탈퇴 관리:** 탈퇴 신청 접수 및 개인정보 파기 정책에 따른 최종 데이터 정리.
 
@@ -678,9 +682,10 @@ API 호출 규칙은 다음을 따릅니다.
 ## 10. 백엔드 구성 (Backend Configuration - PocketBase)
 
 - **프론트 운영 도메인:** 시놀로지 NAS에 배포하며 사용자는 `https://anoju.synology.me`로 접속합니다.
-- **서버 환경:** 시놀로지 NAS Docker 기반 자체 호스팅 (`https://pocketbase.anoju.synology.me`).
+- **서버 환경:** 시놀로지 NAS Docker 기반 자체 호스팅 (`https://pocketbase.anoju.synology.me`)이며, 현재 운영 PocketBase 컨테이너 이름은 `anoju-pocketbase-ffmpeg-1`입니다.
 - **도메인 분리:** 프론트 서비스 도메인은 `https://anoju.synology.me`, PocketBase API/Admin 도메인은 `https://pocketbase.anoju.synology.me`로 분리합니다.
 - **환경 변수:** 운영 빌드 기준 `VITE_APP_URL=https://anoju.synology.me`, `VITE_PB_URL=https://pocketbase.anoju.synology.me`를 사용합니다.
+- **운영 컨테이너 확인:** PocketBase 환경 변수, ffmpeg/ffprobe, hook 반영 여부 확인은 예전 `pocketbase` 컨테이너명이 아니라 `anoju-pocketbase-ffmpeg-1` 기준으로 수행합니다. 예: `sudo docker exec anoju-pocketbase-ffmpeg-1 printenv | grep TURNSTILE`.
 - **외부 서비스 등록:** OAuth provider, Cloudflare Turnstile, CORS/Redirect 설정에는 프론트 운영 도메인과 PocketBase redirect 도메인을 구분해서 등록합니다.
 - **보안 전략:** PocketBase API Rules를 통해 컬렉션별 접근 권한(ACL) 제어.
 - **실시간성:** SDK의 `subscribe` 기능을 활용하여 실시간 UI 업데이트 대응.
@@ -696,6 +701,7 @@ API 호출 규칙은 다음을 따릅니다.
 - **admin:** 숨김 처리, 영구 삭제, 공지 등록, 회원 관리 등 관리자 기능을 사용할 수 있습니다.
 - **최종 권한:** 프론트에서 버튼을 숨기더라도 최종 권한 검증은 PocketBase API Rules에서 수행합니다.
 - **상태 제한:** 이메일 미인증, 정지, 탈퇴 상태 사용자는 역할과 별개로 쓰기 액션이 제한될 수 있습니다.
+- **관리자 접근:** 관리자 전용 라우트와 운영 API는 `adminOnly`와 PocketBase 서버 권한 검증을 함께 사용합니다. 관리자 화면은 검색 노출을 막기 위해 `robots: 'noindex'`를 필수로 둡니다.
 
 ### 10.1.1 테스트 계정 정책
 
@@ -720,7 +726,7 @@ API 호출 규칙은 다음을 따릅니다.
 초기 데이터 모델은 커뮤니티 기능과 관리자 운영에 필요한 최소 컬렉션을 기준으로 설계합니다.
 
 - **users:** 사용자 계정과 프로필
-  - `email`, `nickname`, `avatar`, `bio`, `role`, `status`, `emailVerified`, `created`
+  - `email`, `nickname`, `avatar`, `bio`, `role`, `status`, `emailVerified`, `suspendedAt`, `suspendedUntil`, `suspendedReason`, `suspendedBy`, `adminMemo`, `warningCount`, `created`
   - `role`: `user | admin`
   - `status`: `active | suspended | withdrawn`
 - **posts:** 자유게시판/갤러리 게시글
@@ -740,14 +746,26 @@ API 호출 규칙은 다음을 따릅니다.
 - **bookmarks:** 게시글 스크랩
   - `post`, `user`
 - **reports:** 신고
-  - `targetType`, `targetId`, `reporter`, `reason`, `detail`, `status`, `created`
-  - `targetType`: `post | comment | user`
+  - `targetType`, `targetId`, `reporter`, `reason`, `detail`, `status`, `handledBy`, `handledAt`, `resolution`, `adminMemo`, `created`
+  - `targetType`: `post | comment | pics | picLog | clip | clip_comment | user`
+  - `status`: `pending | reviewing | reviewed | resolved | rejected`
+  - 신고는 로그인 및 이메일 인증 완료 사용자만 생성할 수 있고, 같은 사용자는 같은 대상에 중복 신고할 수 없습니다. 본인이 작성한 대상은 신고할 수 없습니다.
+  - 신고 사유는 `spam`, `abuse`, `sexual`, `violence`, `illegal`, `privacy`, `copyright`, `other` 후보를 기본으로 하고, `other` 또는 추가 설명이 필요한 사유는 `detail`을 입력받습니다.
+- **content_settings:** 게시판/갤러리 운영 설정
+  - `contentKey`, `label`, `group`, `contentType`, `listPath`, `writePermission`, `editPermission`, `deletePermission`, `viewPermission`, `showComments`, `allowComments`, `showReactions`, `allowReactions`, `showShare`, `showReport`, `showInList`, `status`, `created`, `updated`
+  - `contentKey`: `freeBoard | deviceInfo | itLogs | pics | picLog | clips`와 추후 추가되는 게시판/갤러리 키
+  - `contentType`: `board | gallery`
+  - `writePermission`: `adminOnly | verifiedUser | user | closed`
+  - `editPermission`: `authorAndAdmin | adminOnly | closed`
+  - `deletePermission`: `authorAndAdmin | adminOnly`
+  - `viewPermission`: `public | user | verifiedUser | adminOnly`
+  - `status`: `active | readonly | hidden`
+  - 현재 존재하는 모든 게시판/갤러리와 앞으로 추가되는 모든 게시판/갤러리는 이 설정 구조에 등록해야 합니다.
 - **device_reports:** 모바일 디바이스 웹 해상도 측정 데이터
   - `manufacturer`, `model`, `screenWidth`, `screenHeight`, `windowWidthMin`, `windowWidthMax`, `windowHeightMin`, `windowHeightMax`, `devicePixelRatio`, `orientation`, `userAgent`, `displaySetting`, `description`, `author`, `status`, `deleted`, `created`, `updated`
   - `orientation`: `portrait | landscape`
   - `status`: `published | hidden | deleted`
   - 목록 조회는 공개하고, 생성/수정은 인증 및 이메일 인증 완료 사용자로 제한합니다.
-  - `status`: `pending | reviewed | rejected | resolved`
 - **notices:** 공지
   - `title`, `content`, `placement`, `active`, `startsAt`, `endsAt`
   - `placement`: `global | board | gallery`
@@ -760,6 +778,7 @@ API 호출 규칙은 다음을 따릅니다.
 - **이메일 미인증:** 이메일 미인증 사용자는 글쓰기, 댓글, 좋아요/싫어요, 스크랩 등 쓰기 액션을 제한합니다.
 - **정지 사용자:** 정지 사용자는 로그인 상태를 유지할 수 있으나 쓰기 액션과 주요 사용자 기능을 제한합니다.
 - **탈퇴 사용자:** 탈퇴 상태 사용자는 세션을 무효화하거나 로그인 이후 즉시 안내 후 로그아웃 처리합니다.
+- **탈퇴 저장 규칙:** 일반 사용자는 `role`, `status`를 임의 변경할 수 없지만, 본인 계정의 `status=withdrawn` 변경은 `user_defaults.pb.js` hook에서 예외 허용하여 회원 탈퇴가 soft delete처럼 저장되게 합니다.
 - **로그인 성공:** redirect 경로가 있으면 해당 경로로 복귀하고, 없으면 `/`로 이동합니다.
 - **자동 로그인 복원:** 앱 시작 시 저장된 인증 토큰을 기준으로 자동 로그인 복원을 시도하되, 서버 검증에 실패하거나 사용자 상태가 제한 상태이면 세션을 정리하고 적절한 안내를 표시합니다.
 - **자동 로그인 저장 범위:** 자동 로그인 선택 여부는 인증 토큰 저장 전략과 함께 관리하며, 사용자가 선택하지 않은 경우 장기 지속 저장을 사용하지 않습니다.
@@ -779,12 +798,15 @@ API 호출 규칙은 다음을 따릅니다.
 
 PocketBase hook은 NAS 운영 환경의 JSVM 특성과 배포 재시작 절차에 민감하므로, 프론트 구현과 별도의 서버 런타임 코드로 취급합니다.
 
-- **callback 자기완결:** `pb_hooks/*.pb.js`의 이벤트 callback은 필요한 helper 함수를 callback 내부에 정의해 자기완결적으로 동작하게 합니다. PocketBase JSVM에서 전역 함수 참조가 끊기거나 여러 hook 파일이 같은 컨텍스트에서 충돌할 수 있으므로, 전역 helper 함수는 기본적으로 사용하지 않습니다.
-- **전역 이름 최소화:** 파일 상단 전역에는 불변 설정값처럼 꼭 필요한 값만 둡니다. `isBlank`, `syncReactionCounts`, `DEFAULT_USER_ROLE`처럼 여러 파일에서 반복될 수 있는 이름은 전역으로 선언하지 않고, 필요하면 callback 내부로 이동하거나 파일 목적이 드러나는 고유 접두사를 붙입니다.
+- **callback 자기완결:** `pb_hooks/*.pb.js`의 이벤트 callback은 필요한 helper 함수를 callback 내부에 정의해 자기완결적으로 동작하게 합니다. PocketBase JSVM에서 전역 함수 참조가 끊기거나 여러 hook 파일이 같은 컨텍스트에서 충돌할 수 있으므로, 전역 helper 함수는 사용하지 않습니다.
+- **전역 helper 금지:** `verifyTurnstile`, `syncReactionCounts`, `resolveClipVideoPolicy`, `isBlank`처럼 callback이 호출하는 함수는 파일 최상단 전역으로 선언하지 않습니다. 이전에 `clip_video_policy.pb.js`, `reaction_counts.pb.js`, `turnstile.pb.js`에서 전역 helper 참조로 `ReferenceError`가 반복 발생했으므로, 중복 코드가 생기더라도 callback 내부 helper를 우선합니다.
+- **전역 이름 최소화:** 파일 상단 전역에는 불변 primitive 설정값처럼 꼭 필요한 값만 둡니다. `DEFAULT_USER_ROLE`, `CONFIG`, `state`, `cache`처럼 여러 파일에서 반복되거나 mutable해질 수 있는 이름은 전역으로 선언하지 않고, 필요하면 callback 내부로 이동하거나 파일 목적이 드러나는 고유 접두사를 붙입니다.
+- **hook 리뷰 체크:** `pb_hooks` 수정 시 `onRecord`, `onModel`, `router`, `cron` callback 본문에서 참조하는 모든 식별자가 callback 내부에서 선언되었거나 PocketBase가 제공하는 전역 API인지 확인합니다. `rg "function |const |let |var " pb_hooks/*.pb.js`로 파일 상단 helper가 남아 있는지 점검하고, 전역 helper가 있으면 배포 전에 callback 내부로 이동합니다.
 - **검증 hook:** Turnstile, 업로드 제한, 권한 제한처럼 요청 성공 여부를 결정하는 검증은 `e.next()` 전에 수행합니다. 실패 시 한글 메시지를 가진 `BadRequestError` 또는 `e.badRequestError()`를 사용해 의도적으로 요청을 중단합니다.
 - **파생 동기화 hook:** 좋아요/싫어요 카운트, 댓글 수, 통계처럼 원본 요청 이후 맞춰지는 파생 데이터는 실패하더라도 원본 create/update/delete 요청을 깨지 않도록 `try-catch`와 logger 중심으로 설계합니다. 파생 동기화 실패는 Admin UI Logs에서 확인하고 재동기화할 수 있게 합니다.
+- **댓글/멘션 알림 hook:** 자유게시판, ITLogs, Pics의 댓글 생성 후 알림은 `comment_notifications.pb.js`가 담당합니다. 내 글 댓글, 내 댓글 답글, 댓글 본문 `@nickname` 멘션 알림을 서버 권한으로 생성하며, 일반 회원의 `users` list rule 제한 때문에 프론트에서 멘션 대상 닉네임을 직접 검색하지 않습니다. 알림 생성 실패는 원 댓글 생성을 롤백하지 않고 Admin UI Logs에 기록합니다.
 - **외부 명령 hook:** `ffmpeg`, `ffprobe`처럼 컨테이너 외부 명령에 의존하는 hook은 명령 존재 여부, timeout, 임시 파일 cleanup, 출력 파싱 실패를 모두 방어합니다. 임시 파일은 성공/실패 경로 모두에서 정리하고, 저장 파일로 넘긴 결과물은 PocketBase가 처리할 수 있게 분리합니다.
-- **배포 검증:** NAS 경로 `/volume1/docker/pocketbase/pb_hooks`에 파일을 올린 뒤 PocketBase 컨테이너를 재시작합니다. Admin UI Logs에서 hook 로딩 오류, `ReferenceError`, `TypeError`가 없는지 확인하고, 변경 대상 컬렉션의 create/update/delete 요청을 실제로 테스트합니다.
+- **배포 검증:** NAS 경로 `/volume1/docker/pocketbase/pb_hooks`에 파일을 올린 뒤 운영 컨테이너 `anoju-pocketbase-ffmpeg-1`를 재시작합니다. Admin UI Logs에서 hook 로딩 오류, `ReferenceError`, `TypeError`가 없는지 확인하고, 변경 대상 컬렉션의 create/update/delete 요청을 실제로 테스트합니다.
 - **운영 스키마 일치:** hook이 참조하는 컬렉션명, 필드명, 인덱스, API Rule은 `docs/pocketbase-schema-and-rules.md`와 운영 PocketBase Export collections 결과가 일치해야 합니다. 불일치가 발견되면 hook 수정 전에 스키마/문서를 먼저 맞춥니다.
 
 ### 10.5 검색, 필터, 정렬 정책

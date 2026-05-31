@@ -30,7 +30,7 @@ export const useTimedVideoRecorder = ({ durationMs = DEFAULT_DURATION_MS }: UseT
   const timeoutRef = useRef<number | null>(null);
   const recordStartAtRef = useRef(0);
   const resultUrlRef = useRef<string | null>(null);
-  const supportedMimeType = useMemo(getSupportedMimeType, []);
+  const supportedMimeType = useMemo(() => getSupportedMimeType(), []);
   const isSupported = Boolean(
     typeof navigator !== 'undefined' &&
       typeof navigator.mediaDevices?.getUserMedia === 'function' &&
@@ -187,12 +187,6 @@ export const useTimedVideoRecorder = ({ durationMs = DEFAULT_DURATION_MS }: UseT
   }, [clearRecordTimeout, stopStream]);
 
   useEffect(() => {
-    if (!isSupported) {
-      setStatus('unsupported');
-    }
-  }, [isSupported]);
-
-  useEffect(() => {
     return () => {
       clearRecordTimeout();
       stopStream();
@@ -207,7 +201,7 @@ export const useTimedVideoRecorder = ({ durationMs = DEFAULT_DURATION_MS }: UseT
   }, [clearRecordTimeout, stopStream]);
 
   return {
-    status,
+    status: isSupported ? status : 'unsupported',
     stream,
     result,
     errorMessage,

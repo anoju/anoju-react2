@@ -16,10 +16,26 @@ PocketBase Docker 구성 기준으로 아래 경로에 hook 파일을 배치합�
 pb_hooks
 ```
 
+## 운영 컨테이너 기준
+
+현재 운영 PocketBase 컨테이너 이름은 아래 값을 기준으로 합니다.
+
+```text
+anoju-pocketbase-ffmpeg-1
+```
+
+Docker 명령으로 환경 변수나 ffmpeg 설치 상태를 확인할 때는 예전 `pocketbase` 컨테이너명이 아니라 운영 컨테이너명을 사용합니다.
+
+```bash
+sudo docker exec anoju-pocketbase-ffmpeg-1 printenv | grep TURNSTILE
+sudo docker exec anoju-pocketbase-ffmpeg-1 command -v ffmpeg
+sudo docker exec anoju-pocketbase-ffmpeg-1 command -v ffprobe
+```
+
 ## 적용 후 조치
 
 1. NAS의 PocketBase 컨테이너에 필요한 `pb_hooks/*.pb.js` 파일을 복사합니다.
-2. PocketBase 컨테이너를 재시작합니다.
+2. 운영 컨테이너 `anoju-pocketbase-ffmpeg-1`를 재시작합니다.
 3. Admin UI의 Logs에서 hook 로딩 오류가 없는지 확인합니다.
 4. 기능별 테스트를 진행합니다.
 
@@ -44,6 +60,47 @@ kakao_{providerUserId}@oauth.anoju.synology.me
 - 가상 이메일 계정은 `verified=false` 상태로 두고, 마이페이지에서 실제 이메일 등록 및 인증을 유도합니다.
 - 게시글/댓글 작성 같은 쓰기 기능은 이메일 인증 완료 후에만 허용합니다.
 
+## `user_defaults.pb.js`
+
+목적:
+
+- 일반 회원가입 시 `role=user`, `status=active` 기본값을 보장합니다.
+- 일반 사용자가 `role`, `status`를 임의로 바꾸지 못하게 막습니다.
+- 단, 본인 계정의 회원 탈퇴 요청은 `status=withdrawn` 변경만 예외로 허용합니다.
+
+주의:
+
+- 이 파일이 최신 버전이 아니면 프론트의 회원 탈퇴 버튼을 눌러도 서버 hook이 `status`를 원래 값으로 되돌립니다.
+- 회원 탈퇴 검증 전 NAS의 `/volume1/docker/pocketbase/pb_hooks/user_defaults.pb.js`를 프로젝트 원본과 맞춘 뒤 PocketBase 컨테이너를 재시작해야 합니다.
+
+## `comment_notifications.pb.js`
+
+목적:
+
+- 자유게시판, ITLogs, Pics 댓글 생성 시 알림을 서버에서 생성합니다.
+- 내 글 댓글, 내 댓글 답글, `@nickname` 멘션 알림을 처리합니다.
+- 일반 회원이 `users` 목록을 조회할 수 없는 권한 구조에서도 서버 hook이 닉네임을 매칭합니다.
+- 알림 생성 실패가 댓글 작성 성공을 깨지 않도록 후처리 `try-catch`로 기록합니다.
+
+주의:
+
+- 댓글 알림은 프론트가 직접 만들지 않고 이 hook을 기준으로 생성합니다.
+- 자기 자신에게 발생한 댓글/답글/멘션 알림은 생성하지 않습니다.
+- 동일 actor/type/targetId/recipient 조합의 알림은 중복 생성하지 않습니다.
+- 이 파일도 callback 내부 helper만 사용하며 전역 helper를 두지 않습니다.
+
+배치:
+
+```text
+/volume1/docker/pocketbase/pb_hooks/comment_notifications.pb.js
+```
+
+적용 후 테스트:
+
+1. 운영 컨테이너 `anoju-pocketbase-ffmpeg-1`를 재시작합니다.
+2. Admin UI Logs에서 hook 로딩 오류가 없는지 확인합니다.
+3. `test1`이 댓글에 `@test2`를 작성한 뒤 `test2` 알림함의 `태그` 필터에 멘션 알림이 생성되는지 확인합니다.
+
 ## `clip_video_policy.pb.js`
 
 목적:
@@ -66,7 +123,7 @@ kakao_{providerUserId}@oauth.anoju.synology.me
 필수 조건:
 
 - PocketBase 컨테이너 안에서 `ffprobe` 명령이 실행 가능해야 합니다.
-- 현재 운영 컨테이너는 `anoju-pocketbase-ffmpeg:latest`처럼 `ffmpeg/ffprobe`가 포함된 이미지를 사용합니다.
+- 현재 운영 컨테이너 `anoju-pocketbase-ffmpeg-1`는 `anoju-pocketbase-ffmpeg:latest`처럼 `ffmpeg/ffprobe`가 포함된 이미지를 사용합니다.
 
 배치:
 
@@ -82,9 +139,17 @@ command -v ffprobe
 ffprobe -version | head -n 1
 ```
 
+NAS에서 직접 확인할 때는 운영 컨테이너명을 붙여 실행합니다.
+
+```bash
+sudo docker exec anoju-pocketbase-ffmpeg-1 command -v ffmpeg
+sudo docker exec anoju-pocketbase-ffmpeg-1 command -v ffprobe
+sudo docker exec anoju-pocketbase-ffmpeg-1 ffprobe -version
+```
+
 적용 후 테스트:
 
-1. PocketBase 컨테이너를 재시작합니다.
+1. 운영 컨테이너 `anoju-pocketbase-ffmpeg-1`를 재시작합니다.
 2. Admin UI Logs에서 hook 로딩 오류가 없는지 확인합니다.
 3. 30초 이하/720p 이하 Clips 업로드가 성공하는지 확인합니다.
 4. 30초 초과 영상에서 선택한 30초 구간만 저장되는지 확인합니다.

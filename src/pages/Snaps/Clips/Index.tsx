@@ -134,7 +134,7 @@ const Clips = () => {
       <header className="clips-page__header">
         <span className="board-page__eyebrow">Snaps</span>
         <h2>Clips</h2>
-        <p>짧게 훑고, 마음에 드는 영상은 집중해서 보는 동영상 게시판입니다.</p>
+        <p>30초의 짧은 순간을 영상으로 기록하고, 가볍게 나누는 공간입니다.</p>
       </header>
 
       <form className="clips-page__search" onSubmit={handleSearchSubmit}>

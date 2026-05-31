@@ -32,6 +32,12 @@ PocketBase auth collection입니다.
 | `bio`      | text   | no   |          | 한 줄 소개                         |
 | `role`     | select | yes  | `user`   | `user`, `admin`                    |
 | `status`   | select | yes  | `active` | `active`, `suspended`, `withdrawn` |
+| `suspendedAt` | date | no | | 정지 처리 시각 |
+| `suspendedUntil` | date | no | | 정지 만료 시각 |
+| `suspendedReason` | text | no | | 정지 사유 |
+| `suspendedBy` | relation users | no | | 정지 처리 관리자 |
+| `adminMemo` | text | no | | 관리자 메모 |
+| `warningCount` | number | no | `0` | 경고 횟수 |
 
 권장 인덱스:
 
@@ -238,12 +244,16 @@ Delete rule: user = @request.auth.id || @request.auth.role = "admin"
 
 | 필드         | 타입           | 필수 | 기본값    | 설명                                          |
 | ------------ | -------------- | ---- | --------- | --------------------------------------------- |
-| `targetType` | select         | yes  |           | `post`, `comment`, `user`                     |
+| `targetType` | select         | yes  |           | `post`, `comment`, `pics`, `picLog`, `clip`, `clip_comment`, `user` |
 | `targetId`   | text           | yes  |           | 대상 record id                                |
 | `reporter`   | relation users | yes  |           | 신고자                                        |
-| `reason`     | select         | yes  |           | 신고 사유                                     |
+| `reason`     | select         | yes  |           | `spam`, `abuse`, `sexual`, `violence`, `illegal`, `privacy`, `copyright`, `other` |
 | `detail`     | text           | no   |           | 상세 설명                                     |
-| `status`     | select         | yes  | `pending` | `pending`, `reviewed`, `rejected`, `resolved` |
+| `status`     | select         | yes  | `pending` | `pending`, `reviewing`, `reviewed`, `resolved`, `rejected` |
+| `handledBy`  | relation users | no   |           | 처리 관리자                                   |
+| `handledAt`  | date           | no   |           | 처리 시각                                     |
+| `resolution` | text           | no   |           | 처리 결과                                     |
+| `adminMemo`  | text           | no   |           | 관리자 메모                                   |
 
 API Rules:
 
@@ -251,6 +261,57 @@ API Rules:
 List rule: @request.auth.role = "admin"
 View rule: reporter = @request.auth.id || @request.auth.role = "admin"
 Create rule: @request.auth.id != "" && @request.auth.verified = true && reporter = @request.auth.id
+Update rule: @request.auth.role = "admin"
+Delete rule: @request.auth.role = "admin"
+```
+
+운영 규칙:
+
+- 로그인 및 이메일 인증 완료 사용자만 신고할 수 있습니다.
+- 본인이 작성한 대상은 신고할 수 없습니다.
+- 같은 사용자는 같은 대상에 중복 신고할 수 없습니다.
+- 신고 접수만으로 자동 삭제하지 않고, 관리자 검토 후 숨김, 삭제, 회원 경고, 회원 정지, 기각, 메모 기록 중 하나로 조치합니다.
+- 중복 신고 방지를 위해 `targetType`, `targetId`, `reporter` 조합의 unique 인덱스를 권장합니다.
+
+## content_settings
+
+게시판/갤러리 운영 설정 컬렉션입니다. 현재 존재하는 모든 게시판/갤러리와 추후 추가되는 모든 게시판/갤러리는 이 컬렉션에 등록합니다.
+
+필드:
+
+| 필드 | 타입 | 필수 | 기본값 | 설명 |
+| ---- | ---- | ---- | ------ | ---- |
+| `contentKey` | text | yes | | `freeBoard`, `deviceInfo`, `itLogs`, `pics`, `picLog`, `clips`와 추후 추가 키 |
+| `label` | text | yes | | 관리자 화면 노출명 |
+| `group` | select | yes | | `playground`, `snaps` |
+| `contentType` | select | yes | | `board`, `gallery` |
+| `listPath` | text | yes | | 목록 경로 |
+| `writePermission` | select | yes | `verifiedUser` | `adminOnly`, `verifiedUser`, `user`, `closed` |
+| `editPermission` | select | yes | `authorAndAdmin` | `authorAndAdmin`, `adminOnly`, `closed` |
+| `deletePermission` | select | yes | `authorAndAdmin` | `authorAndAdmin`, `adminOnly` |
+| `viewPermission` | select | yes | `public` | `public`, `user`, `verifiedUser`, `adminOnly` |
+| `showComments` | bool | no | `true` | 댓글 영역 노출 여부 |
+| `allowComments` | bool | no | `true` | 댓글 작성 허용 여부 |
+| `showReactions` | bool | no | `true` | 좋아요/싫어요 노출 여부 |
+| `allowReactions` | bool | no | `true` | 좋아요/싫어요 사용 허용 여부 |
+| `showShare` | bool | no | `true` | 공유하기 노출 여부 |
+| `showReport` | bool | no | `true` | 신고하기 노출 여부 |
+| `showInList` | bool | no | `true` | 목록 노출 여부 |
+| `status` | select | yes | `active` | `active`, `readonly`, `hidden` |
+
+권장 인덱스:
+
+```text
+CREATE UNIQUE INDEX idx_content_settings_key ON content_settings (contentKey);
+CREATE INDEX idx_content_settings_group ON content_settings (group);
+```
+
+API Rules:
+
+```text
+List rule: @request.auth.role = "admin"
+View rule: @request.auth.role = "admin"
+Create rule: @request.auth.role = "admin"
 Update rule: @request.auth.role = "admin"
 Delete rule: @request.auth.role = "admin"
 ```
@@ -478,8 +539,9 @@ Delete rule: @request.auth.role = "admin"
 
 주의:
 
-- 1차 프론트 구현은 댓글 작성, picLog 태그, picLog 순서 변경 요청 시 클라이언트에서 알림을 생성합니다.
-- 운영 안정성을 높이려면 이후 PocketBase hook에서 알림 생성을 서버 책임으로 옮겨 중복 생성과 권한 우회를 방지합니다.
+- 댓글/답글/댓글 `@nickname` 멘션 알림은 `comment_notifications.pb.js` hook에서 서버 책임으로 생성합니다.
+- 일반 회원은 `users` list rule이 막혀 다른 회원 닉네임을 직접 검색할 수 없으므로, 멘션 대상 매칭은 클라이언트가 아니라 서버 hook에서 처리해야 합니다.
+- picLog 태그와 picLog 순서 변경 요청 알림은 1차 구현 범위에서 클라이언트 생성을 유지하되, 운영 안정화 시 서버 hook으로 옮깁니다.
 - 사용자가 자기 글 또는 자기 댓글에 직접 남긴 액션은 프론트에서 자기 알림을 만들지 않습니다.
 
 ## Turnstile 회원가입 서버 훅 개요

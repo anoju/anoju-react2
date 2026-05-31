@@ -26,7 +26,7 @@ export const AuthGuard = ({ route, children }: AuthGuardProps) => {
     return <Navigate to={`${LOGIN_PATH}?redirect=${redirect}`} replace />;
   }
 
-  if (status === 'emailUnverified') {
+  if (status === 'emailUnverified' && !route.allowEmailUnverified) {
     return <Navigate to={`${LOGIN_PATH}?reason=email-unverified`} replace />;
   }
 
@@ -34,7 +34,7 @@ export const AuthGuard = ({ route, children }: AuthGuardProps) => {
     return <Navigate to={`${LOGIN_PATH}?reason=${status}`} replace />;
   }
 
-  if (route.requiresAuth && status !== 'authenticated') {
+  if (route.requiresAuth && status !== 'authenticated' && !(status === 'emailUnverified' && route.allowEmailUnverified)) {
     const redirect = encodeURIComponent(`${location.pathname}${location.search}`);
     return <Navigate to={`${LOGIN_PATH}?redirect=${redirect}`} replace />;
   }

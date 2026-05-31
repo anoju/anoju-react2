@@ -1,9 +1,11 @@
 import type React from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Trash2, Upload } from 'lucide-react';
+import { Trash2, Upload, UserX } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Avatar, Button, Dialog, Input, Slider, SocialLoginButtons, confirm, toast } from '@/components';
 import { authApi, getUserMessage, toAppError } from '@/apis';
 import type { LinkedOAuthProvider, SupportedOAuthProvider } from '@/apis/authApi';
+import { DEFAULT_HOME_PATH } from '@/constants/app';
 import { useOAuthProviders } from '@/hooks/useOAuthProviders';
 import { useAuthStore } from '@/stores/authStore';
 import { isNicknameConflictMessage, normalizeNickname, validateNickname } from '@/utils/nickname';
@@ -12,6 +14,7 @@ import { UPLOAD_LIMITS, validateImageFile } from '@/utils/uploadPolicy';
 const CROP_SIZE = 512;
 
 const MyPageProfile = () => {
+  const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cropCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -327,6 +330,32 @@ const MyPageProfile = () => {
     }
   };
 
+  const handleWithdraw = async () => {
+    const confirmed = await confirm('회원 탈퇴 시 계정은 삭제되지 않고 탈퇴 상태로 숨김 처리됩니다. 탈퇴하시겠습니까?', {
+      title: '회원 탈퇴',
+      confirmLabel: '다음',
+      tone: 'danger',
+    });
+
+    if (!confirmed) return;
+
+    const finalConfirmed = await confirm('마지막 확인입니다. 탈퇴 후에는 이 계정으로 서비스를 이용할 수 없습니다.', {
+      title: '정말 탈퇴할까요?',
+      confirmLabel: '탈퇴',
+      tone: 'danger',
+    });
+
+    if (!finalConfirmed) return;
+
+    try {
+      await authApi.withdrawAccount();
+      toast('회원 탈퇴가 완료되었습니다.', { tone: 'success' });
+      navigate(DEFAULT_HOME_PATH, { replace: true });
+    } catch {
+      toast('회원 탈퇴를 처리하지 못했습니다. 잠시 후 다시 시도해주세요.', { tone: 'danger' });
+    }
+  };
+
   return (
     <section className="container my-page">
       <header className="my-page__header">
@@ -473,6 +502,14 @@ const MyPageProfile = () => {
           disabledProviders={linkedProviderNames}
           onSuccess={loadLinkedProviders}
         />
+      </section>
+
+      <section className="my-page__notice" aria-labelledby="withdraw-title">
+        <h3 id="withdraw-title">회원 탈퇴</h3>
+        <p>탈퇴하면 회원 정보는 삭제하지 않고 탈퇴 상태로 숨김 처리합니다.</p>
+        <Button type="button" variant="ghost" tone="danger" onClick={handleWithdraw}>
+          <UserX size={16} /> 회원 탈퇴
+        </Button>
       </section>
 
       <Dialog
