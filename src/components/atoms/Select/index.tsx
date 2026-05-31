@@ -2,6 +2,7 @@ import type React from 'react';
 import { Check, ChevronDown } from 'lucide-react';
 import { useId, useState } from 'react';
 import { BottomSheet } from '@/components/feedback';
+import FocusTrace from '../FocusTrace';
 
 export interface SelectOption {
   value: string;
@@ -69,7 +70,7 @@ const Select = ({
         </label>
       ) : null}
       {native ? (
-        <div className="field__control">
+        <div className="field__control field__control--focus-trace">
           <select
             id={selectId}
             className="field__select"
@@ -95,6 +96,7 @@ const Select = ({
             ))}
           </select>
           <ChevronDown className="field__select-icon" size={18} aria-hidden="true" />
+          <FocusTrace />
         </div>
       ) : (
         <>
@@ -112,7 +114,8 @@ const Select = ({
             onClick={() => setIsOpen(true)}
           >
             <span data-placeholder={!selectedOption || undefined}>{displayLabel}</span>
-            <ChevronDown size={18} aria-hidden="true" />
+            <ChevronDown className="field__select-trigger-icon" size={18} aria-hidden="true" />
+            <FocusTrace />
           </button>
           <BottomSheet open={isOpen} title={label ?? '옵션 선택'} onClose={() => setIsOpen(false)}>
             <div className="select-sheet" role="listbox" aria-labelledby={selectId}>

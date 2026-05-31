@@ -1,5 +1,6 @@
 import type React from 'react';
 import { useId } from 'react';
+import FocusTrace from '../FocusTrace';
 
 interface TextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
@@ -31,13 +32,16 @@ const TextArea = ({
           {label}
         </label>
       ) : null}
-      <textarea
-        id={textareaId}
-        className="field__textarea"
-        aria-invalid={Boolean(error) || undefined}
-        aria-describedby={[descriptionId, errorId].filter(Boolean).join(' ') || undefined}
-        {...props}
-      />
+      <div className="field__textarea-control field__control--focus-trace">
+        <textarea
+          id={textareaId}
+          className="field__textarea"
+          aria-invalid={Boolean(error) || undefined}
+          aria-describedby={[descriptionId, errorId].filter(Boolean).join(' ') || undefined}
+          {...props}
+        />
+        <FocusTrace />
+      </div>
       {description ? (
         <p className="field__description" id={descriptionId}>
           {description}

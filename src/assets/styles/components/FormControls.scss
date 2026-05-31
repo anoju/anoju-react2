@@ -8,6 +8,8 @@
 
   &[data-invalid='true'] {
     .field__control,
+    .field__textarea-control,
+    .field__select-trigger,
     .field__textarea {
       border-color: var(--color-border-danger);
     }
@@ -33,6 +35,15 @@
     &:focus-within {
       border-color: var(--color-border-focus);
       box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-border-focus), transparent 78%);
+    }
+
+    &--focus-trace {
+      overflow: visible;
+
+      &:focus-within {
+        border-color: var(--color-border-default);
+        box-shadow: none;
+      }
     }
   }
 
@@ -76,6 +87,24 @@
     &:focus {
       border-color: var(--color-border-focus);
       box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-border-focus), transparent 78%);
+    }
+  }
+
+  &__textarea-control {
+    position: relative;
+    display: flex;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-surface);
+    transition: var(--transition-base);
+
+    .field__textarea {
+      border: 0;
+      background: transparent;
+
+      &:focus {
+        box-shadow: none;
+      }
     }
   }
 
@@ -134,11 +163,13 @@
   }
 
   &__select-trigger {
+    position: relative;
     display: flex;
     width: 100%;
     min-height: 2.75rem;
     align-items: center;
     justify-content: space-between;
+    overflow: visible;
     padding: 0 var(--spacing-md);
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-md);
@@ -163,26 +194,19 @@
       }
     }
 
-    svg {
+    .field__select-trigger-icon {
       flex: 0 0 auto;
       color: var(--color-icon-muted);
       transition: transform 0.2s ease, color 0.2s ease;
     }
 
     &[data-state='open'] {
-      border-color: var(--color-border-focus);
-      box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-border-focus), transparent 78%);
+      box-shadow: none;
 
-      svg {
+      .field__select-trigger-icon {
         color: var(--color-icon-primary);
         transform: rotate(180deg);
       }
-    }
-
-    &:hover:not(:disabled),
-    &:focus-visible:not(:disabled) {
-      border-color: var(--color-border-focus);
-      box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-border-focus), transparent 78%);
     }
 
     &:focus-visible {
@@ -215,6 +239,61 @@
 
   &__error {
     color: var(--color-text-danger);
+  }
+}
+
+.focus-trace {
+  position: absolute;
+  inset: -1px;
+  z-index: 2;
+  display: block;
+  overflow: visible;
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+
+  &__svg {
+    position: absolute;
+    inset: 0;
+    display: block;
+    overflow: visible;
+  }
+
+  &__path {
+    fill: none;
+    stroke: var(--color-border-focus);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    vector-effect: non-scaling-stroke;
+  }
+}
+
+.field__control--focus-trace:focus-within .focus-trace,
+.field__select-trigger:focus-visible .focus-trace,
+.field__select-trigger[data-state='open'] .focus-trace {
+  opacity: 1;
+}
+
+.field__control--focus-trace:focus-within .focus-trace__path,
+.field__select-trigger:focus-visible .focus-trace__path,
+.field__select-trigger[data-state='open'] .focus-trace__path {
+  animation: focus-trace-draw 0.48s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.field[data-invalid='true'] .field__control--focus-trace:focus-within .focus-trace__path {
+  stroke: var(--color-border-danger);
+}
+
+@keyframes focus-trace-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+
+  to {
+    stroke-dashoffset: 0;
   }
 }
 
@@ -255,12 +334,6 @@
       border-color: var(--color-border-focus);
       color: var(--color-action-primary);
       background: var(--color-bg-primary-soft);
-    }
-
-    &:hover:not(:disabled),
-    &:focus-visible:not(:disabled) {
-      border-color: var(--color-border-focus);
-      background: var(--color-bg-surface-soft);
     }
 
     &:focus-visible {

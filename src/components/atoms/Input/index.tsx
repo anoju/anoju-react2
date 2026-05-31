@@ -1,6 +1,7 @@
 import type React from 'react';
 import { useId, useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
+import FocusTrace from '../FocusTrace';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -43,7 +44,7 @@ const Input = ({
           {label}
         </label>
       ) : null}
-      <div className="field__control">
+      <div className="field__control field__control--focus-trace">
         {leftIcon ? <span className="field__icon field__icon--left">{leftIcon}</span> : null}
         <input
           id={inputId}
@@ -67,6 +68,7 @@ const Input = ({
           </button>
         ) : null}
         {rightIcon ? <span className="field__icon field__icon--right">{rightIcon}</span> : null}
+        <FocusTrace />
       </div>
       {description ? (
         <p className="field__description" id={descriptionId}>
