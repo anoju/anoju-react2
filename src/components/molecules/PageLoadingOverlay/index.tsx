@@ -1,11 +1,13 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { PageLoading } from '../PageLoading';
+import { useBodyScrollLock } from '@/hooks';
 import { usePageLoadingStore } from '@/stores/pageLoadingStore';
 
 export const PageLoadingOverlay = () => {
   const entries = usePageLoadingStore((state) => state.entries);
   const visible = entries.length > 0;
   const label = entries.at(-1)?.label;
+  useBodyScrollLock(visible);
 
   return (
     <AnimatePresence>
@@ -24,4 +26,3 @@ export const PageLoadingOverlay = () => {
     </AnimatePresence>
   );
 };
-

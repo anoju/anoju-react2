@@ -1,3 +1,4 @@
+export { useBodyScrollLock } from './useBodyScrollLock';
 export { useDeleteAction } from './useDeleteAction';
 export { useOAuthProviders } from './useOAuthProviders';
 export { usePageLoadingEffect } from './usePageLoadingEffect';
@@ -7,4 +8,3 @@ export { useSyncedSearchParams } from './useSyncedSearchParams';
 export { useTheme, type ThemeMode } from './useTheme';
 export { useTimedVideoRecorder } from './useTimedVideoRecorder';
 export { useUnsavedChanges } from './useUnsavedChanges';
-

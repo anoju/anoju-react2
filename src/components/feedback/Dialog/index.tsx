@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { IconButton } from '@/components/atoms';
+import { useBodyScrollLock } from '@/hooks';
 
 interface DialogProps {
   open: boolean;
@@ -27,6 +28,7 @@ export const Dialog = ({
 }: DialogProps) => {
   const dialogRef = useRef<HTMLDivElement>(null);
   const lastFocusedRef = useRef<HTMLElement | null>(null);
+  useBodyScrollLock(open);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -74,12 +76,9 @@ export const Dialog = ({
     };
 
     document.addEventListener('keydown', handleKeyDown);
-    document.body.style.overflow = 'hidden';
-
     return () => {
       window.clearTimeout(focusTimer);
       document.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = '';
       lastFocusedRef.current?.focus();
     };
   }, [closeOnEsc, onClose, open]);
