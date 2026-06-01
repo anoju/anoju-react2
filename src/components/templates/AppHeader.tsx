@@ -8,6 +8,7 @@ import { DEFAULT_HOME_PATH, MY_PAGE_NOTIFICATIONS_PATH } from '@/constants/app';
 import { IconButton, Img } from '@/components/atoms';
 import type { HeaderConfig } from '@/routes/types';
 import { useAuthStore } from '@/stores/authStore';
+import { closeTopOverlay } from '@/stores/overlayStore';
 
 interface AppHeaderProps {
   config: HeaderConfig;
@@ -69,6 +70,10 @@ export const AppHeader = ({ config, visible }: AppHeaderProps) => {
   }
 
   const handleBack = () => {
+    if (closeTopOverlay()) {
+      return;
+    }
+
     const backButton = config.backButton;
 
     if (!backButton || backButton.type === 'history') {

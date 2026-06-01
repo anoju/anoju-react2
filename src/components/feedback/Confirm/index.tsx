@@ -8,6 +8,7 @@ interface ConfirmProps {
   confirmLabel?: string;
   cancelLabel?: string;
   tone?: 'primary' | 'danger';
+  closeOnBack?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -19,6 +20,7 @@ export const Confirm = ({
   confirmLabel = '확인',
   cancelLabel = '취소',
   tone = 'primary',
+  closeOnBack = true,
   onConfirm,
   onCancel,
 }: ConfirmProps) => (
@@ -27,6 +29,8 @@ export const Confirm = ({
     title={title}
     description={message}
     closeOnOverlayClick={false}
+    closeOnBack={closeOnBack}
+    overlayType="confirm"
     onClose={onCancel}
     footer={
       <>

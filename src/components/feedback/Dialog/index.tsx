@@ -1,9 +1,10 @@
 import type React from 'react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useId, useRef } from 'react';
 import { X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { IconButton } from '@/components/atoms';
 import { useBodyScrollLock } from '@/hooks';
+import { useOverlayStore, type OverlayType } from '@/stores/overlayStore';
 
 interface DialogProps {
   open: boolean;
@@ -13,6 +14,8 @@ interface DialogProps {
   footer?: React.ReactNode;
   closeOnOverlayClick?: boolean;
   closeOnEsc?: boolean;
+  closeOnBack?: boolean;
+  overlayType?: OverlayType;
   onClose: () => void;
 }
 
@@ -24,11 +27,35 @@ export const Dialog = ({
   footer,
   closeOnOverlayClick = true,
   closeOnEsc = true,
+  closeOnBack = true,
+  overlayType = 'dialog',
   onClose,
 }: DialogProps) => {
+  const overlayId = useId();
+  const titleId = `${overlayId}-title`;
+  const descriptionId = `${overlayId}-description`;
   const dialogRef = useRef<HTMLDivElement>(null);
   const lastFocusedRef = useRef<HTMLElement | null>(null);
+  const registerOverlay = useOverlayStore((state) => state.registerOverlay);
+  const unregisterOverlay = useOverlayStore((state) => state.unregisterOverlay);
   useBodyScrollLock(open);
+
+  useEffect(() => {
+    if (!open) {
+      return undefined;
+    }
+
+    registerOverlay({
+      id: overlayId,
+      type: overlayType,
+      close: onClose,
+      closeOnBack,
+    });
+
+    return () => {
+      unregisterOverlay(overlayId);
+    };
+  }, [closeOnBack, onClose, open, overlayId, overlayType, registerOverlay, unregisterOverlay]);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -104,8 +131,8 @@ export const Dialog = ({
             className="dialog__panel"
             role="dialog"
             aria-modal="true"
-            aria-labelledby={title ? 'dialog-title' : undefined}
-            aria-describedby={description ? 'dialog-description' : undefined}
+            aria-labelledby={title ? titleId : undefined}
+            aria-describedby={description ? descriptionId : undefined}
             tabIndex={-1}
             initial={{ y: 18, scale: 0.98, opacity: 0 }}
             animate={{ y: 0, scale: 1, opacity: 1 }}
@@ -115,12 +142,12 @@ export const Dialog = ({
             <div className="dialog__header">
               <div className="dialog__heading">
                 {title ? (
-                  <h2 className="dialog__title" id="dialog-title">
+                  <h2 className="dialog__title" id={titleId}>
                     {title}
                   </h2>
                 ) : null}
                 {description ? (
-                  <p className="dialog__description" id="dialog-description">
+                  <p className="dialog__description" id={descriptionId}>
                     {description}
                   </p>
                 ) : null}

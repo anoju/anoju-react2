@@ -1,7 +1,9 @@
 import type React from 'react';
+import { useEffect, useId } from 'react';
 import { X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useBodyScrollLock } from '@/hooks';
+import { useOverlayStore } from '@/stores/overlayStore';
 
 interface BottomSheetProps {
   open: boolean;
@@ -10,6 +12,7 @@ interface BottomSheetProps {
   onClose: () => void;
   showCloseButton?: boolean;
   closeLabel?: string;
+  closeOnBack?: boolean;
 }
 
 export const BottomSheet = ({
@@ -19,8 +22,30 @@ export const BottomSheet = ({
   onClose,
   showCloseButton = true,
   closeLabel = '닫기',
+  closeOnBack = true,
 }: BottomSheetProps) => {
+  const overlayId = useId();
+  const titleId = `${overlayId}-title`;
+  const registerOverlay = useOverlayStore((state) => state.registerOverlay);
+  const unregisterOverlay = useOverlayStore((state) => state.unregisterOverlay);
   useBodyScrollLock(open);
+
+  useEffect(() => {
+    if (!open) {
+      return undefined;
+    }
+
+    registerOverlay({
+      id: overlayId,
+      type: 'bottomSheet',
+      close: onClose,
+      closeOnBack,
+    });
+
+    return () => {
+      unregisterOverlay(overlayId);
+    };
+  }, [closeOnBack, onClose, open, overlayId, registerOverlay, unregisterOverlay]);
 
   return (
     <AnimatePresence>
@@ -31,7 +56,7 @@ export const BottomSheet = ({
             className="bottom-sheet__panel"
             role="dialog"
             aria-modal="true"
-            aria-labelledby={title ? 'bottom-sheet-title' : undefined}
+            aria-labelledby={title ? titleId : undefined}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
@@ -39,7 +64,7 @@ export const BottomSheet = ({
           >
             <header className="bottom-sheet__header">
               {title ? (
-                <h2 className="bottom-sheet__title" id="bottom-sheet-title">
+                <h2 className="bottom-sheet__title" id={titleId}>
                   {title}
                 </h2>
               ) : null}

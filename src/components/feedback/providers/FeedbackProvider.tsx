@@ -12,6 +12,7 @@ import {
   type ConfirmRequest,
   type ToastRequest,
 } from '../services/feedbackEvents';
+import { OverlayHistoryManager } from './OverlayHistoryManager';
 
 interface FeedbackProviderProps {
   children: React.ReactNode;
@@ -65,12 +66,14 @@ export const FeedbackProvider = ({ children }: FeedbackProviderProps) => {
 
   return (
     <>
+      <OverlayHistoryManager />
       {children}
       <Alert
         open={Boolean(alertRequest)}
         title={alertRequest?.title}
         message={alertRequest?.message ?? ''}
         confirmLabel={alertRequest?.confirmLabel}
+        closeOnBack={alertRequest?.closeOnBack}
         onClose={closeAlert}
       />
       <Confirm
@@ -80,6 +83,7 @@ export const FeedbackProvider = ({ children }: FeedbackProviderProps) => {
         confirmLabel={confirmRequest?.confirmLabel}
         cancelLabel={confirmRequest?.cancelLabel}
         tone={confirmRequest?.tone}
+        closeOnBack={confirmRequest?.closeOnBack}
         onConfirm={() => closeConfirm(true)}
         onCancel={() => closeConfirm(false)}
       />

@@ -4,6 +4,7 @@ export interface AlertRequest {
   title?: string;
   message: string;
   confirmLabel?: string;
+  closeOnBack?: boolean;
   resolve: () => void;
 }
 
@@ -13,6 +14,7 @@ export interface ConfirmRequest {
   confirmLabel?: string;
   cancelLabel?: string;
   tone?: 'primary' | 'danger';
+  closeOnBack?: boolean;
   resolve: (confirmed: boolean) => void;
 }
 

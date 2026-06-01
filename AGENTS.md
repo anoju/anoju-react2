@@ -26,6 +26,7 @@
 - **공통 UI API**: 공통 컴포넌트는 `size="xs|sm|md|lg|xl"`, `variant="solid|soft|outline|ghost|plain"`, `tone="primary|neutral|danger|success|warning|info"`를 기본 축으로 삼고, 상태는 `data-state`, `data-disabled`, `data-loading`, `data-selected`, `data-active`, `data-invalid`로 표현합니다.
 - **공통 피드백 정책**: 저장/복사 등 짧은 결과는 `Toast`, 단순 안내는 `Alert`, 삭제/로그아웃/작성 취소처럼 결정이 필요한 경우는 `Confirm`, 모바일 액션 선택은 `BottomSheet`, 페이지/섹션 실패는 `ErrorState`, 데이터 없음은 `EmptyState`, 짧은 진행 상태는 `Spinner`를 사용합니다.
 - **Dialog 사용 원칙**: `Dialog`는 콘텐츠나 복합 UI를 담는 범용 모달 컨테이너로 사용합니다. 안내 메시지와 확인/취소 메시지는 원시 `Dialog`를 직접 쓰지 않고, 사용성이 편한 `Alert`와 `Confirm` 래퍼를 사용합니다.
+- **Overlay 뒤로가기 정책**: `Dialog`, `Alert`, `Confirm`, `BottomSheet`처럼 화면 위에 뜨는 overlay는 전역 stack으로 관리합니다. 첫 overlay가 열릴 때 브라우저 history에 닫기용 entry를 추가하고, 브라우저 뒤로가기 또는 Android back gesture가 발생하면 실제 라우트 이동보다 최상단 overlay 닫기를 우선합니다. 여러 overlay가 중첩되어도 닫기용 history entry는 중복 추가하지 않고, 헤더 뒤로가기 버튼도 열린 overlay가 있으면 `history.back()` 대신 최상단 overlay를 먼저 닫습니다. 닫히면 안 되는 처리 중 상태는 `closeOnBack: false` 같은 옵션으로 예외 처리합니다.
 - **로딩 정책**: 로고 기반 인터랙션을 가진 전역/페이지 단위 로딩은 루트에 `PageLoadingOverlay`를 한 번만 배치하고, 화면/비동기 로직에서는 `openPageLoading`, `closePageLoading`, `usePageLoadingEffect`로 호출합니다. `PageLoading` 컴포넌트를 각 화면에서 직접 렌더링하지 않습니다. 전역 로딩은 중복 렌더링하지 않고 내부 카운터로 열린 횟수를 관리하며, 여러 번 open된 경우 같은 횟수만큼 close되어야 닫힙니다. 예외적으로 전체 초기화가 필요한 경우 `closePageLoading({ all: true })`로 완전 닫기를 수행합니다. 전체 페이지를 막는 로딩은 인증 초기화, 보호 라우트 판정, 필수 초기 데이터 확인, 상세/수정 화면의 첫 데이터 조회처럼 화면 렌더링 자체가 불가능한 경우에만 사용합니다. 버튼 액션은 `Button loading`, 리스트 추가 로딩은 리스트 하단 `Spinner` 로딩을 사용합니다. 이미 데이터가 보이는 상태의 재조회, 무한스크롤 추가 조회, 비디오 내부 버퍼링, 작은 위젯 로딩에는 전역 페이지 로딩을 사용하지 않습니다.
 - **Skeleton 정책**: 짧은 Skeleton 노출은 오류처럼 보일 수 있으므로 기본 1차 컴포넌트에서는 제외하고, `500ms` 이상 예상되는 리스트/상세 구조에서만 2차로 제한 검토합니다.
 - **DataList 정책**: 리스트형 화면은 공통 `DataList`를 사용하며, 1차로 `mode="infinite"`와 `mode="loadMore"`를 지원합니다. 첫 조회 실패는 `ErrorState`, 데이터 없음은 `EmptyState`, 추가 조회 실패는 기존 목록 유지 후 하단 재시도 액션으로 처리합니다.
@@ -52,7 +53,7 @@
 - **헤더 구성:** 좌측 영역은 `뒤로가기 버튼`, `페이지 타이틀`, `좌측 확장 영역` 순서로 배치하고, 우측 영역은 `우측 확장 영역`, `알림 버튼`, `홈 버튼` 순서로 배치합니다.
 - **헤더 요소 제어:** 뒤로가기 버튼, 페이지 타이틀, 홈 버튼, 좌우 확장 영역은 화면별 요구에 따라 숨김 처리하거나 커스텀 콘텐츠를 주입할 수 있어야 합니다.
 - **헤더 알림 버튼:** 홈 화면의 메인 헤더 우측에는 알림함으로 이동하는 `IconButton`을 제공합니다. 비로그인 사용자가 누르면 보호 라우트를 통해 로그인 화면으로 이동하고, 로그인 사용자는 알림함으로 이동합니다. 읽지 않은 알림이 있으면 접근성 이름과 시각 배지를 함께 갱신합니다. 알림 버튼은 기본적으로 홈 화면에서만 노출하고, 노출 여부는 라우트/레이아웃 설정에서 화면별로 제어합니다.
-- **뒤로가기 동작:** 뒤로가기는 기본적으로 `history.back()`을 사용하되, 화면별 설정에 따라 특정 경로 이동 또는 커스텀 핸들러로 대체할 수 있어야 합니다.
+- **뒤로가기 동작:** 뒤로가기는 기본적으로 `history.back()`을 사용하되, 열린 overlay가 있으면 라우트 이동보다 최상단 overlay 닫기를 우선합니다. 화면별 설정에 따라 특정 경로 이동 또는 커스텀 핸들러로 대체할 수 있어야 합니다.
 - **전체메뉴 버튼 제외:** 전체메뉴는 별도 페이지로 관리하므로 전역 헤더에는 전체메뉴 버튼을 두지 않습니다.
 - **모바일 푸터 정책:** 모바일 UI에는 기본 푸터를 제공하지 않습니다.
 - **하단 플로팅 버튼:** 하단 플로팅 버튼은 모든 화면에 배치하지 않고, `홈` 화면과 플로팅 메뉴 항목으로 직접 이동하는 주요 화면에서 기본 노출합니다. 기본 메뉴는 `전체메뉴`, `lounge`, `Snaps`, `마이페이지`로 구성하며, 기존 `홈` 항목은 제외합니다. 자유게시판 목록/상세/작성/수정, Pics 피드/상세/작성, picLog 목록/상세/작성/수정 등 콘텐츠 소비/작성 중심의 하위 화면에서는 기본 미노출하되, 라우트/레이아웃 설정에서 화면별로 재정의할 수 있어야 합니다.
@@ -121,6 +122,7 @@
 - **방어적 프로그래밍:** Optional Chaining(`?.`), Nullish Coalescing(`??`), API 호출 시 `try-catch` 등을 필수 적용합니다.
 - **타입 엄격성:** TypeScript 사용 시 **`any` 타입 사용을 원칙적으로 금지**합니다. 모호한 데이터는 `unknown`을 사용하거나 인터페이스를 정의하며, `any`는 기술적으로 회피 불가능한 경우에만 최소한으로 사용합니다.
 - **전역 상태 관리:** 전역 상태는 Zustand를 사용하며, `src/stores/authStore.ts`, `src/stores/themeStore.ts`, `src/stores/layoutStore.ts`, `src/stores/appStore.ts`처럼 역할별로 분리합니다.
+- **Overlay 상태 관리:** `Dialog`, `Alert`, `Confirm`, `BottomSheet`의 열림 상태와 뒤로가기 닫기 동작은 화면별 이벤트 리스너로 흩어두지 않고 Zustand 기반 전역 overlay stack 또는 layout store에서 중앙 관리합니다.
 - **뒤로가기 설정:** 헤더 뒤로가기 버튼은 단순 boolean이 아니라 `history`, `route`, `custom` 타입을 가진 설정 객체로 관리합니다. 커스텀 동작은 설정 파일에 함수를 직접 넣지 않고 `actionKey`로 연결합니다.
 - **API 에러 처리:** PocketBase 원본 에러는 화면에서 직접 다루지 않고 `UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `VALIDATION`, `NETWORK`, `SERVER`, `UNKNOWN` 코드 기반의 공통 `AppError` 형태로 변환하여 처리합니다.
 - **검색/필터/정렬:** 검색어, 태그, 정렬, 필터는 URL query와 동기화하고, 변경 시 `DataList`의 페이지/커서 상태를 초기화합니다.

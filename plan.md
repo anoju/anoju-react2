@@ -544,6 +544,8 @@ UI 컴포넌트는 라이브러리를 직접 도입하지 않고 프로젝트 �
 
 `Alert`와 `Confirm`은 내부적으로 `Dialog`를 활용하되 사용성이 최대한 편하도록 명령형 헬퍼와 컴포넌트 방식을 모두 지원하도록 설계합니다.
 
+`Dialog`, `Alert`, `Confirm`, `BottomSheet`는 공통 overlay stack에 등록하여 브라우저 뒤로가기와 헤더 뒤로가기 동작을 일관되게 처리합니다. 사용자가 overlay가 열린 상태에서 브라우저 뒤로가기 또는 Android back gesture를 사용하면 실제 라우트 이동보다 최상단 overlay 닫기를 우선합니다.
+
 ```ts
 await confirm({
   title: '삭제할까요?',
@@ -565,7 +567,29 @@ alert({
 - **접근성:** `Alert`와 `Confirm`은 제목, 설명, 포커스 트랩, ESC/오버레이 닫기 정책, 초기 포커스, 복귀 포커스를 일관되게 처리합니다.
 - **사용 제한:** 단순 안내/확인 메시지에 원시 `Dialog`를 직접 사용하지 않고, 반드시 `Alert` 또는 `Confirm`을 사용합니다.
 
-### 9.3.1 로딩 정책
+#### 9.3.1 Overlay 히스토리 및 뒤로가기 정책
+
+모바일 브라우저와 Android back gesture에서 팝업이 열린 상태로 페이지가 이동되는 것을 막기 위해 overlay와 브라우저 history를 전역에서 연동합니다.
+
+- **전역 stack:** `Dialog`, `Alert`, `Confirm`, `BottomSheet`는 열릴 때 전역 overlay stack에 등록하고 닫힐 때 해제합니다. 화면별로 `popstate` 이벤트를 직접 등록하지 않습니다.
+- **닫기용 history entry:** 첫 overlay가 열리는 순간 브라우저 history에 overlay 닫기용 entry를 1개 추가합니다. overlay가 여러 개 중첩되어도 닫기용 entry는 중복 추가하지 않습니다.
+- **브라우저 뒤로가기:** `popstate` 발생 시 닫을 수 있는 overlay가 있으면 라우트 이동을 진행하지 않고 stack 최상단 overlay만 닫습니다. overlay가 없으면 기존 라우터 뒤로가기 흐름을 그대로 허용합니다.
+- **헤더 뒤로가기:** AppHeader의 뒤로가기 버튼은 열린 overlay가 있으면 `history.back()`이나 route 이동보다 최상단 overlay 닫기를 우선합니다.
+- **닫기 제어:** 기본 overlay는 `closeOnBack: true`로 두고, 저장/삭제/업로드 처리 중처럼 닫히면 안 되는 상태는 `closeOnBack: false` 또는 상태별 guard로 예외 처리합니다.
+- **정리 정책:** overlay가 모두 닫히면 닫기용 history entry가 남아 다음 뒤로가기 흐름을 방해하지 않도록 루트 overlay manager에서 상태를 동기화합니다.
+
+```ts
+type OverlayType = 'dialog' | 'alert' | 'confirm' | 'bottomSheet'
+
+type OverlayEntry = {
+  id: string
+  type: OverlayType
+  close: () => void
+  closeOnBack?: boolean
+}
+```
+
+### 9.3.2 로딩 정책
 
 로딩 UI는 사용자의 흐름을 막지 않는 것을 기본으로 하며, 필요한 범위에만 최소한으로 표시합니다.
 
@@ -912,7 +936,7 @@ PocketBase hook은 NAS 운영 환경의 JSVM 특성과 배포 재시작 절차�
 - **전체메뉴 제외:** 전체메뉴는 별도 페이지에서 관리하므로 헤더에는 전체메뉴 버튼을 배치하지 않습니다.
 - **요소 숨김 처리:** 뒤로가기 버튼, 페이지 타이틀, 홈 버튼, 좌우 확장 영역은 화면별 설정에 따라 숨김 처리할 수 있어야 합니다.
 - **확장 영역:** 좌우 확장 영역은 텍스트, 아이콘 버튼, 상태 표시, 액션 버튼 등 화면별 추가 요소를 주입할 수 있는 슬롯으로 설계합니다.
-- **뒤로가기 동작:** 기본 동작은 `history.back()`으로 처리하되, 화면별 설정에 따라 특정 경로 이동 또는 커스텀 핸들러를 사용할 수 있어야 합니다.
+- **뒤로가기 동작:** 기본 동작은 `history.back()`으로 처리하되, 열린 overlay가 있으면 라우트 이동보다 최상단 overlay 닫기를 우선합니다. 화면별 설정에 따라 특정 경로 이동 또는 커스텀 핸들러를 사용할 수 있어야 합니다.
 
 ### 11.4 하단 플로팅 버튼 정책
 
@@ -972,6 +996,7 @@ type BackButtonConfig =
 - **경로 이동형 뒤로가기:** 목록/상세처럼 돌아갈 경로가 명확한 화면은 `type: 'route'`와 `to` 경로를 사용합니다.
 - **커스텀 뒤로가기:** 작성 취소 확인, 모달 닫기, 임시 저장 처리처럼 화면 상태가 필요한 경우 `type: 'custom'`과 `actionKey`를 사용합니다.
 - **커스텀 액션 분리:** `routeConfig`에는 함수를 직접 넣지 않고 `actionKey`만 선언합니다. 실제 함수는 화면 컴포넌트 또는 레이아웃 액션 레지스트리에서 등록합니다.
+- **Overlay 우선순위:** 모든 뒤로가기 타입은 실행 전에 전역 overlay stack을 확인합니다. 닫을 수 있는 overlay가 있으면 최상단 overlay를 닫고, overlay가 없을 때만 `history`, `route`, `custom` 동작을 실행합니다.
 
 ```ts
 export const routeConfig = [
